@@ -3,58 +3,41 @@ const Login=()=>{
 
     return(<div>
 
-<div class="main-bg">
-        <div class="box-conatiner">
-            <div id="a">
-                <div class="circle-ripple"></div>
-            </div>
+<div className="container" id="container">
+    
 
-            <div class="row">
-                <div class="col-md-6 col-sm-6">
-                    <h1 class="heading-left">For Continue Please Login</h1>
+        <div className="form-container sign-in">
+            <form>
+                <h1>Sign In</h1>
+                <div className="social-icons">
+                    {/* <a href="#" class="icon"><i class="fa-brands fa-google-plus-g"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-facebook-f"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-github"></i></a>
+                    <a href="#" class="icon"><i class="fa-brands fa-linkedin-in"></i></a> */}
                 </div>
-                <div class="col-sm-6 col-md-6">
-                    <div class="wrap-login100">
-                        <span class="login100-form-title">
-                            Sign In
-                        </span>
-                        <form class="login100-form validate-form p-l-55 p-r-55 p-t-20">
-                           
-                            <div class="wrap-input100 validate-input m-b-16" data-validate="Please enter username">
-                                <input class="input100" type="text" name="username" placeholder="Username"/>
-                                <span class="focus-input100"></span>
-                            </div>
-                            <div class="wrap-input100 validate-input" data-validate="Please enter password">
-                                <input class="input100" type="password" name="pass" placeholder="Password"/>
-                                <span class="focus-input100"></span>
-                            </div>
-                            <div class="text-right p-t-13 p-b-23">
-                                <span class="txt1">
-                                    Forgot
-                                </span>
-                                <a href="#" class="txt2">
-                                    Username / Password?
-                                </a>
-                            </div>
-                            <div class="container-login100-form-btn">
-                                <button class="login100-form-btn">
-                                    Sign in
-                                </button>
-                            </div>
-                            <div class="flex-col-c p-t-140 p-b-40">
-                                <span class="txt1 p-b-9">
-                                    Don’t have an account?
-                                </span>
-                                <a href="#" class="txt3">
-                                    Sign up now
-                                </a>
-                            </div>
-                        </form>
-                    </div>
+                <span>or use your email password</span>
+                <input type="email" placeholder="Email"/>
+                <input type="password" placeholder="Password"/>
+                <a href="#">→ Forget Your Password? ←</a>
+                <button>Sign In</button>
+            </form>
+        </div>
+        <div className="toggle-container">
+            <div className="toggle">
+                <div className="toggle-panel toggle-left">
+                    <h1>Welcome Back!</h1>
+                    <p>Enter your personal details to use all of site features</p>
+                    <button className="hidden" id="login">Sign In</button>
+                </div>
+                <div className="toggle-panel toggle-right">
+                    <h1>IOS MANAGEMENT SYSTEM</h1>
+                    <p>Register with your personal details</p>
+                
                 </div>
             </div>
         </div>
     </div>
+    
     </div>)
 }
 export default Login;
