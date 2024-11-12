@@ -1,0 +1,290 @@
+/* ProductPreviewTable.css */
+.bottom-div {
+    display: flex;              /* Use flexbox for layout */
+    justify-content: flex-end; /* Align items to the right */
+    width: 100%;               /* Take full width */
+  }
+  
+  .product-preview-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin: 20px 0;
+  }
+  
+  .product-preview-table th,
+  .product-preview-table td {
+    padding: 10px;
+    border: 1px solid #ccc;
+    text-align: center;
+  }
+  
+  .product-preview-table th {
+    font-weight: bold;
+    background-color: #f8f9fa;
+  }
+  
+  .product-preview-table .highlight-design {
+    background-color: #D24545;
+    color: #FFFFFF;
+  }
+  
+  .product-preview-table .highlight-realisation {
+    background-color: #E9B824;
+    color: black;
+  }
+  
+  .product-preview-table .highlight-testing {
+    background-color: #0B60B0;
+    color: #FFFFFF;
+  }
+  
+  .product-preview-table .highlight-closure {
+    background-color: green;
+    color: #FFFFFF;
+  }
+  
+  .product-preview-table .highlight-in-house {
+    background-color: #FF8911;
+    color: black;
+  }
+  
+  .product-preview-table .highlight-btp {
+    background-color: #FDE767;
+    color: black;
+  }
+  
+  .product-preview-table .highlight-bts {
+    background-color: #B67352;
+    color: black;
+  }
+  
+  .product-preview-table .highlight-cots {
+    background-color: #492E87;
+    color: #FFFFFF;
+  }
+/*----------------genealogy-tree----------*/
+.genealogy-body{
+    white-space: nowrap;
+    overflow-y: hidden;
+    padding: 50px;
+    min-height: 500px;
+    padding-top: 0px;
+    text-align: center;
+  }
+  
+  
+  .genealogy-tree{
+  display: inline-block;
+  }
+  .genealogy-tree ul {
+    padding-top: 20px;
+    position: relative;
+    padding-left: 0px;
+    display: flex;
+    justify-content: center;
+  }
+  .genealogy-tree li {
+    float: left; text-align: center;
+    list-style-type: none;
+    position: relative;
+    padding: 17px 0px 0 0px;
+  }
+  
+   .genealogy-tree li::before, .genealogy-tree li::after{
+    content: '';
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 2px solid #ccc;
+    width: 50%;
+    height: 18px;
+  }
+  .genealogy-tree li::after{
+    right: auto; left: 50%;
+    border-left: 2px solid #ccc;
+  }
+  .genealogy-tree li:only-child::after, .genealogy-tree li:only-child::before {
+    display: none;
+  }
+  .genealogy-tree li:only-child{
+    padding-top: 0;
+  }
+  .genealogy-tree li:first-child::before, .genealogy-tree li:last-child::after{
+    border: 0 none;
+  }
+  .genealogy-tree li:last-child::before{
+     border-right: 2px solid #ccc;
+     border-radius: 0 5px 0 0;
+    -webkit-border-radius: 0 5px 0 0;
+    -moz-border-radius: 0 5px 0 0;
+  }
+  .genealogy-tree li:first-child::after{
+    border-radius: 5px 0 0 0;
+    -webkit-border-radius: 5px 0 0 0;
+    -moz-border-radius: 5px 0 0 0;
+  }
+  .genealogy-tree ul ul::before{
+    content: '';
+    position: absolute; top: 0; left: 50%;
+    border-left: 2px solid #ccc;
+    width: 0; height: 20px;
+  }
+  
+  
+  
+  
+  .genealogy-tree li .before, .genealogy-tree li .after{
+  
+    position: absolute;
+    top: 0;
+    right: 50%;
+    border-top: 1px solid black;
+    width: 50%;
+    height: 18px;
+  }
+  
+  .genealogy-tree li .after{
+    right: auto;
+    left: 50%;
+     border-left: 2px solid black;
+  
+  }
+  
+  
+   .genealogy-tree li:only-child{
+    padding-top: 0;
+  }
+  
+  
+  
+   .genealogy-tree li:last-child .before {
+    border-right: 2px solid black ! important;
+    border-top: 2px solid black ! important;
+    border-radius: 0 5px 0 0 ! important;
+    -webkit-border-radius: 0 5px 0 0 ! important;
+    -moz-border-radius: 0 5px 0 0 ! important;
+  }
+  .genealogy-tree li:last-child .after {
+    border-right: none ! important;
+    border-top: 2px solid black ! important;
+    border-radius: 0 5px 0 0 ! important;
+    -webkit-border-radius: 0 5px 0 0 ! important;
+    -moz-border-radius: 0 5px 0 0 ! important;
+  }
+  
+  .genealogy-tree li:first-child .before {
+  
+    border-radius: 5px 0 0 0 ! important;
+    -webkit-border-radius: 5px 0 0 0 ! important;
+    -moz-border-radius: 5px 0 0 0 ! important;
+    border-top: none ! important;
+  }
+  
+  .genealogy-tree li:first-child .after {
+  
+    border-radius: 5px 0 0 0 ! important;
+    -webkit-border-radius: 5px 0 0 0 ! important;
+    -moz-border-radius: 5px 0 0 0 ! important;
+    border-top: 2px solid black ! important;
+  }
+  
+  
+  .genealogy-tree ul ul .firstchildafter{
+  
+    position: absolute;
+     top: 0;
+     left: 50%;
+    border-left: 2px solid black;
+    width: 0;
+     height: 20px;
+  }
+  
+  
+  .genealogy-tree li .action-view-box{
+     text-decoration: none;
+     /* font-family: arial, verdana, tahoma; */
+     font-size: 11px;
+     display: inline-block;
+     border-radius: 5px;
+    -webkit-border-radius: 5px;
+    -moz-border-radius: 5px;
+  }
+  
+  
+  /*--------------memeber-card-design----------*/
+  .member-view-box{
+    padding:0px 15px;
+    text-align: center;
+    border-radius: 4px;
+    position: relative;
+  }
+  
+  .action-box
+  {
+  
+      border: 1px solid black;
+      max-width:100px;
+      padding: 10px; /* Add padding for better spacing */
+      display: flex; /* Use flexbox for alignment */
+      flex-direction: column; /* Stack children vertically */
+      align-items: flex-center;
+  
+  }
+  
+  
+  .action-box-header
+  {
+  
+      padding:2px;
+       text-align: center;
+  
+  
+  }
+  .corner {
+    position: absolute;
+    width: 20px; /* Adjust the width of the corner */
+    height: 20px; /* Adjust the height of the corner */
+    background-color: red; /* Adjust the color as needed */
+  }
+  
+  .top-left {
+    top: -2px; /* Adjust position from top */
+    left: -2px; /* Adjust position from left */
+  }
+  
+  .top-right {
+    top: -2px; /* Adjust position from top */
+    right: -2px; /* Adjust position from right */
+  }
+  
+  .bottom-left {
+    bottom: -2px; /* Adjust position from bottom */
+    left: -2px; /* Adjust position from left */
+  }
+  
+  .bottom-right {
+    bottom: -2px; /* Adjust position from bottom */
+    right: -2px; /* Adjust position from right */
+  }
+  
+  
+  
+  
+  .action-box-body
+  {
+     padding:0px;
+      text-align: center;
+      background-color:#FFFFFF ;
+      display: block;
+      flex-wrap: wrap;
+      border-bottom-right-radius : 9px;
+      border-bottom-left-radius: 7px;
+  }
+  
+  .levelNameSpan {
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 1.7em;
+    white-space: normal; /* Allows wrapping of text */
+    overflow-wrap: break-word; /* Ensures long words break appropriately */
+}

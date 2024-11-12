@@ -1,0 +1,10 @@
+.summary-btn-outline {
+    color: #9683EC;
+    border-color: #9683EC;
+  }
+  
+  .summary-btn-outline:hover {
+    color: #fff;
+    background-color: #9683EC;
+    border-color:#9683EC;
+  }

@@ -8,8 +8,8 @@
   max-width: 100%;
   min-height: 480px;
   display: flex;
-  margin-left: 300px;
-  margin-top: 50px;
+  /* margin-left: 300px; */
+  /* margin-top: 50px; */
 }
 
 .container-login p{

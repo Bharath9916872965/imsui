@@ -43,6 +43,33 @@ export const login = async (username, password) => {
     }
   };
 
+  export const logout = async (logoutType) => {
+    const user = getCurrentUser();
+    if (user && user.username) {
+      try {
+  
+        // customAuditStampingLogout(user.username, logoutType);
+        localStorage.removeItem('user');
+        localStorage.removeItem('roleId');
+        localStorage.removeItem('password');
+  
+  
+      } catch (error) {
+        console.error('Error occurred in logout:', error);
+        throw error; 
+      }
+    } else {
+      // No user found in localStorage, just remove the item
+      localStorage.removeItem('user');
+      localStorage.removeItem('roleId');
+      localStorage.removeItem('password');
+    }
+  };
+
+  export const getCurrentUser = () => {
+    return JSON.parse(localStorage.getItem('user'));
+  };
+
   export const  getEmpDetails= async(username) => {
     if (!username) {
       throw new Error('No user found');
