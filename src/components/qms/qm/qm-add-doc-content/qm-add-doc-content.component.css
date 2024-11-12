@@ -1,0 +1,111 @@
+.custom-header {
+    position: relative;
+    color: #273746;
+    padding: 3px 10px;
+    border: 0.5px solid #a18dce;
+    border-left: 3px solid #0fba34;
+    border-radius: 3px;
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 16px;
+    overflow: hidden;
+}
+
+.custom-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background-color: #FF3800;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.custom-header:hover::after {
+    animation: slideUpDown 1s ease-out forwards;
+}
+
+.custom-header:hover {
+    border: 0.5px solid #a18dce;
+    padding-left: 10px;
+    animation: 2s;
+}
+
+@keyframes slideUpDown {
+    0% {
+        opacity: 0;
+        height: 0%;
+    }
+
+    100% {
+        opacity: 1;
+        height: 100%;
+    }
+}
+
+.ck-editor__editable_inline {
+    min-height: 500px !important;
+}
+
+:host ::ng-deep .ck-editor__editable_inline {
+    min-height: 500px !important;
+}
+
+/* .angular-editor img {
+    width: 300px !important;
+    height: auto;
+} */
+
+.angular-editor-wrapper img {
+    width: 300px !important;
+    max-width: 100%;
+}
+
+.subHeadingLink {
+    /* border-bottom: 5px solid #512D6D; */
+    border: 1.5px solid #96c6ea;
+    border-radius: 6px;
+    /* background-color: rgba(0, 0, 0, 0.03); */
+    background-color: #ebf4f5;
+    padding: .2rem 1rem;
+    margin: 0.3rem 0rem 0.3rem 0rem;
+}
+
+.form-control {
+    display: inline-block;
+    width: auto;
+}
+
+.editor-title {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+.project-div {
+    font-weight: bold;
+    color: #FEF9EF;
+    /* background-color: #17C3B2 !important; */
+    background: linear-gradient(to right, #727a9a, #ff7b74);
+    border-radius: 1rem !important;
+    text-transform: none !important;
+}
+
+.topButtons {
+    background-color: #103783 !important;
+    text-transform: none !important;
+}
+
+.main-container{
+    overflow: auto !important;
+    flex-grow: 1 !important;
+    padding: 4px !important; 
+    overflow-x: hidden !important;
+  }
+
+
+
+  

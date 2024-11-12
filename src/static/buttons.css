@@ -1,0 +1,169 @@
+@charset "ISO-8859-1";
+
+
+
+.submit{
+    color: white !important;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: #2e7d32!important;
+    border-color: #2e7d32!important;
+  }
+  .submit:disabled {
+    background-color: gray !important;
+    color: #ccc !important;
+    cursor: not-allowed !important; 
+    box-shadow: none !important; 
+  }     
+  
+  
+  .submit:hover{
+    background-color: #74a778!important;
+    border-color: #2e7d32!important;
+  }
+
+
+    
+  .add{
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: #1976d2!important;
+    border-color: #1976d2!important;
+       
+  }
+  
+  
+  .edit:hover{
+    background-color: rgb(255, 181, 44) !important;
+    border-color: rgb(255, 181, 44) !important;
+
+  }
+
+  .add:hover{
+    background-color: #3589dd!important;
+    border-color: #1976d2!important;
+  }
+  
+  
+  .edit{
+    color:black !important;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px ;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+      background-color: rgb(255, 181, 44) !important;
+    border-color: rgb(255, 181, 44) !important;
+  }
+
+  
+  
+  
+  
+
+  .delete{
+    color: white;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: #dd2c00!important;
+    border-color: #dd2c00!important;
+  }
+  
+  
+  .delete:hover{
+    background-color:#eb4559!important;
+    border-color: #dd2c00!important;
+  }
+  
+  
+  .print{
+    color: white;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: purple;
+    border-color: purple;
+  }
+  
+  
+  .back{
+    color: white !important;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: #17a2b8 !important;
+    border-color: #17a2b8 !important;
+  }
+  
+  
+  .back:hover{
+    background-color: #6886c5;
+  }
+  
+  .reset{
+    color: black;
+    padding: 9px 13px 9px 13px;
+    border-radius: 5px;
+    outline: 0;
+    border: 0;
+    text-transform: uppercase;
+    margin: 2px;
+    cursor: pointer;
+    font-weight: 500;
+    box-shadow: 0px 2px 2px lightgray;
+    transition: ease background-color 250ms;
+    background-color: #cccccc;
+    border-color: #cccccc;
+  }
+
+  /* .edit-icon{
+    color: darkorange !important;
+  }
+
+  .delete-icon{
+    color: darkred !important;
+  } */
+   
