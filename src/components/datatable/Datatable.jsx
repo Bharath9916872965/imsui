@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Datatable.css'; // Import custom CSS
 
 const Datatable = ({ columns, data }) => {
-    console.log('columns-------- ',columns)
     const [filterText, setFilterText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -48,8 +47,6 @@ const Datatable = ({ columns, data }) => {
         return sortedData.filter(item =>
             columns.some(column => {
                 const value = column.selector(item);
-                console.log('value------ ',value)
-                console.log('column------ ',column)
                 return value ? value.toString().toLowerCase().includes(filterText.toLowerCase()) : false;
             })
         );

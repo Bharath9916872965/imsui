@@ -5,6 +5,7 @@ import withRouter from '../../../common/with-router';
 import { IconButton} from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import "./qm-revisionrecords.component.css"
+import QmDocPrint from "../../prints/qms/qm-doc-print";
 
 
 const QmRevisionRecordsComponent = ({router}) => {
@@ -35,10 +36,11 @@ const QmRevisionRecordsComponent = ({router}) => {
                       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
                           <>
                               <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
-                              <button className="btn summary-btn-outline btn-sm"  onClick={() => {
+                              {/* <button className="btn summary-btn-outline btn-sm"  onClick={() => {
                                   // setOpenDialog2(true);
                                   // setSingleDoc(item);
-                              }} title="Document Summary"> <i className="material-icons" >summarize</i></button>
+                              }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
+                              {getDocPDF('', item)}
                           </>
                       )}
                   </div>
@@ -57,13 +59,13 @@ const QmRevisionRecordsComponent = ({router}) => {
         fetchData();
       }, []);
 
-    //   const getDocPDF = (action, versionElements) => {
-
-    //   }
+      const getDocPDF = (action, revisionElements) => {
+        return <QmDocPrint action={action} revisionElements={revisionElements}  />
+      }
 
       const redirecttoQmDocument = useCallback((element) => {
         console.log('hhh---')
-        navigate('/qm-add-content', { state: { versionElements: element } })
+        navigate('/qm-add-content', { state: { revisionElements: element } })
       }, [navigate]);
 
 

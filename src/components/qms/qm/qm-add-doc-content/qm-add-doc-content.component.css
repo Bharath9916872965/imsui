@@ -108,4 +108,9 @@
 
 
 
-  
+  .bigger-checkbox {
+    width: 1.5em;
+    height: 1.5em;
+    transform: scale(1.5); /* Adjust the scale factor as needed */
+    margin-right: 10px; /* Add spacing between checkbox and label */
+  }

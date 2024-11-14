@@ -45,6 +45,7 @@
     transition: ease background-color 250ms;
     background-color: #1976d2!important;
     border-color: #1976d2!important;
+    color: white;
        
   }
   
@@ -117,8 +118,8 @@
     font-weight: 500;
     box-shadow: 0px 2px 2px lightgray;
     transition: ease background-color 250ms;
-    background-color: purple;
-    border-color: purple;
+    background-color: #6e78ff;
+    border-color: #6e78ff;
   }
   
   
@@ -166,4 +167,39 @@
   .delete-icon{
     color: darkred !important;
   } */
+
+  /* .circular-button {
+    width: 48px; 
+    height: 48px;
+    border-radius: 50%; 
+    background-color: #1976d2; 
+    color: #1976d2;
+    border: none;
+    cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
+  }
+  
+  .circular-button:hover {
+    background-color: #E8E8E5; 
+  }
+  
+  .circular-button:active {
+    transform: scale(0.9);
+  } */
+  
+  /* .material-icons {
+    font-size: 1.2em; 
+    vertical-align: middle;
+  } */
+
+  .print-btn-outline {
+    color: #9683EC;
+    border-color: #9683EC;
+  }
+  
+  .print-btn-outline:hover {
+    color: #fff;
+    background-color: #9683EC;
+    border-color:#9683EC;
+  }
    
