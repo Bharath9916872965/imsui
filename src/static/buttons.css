@@ -45,6 +45,7 @@
     transition: ease background-color 250ms;
     background-color: #1976d2!important;
     border-color: #1976d2!important;
+    color: white;
        
   }
   
@@ -77,10 +78,6 @@
     border-color: rgb(255, 181, 44) !important;
   }
 
-  
-  
-  
-  
 
   .delete{
     color: white;

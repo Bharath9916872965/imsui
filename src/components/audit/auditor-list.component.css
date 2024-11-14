@@ -1,0 +1,41 @@
+.modal.show {
+    display: block;
+    opacity: 0;
+    transform: scale(0.9);
+    transition: opacity 0.4s ease-in-out, transform 0.4s ease-in-out;
+  }
+  
+  .modal.show.modal-visible {
+    opacity: 1;
+    transform: scale(1);
+  }
+  
+  .modal-dialog.modal-lg-custom {
+    max-width: 40%;
+    margin-top: 9%;
+  }
+  
+  .modal-content-custom {
+    min-height: 400px;
+  }
+
+  .modal-dialog {
+    margin-top: 9%;
+  }
+  
+  .modal-header {
+    padding-top: 0.5rem; 
+    padding-bottom: 0.9rem; 
+    height: auto; 
+  }
+  
+  
+  .modal-header .btn-danger {
+    padding: 0.5rem 0.7rem;
+    font-size: 1rem; 
+    line-height: 1; 
+  }
+
+  .subclass{
+    margin-top: 12rem ;
+  }

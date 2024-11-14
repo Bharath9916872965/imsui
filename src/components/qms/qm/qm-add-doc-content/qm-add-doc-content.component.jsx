@@ -11,7 +11,7 @@ import $ from 'jquery';
 import 'summernote/dist/summernote-lite.css';
 import 'summernote/dist/summernote-lite.js';
 import Navbar from "../../../Navbar/Navbar";
-import AlertConfirmation from "../../../../common/AlertConfirmation.component";
+// import AlertConfirmation from "../../../../common/AlertConfirmation.component";
 
 const QmAddDocContentComponent = ({ router }) => {
 
@@ -973,7 +973,7 @@ const QmAddDocContentComponent = ({ router }) => {
                             </Button>
                       </div>
                   </div>
-                  <AlertConfirmation open={openConfirmationDialog} onClose={handleDialogClose} onConfirm={handleDialogConfirm} message={'Are you sure to update ?'} />
+                  {/*<AlertConfirmation open={openConfirmationDialog} onClose={handleDialogClose} onConfirm={handleDialogConfirm} message={'Are you sure to update ?'} />*/}
                   {/* <ConfirmationDialog open={openConfirmationDialog} onClose={handleDialogClose} onConfirm={handleDialogConfirm} message={'Are you sure to update ?'} />
                   <ConfirmationDialog open={openEditorContentConfirmationDialog} onClose={handleEditorContentDialogClose} onConfirm={handleEditorContentDialogConfirm} message={'Are you sure to update ?'} />
                   <ConfirmationDialog open={openAddChapterConfirmationDialog} onClose={handleAddChapterDialogClose} onConfirm={handleAddChapterDialogConfirm} message={'Are you sure to add chapter ?'} />
