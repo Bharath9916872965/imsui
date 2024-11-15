@@ -4,6 +4,15 @@ import  config  from "../environment/config";
 
 const API_URL=config.API_URL;
 
+
+ export class AuditorDto{
+    
+    constructor(auditorId,isActive){
+        this.auditorId=auditorId;
+        this.isActive=isActive;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -33,7 +42,7 @@ export const getEmployee = async () => {
 export const insertAditor = async (empIds) => {
     
     try {
-        return (await axios.post(`${API_URL}insert-auditor-employees`, { empIds }, {
+        return (await axios.post(`${API_URL}insert-auditor-employees`,  empIds , {
             headers: authHeader()
         })).data;
     } catch (error) {
@@ -41,3 +50,61 @@ export const insertAditor = async (empIds) => {
         throw error; 
     }
 }
+
+export const deleteAditor = async (AuditorId,isActive) => {
+    try {
+      const response = await axios.post(
+          `${API_URL}auditor-delete`,
+          new AuditorDto(AuditorId,isActive),
+         {headers: authHeader() }
+      );
+      return response.data;
+  
+    } catch (error) {
+      console.error('Error occurred in deleteAditor:', error);
+      throw error;
+    }
+  };
+
+  export const getIqaDtoList = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}iqa-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getIqaDtoList', error);
+        throw error; 
+    }
+    
+}
+
+
+export const insertIqa = async (values) => {
+    
+    try {
+        return (await axios.post(`${API_URL}insert-iqa`, values, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in insertIqa', error);
+        throw error; 
+    }
+}
+
+
+export const getIqaById = async (iqaId) => {
+    try {
+  
+      const response = await axios.post(
+          `${API_URL}iqa-edit-data`,
+          { iqaDataId: iqaId },
+         {headers: authHeader() }
+      );
+      return response.data;
+  
+    } catch (error) {
+      console.error('Error occurred in getIqaById:', error);
+      throw error;
+    }
+  };
+
+
