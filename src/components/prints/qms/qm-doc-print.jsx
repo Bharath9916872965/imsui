@@ -26,14 +26,11 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
   useEffect(() => {
 
-    console.log('revisionElements---', revisionElements)
-    console.log('buttonType---', buttonType)
-
 
     Promise.all([getLabDetails(), getLogoImage(), getQmAbbreviationsById(revisionElements.RevisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), ]).then(([labDetails, logoimage, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
       setLabDetails(labDetails);
       setLogoimage(logoimage);
-      console.log('allChaptersLists--pdf---', allChaptersLists)
+      // console.log('DocTemplateAttributes--pdf---', DocTemplateAttributes)
       // setDocAbbreviationsResponse(docAbbreviationsResponse);
       setAllChaptersList(allChaptersLists);
       setDocumentSummaryDto(DocumentSummaryDto);
@@ -124,11 +121,9 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     let mainList = AllChaptersList.filter(chapter => {
       return chapter.chapterParentId === 0
     });
-    console.log('mainList--', mainList)
 
     for (let i = 0; i < mainList.length; i++) {
       var copyArray = { ...mainList[i] };
-      console.log('copyArray--', copyArray)
       // copyArray.unshift((i + 1) + '.');
       copyArray = { ...copyArray, chapterNumber: (i + 1) + '.' };
       // copyArray.chapterContent = setImagesWidth(copyArray.chapterContent, 450);
@@ -151,20 +146,20 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
 
         // ---adiing page break
-        if(copyArray[6]+'' === 'Y'){
-          if((j==0) || (j>0) && firstLvlList[j-1][6]+'' === 'N') {
+        if(copyArray.isPagebreakAfter+'' === 'Y'){
+          if((j==0) || (j>0) && firstLvlList[j-1].isLandscape+'' === 'N') {
             const val = allValues[allValues.length-2]={ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'firstLvlChapers', tocItem: true, tocMargin: [15, 0, 0, 0], pageBreak: 'before' };
           }
 
-          if((j+1<firstLvlList.length) && firstLvlList[j+1][5]+'' === 'N') {
+          if((j+1<firstLvlList.length) && firstLvlList[j+1].isPagebreakAfter+'' === 'N') {
             const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(chaptercontent, 600)) : ''], style: 'firstLvlContent', pageBreak: 'after' };
           }
         }
 
         // ---adding landscape page
-        if(copyArray[7]+'' === 'Y' ){
+        if(copyArray.isLandscape +'' === 'Y' ){
           const val = allValues[allValues.length-2]={ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'firstLvlChapers', tocItem: true, tocMargin: [15, 0, 0, 0], pageOrientation: 'landscape', pageBreak: 'before' };
-          if((j+1<firstLvlList.length) && firstLvlList[j+1][6]+'' === 'N') {
+          if((j+1<firstLvlList.length) && firstLvlList[j+1].isLandscape+'' === 'N') {
             const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(chaptercontent, 600)) : ''], style: 'firstLvlContent', pageOrientation: 'portrait', pageBreak: 'after' };
           } else {
             const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(chaptercontent, 600)) : ''], style: 'firstLvlContent', pageOrientation: 'portrait',  };
@@ -186,20 +181,20 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
 
           // ---adiing page break
-          if(copyArray[6]+'' === 'Y'){
-            if((k==0) || (k>0) && secondLvlList[k-1][6]+'' === 'N') {
+          if(copyArray.isPagebreakAfter+'' === 'Y'){
+            if((k==0) || (k>0) && secondLvlList[k-1].isLandscape+'' === 'N') {
               const val = allValues[allValues.length-2]={ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'secondLvlChapers', tocItem: true, tocMargin: [30, 0, 0, 0], pageBreak: 'before' };
             }
 
-            if((k+1<secondLvlList.length) && secondLvlList[k+1][5]+'' === 'N') {
+            if((k+1<secondLvlList.length) && secondLvlList[k+1].isPagebreakAfter+'' === 'N') {
               const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(copyArray.chapterContent, 600)) : ''], style: 'secondLvlContent', pageBreak: 'after' };
             }
           }
 
           // ---adding landscape page
-          if(copyArray[7]+'' === 'Y'){
+          if(copyArray.isLandscape +'' === 'Y'){
             const val = allValues[allValues.length-2]={ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'secondLvlChapers', tocItem: true, tocMargin: [30, 0, 0, 0] , pageOrientation: 'landscape', pageBreak: 'before' };
-            if((k+1<secondLvlList.length) && secondLvlList[k+1][6]+'' === 'N') {
+            if((k+1<secondLvlList.length) && secondLvlList[k+1].isLandscape+'' === 'N') {
               const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(copyArray.chapterContent, 600)) : ''], style: 'secondLvlContent', pageOrientation: 'portrait', pageBreak: 'after' };
             } else {
               const val2 = allValues[allValues.length-1]={ stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(copyArray.chapterContent, 600)) : ''], style: 'secondLvlContent', pageOrientation: 'portrait',  };
@@ -530,21 +525,21 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
             bold: true,
         },
         mainChaper: {
-            fontSize: DocTemplateAttributes[1],
+            fontSize: DocTemplateAttributes.headerFontSize,
             bold: true,
         },
         chaperContent: {
-            fontSize: DocTemplateAttributes[4],
+            fontSize: DocTemplateAttributes.paraFontSize,
             margin: [0, 10, 0, 10],
             alignment: 'justify',
         },
         firstLvlChapers: {
-            fontSize: DocTemplateAttributes[2],
+            fontSize: DocTemplateAttributes.subHeaderFontsize,
             bold: true,
             margin: [15, 10, 10, 0]
         },
         firstLvlContent: {
-            fontSize: DocTemplateAttributes[4],
+            fontSize: DocTemplateAttributes.paraFontSize,
             margin: [15, 10, 0, 10],
             alignment: 'justify',
         },
@@ -560,12 +555,12 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
         },
 
         secondLvlChapers: {
-            fontSize: DocTemplateAttributes[3],
+            fontSize: DocTemplateAttributes.superHeaderFontsize,
             bold: true,
             margin: [30, 10, 10, 0]
         },
         secondLvlContent: {
-            fontSize: DocTemplateAttributes[4],
+            fontSize: DocTemplateAttributes.paraFontSize,
             margin: [30, 10, 0, 10],
             alignment: 'justify',
         },
@@ -612,7 +607,7 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   }
 
   return (
-    <button  className="btn print-btn-outline btn-sm" onClick={changeTriggerEffect} title="View"> <i className="material-icons"  >print</i></button>
+    <button  className="icon-button print-icon-button" onClick={changeTriggerEffect} title="View"> <i className="material-icons"  >print</i></button>
   );
   
 }

@@ -5,7 +5,7 @@ import { AddNewSection, getUnAddedChapters, UnAddListToAddList } from '../../../
 import './qm-add-doc-content.component.css';
 import AlertConfirmation from '../../../../common/AlertConfirmation.component';
 
-const QmAddIssueDialog = ({ open, onClose }) => {
+const QmAddSectionDialog = ({ open, onClose }) => {
     const [error, setError] = useState(null);
     const [unAddedChapterList, setUnAddedChapterList] = useState([]);
     const [sectionIds, setSectionIds] = useState([]);
@@ -197,4 +197,4 @@ const QmAddIssueDialog = ({ open, onClose }) => {
     );
 };
 
-export default QmAddIssueDialog;
+export default QmAddSectionDialog;

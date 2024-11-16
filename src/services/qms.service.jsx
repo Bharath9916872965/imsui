@@ -23,7 +23,7 @@ export const getQmVersionRecordDtoList = async () => {
 
 export const updatechapterPagebreakAndLandscape = async (chapterPagebreakOrLandscape) => {
     try {
-        return (await axios.post(`${API_URL}updatechapterPagebreakAndLandscape`, chapterPagebreakOrLandscape, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}updatechapter-pagebreak-landscape`, chapterPagebreakOrLandscape, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updatechapterPagebreakAndLandscape', error);
         throw error;
@@ -140,7 +140,6 @@ export const getLogoImage = async () => {
 
 export const getDocSummarybyId = async (documentId) => {
     try {
-        console.log('documentId-----', documentId)
         return (await axios.post(`${API_URL}get-docsummary`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getDocSummarybyId', error);

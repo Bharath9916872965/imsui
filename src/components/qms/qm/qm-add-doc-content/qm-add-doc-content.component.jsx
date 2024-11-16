@@ -12,7 +12,7 @@ import 'summernote/dist/summernote-lite.css';
 import 'summernote/dist/summernote-lite.js';
 import Navbar from "../../../Navbar/Navbar";
 import AlertConfirmation from "../../../../common/AlertConfirmation.component";
-import QmAddIssueDialog from "./qm-add-issue-dialog";
+import QmAddSectionDialog from "./qm-add-section-dialog";
 import QmDocPrint from "../../../prints/qms/qm-doc-print";
 
 const QmAddDocContentComponent = ({ router }) => {
@@ -26,7 +26,6 @@ const QmAddDocContentComponent = ({ router }) => {
   const [ChapterListFirstLvl, setChapterListFirstLvl] = useState([]);
   const [ChapterListSecondLvl, setChapterListSecondLvl] = useState([]);
   const [ChapterListThirdLvl, setChapterListThirdLvl] = useState([]);
-  const [qaqtDocTypeAndProjectDto, setQaqtDocTypeAndProjectDto] = useState(null);
 
   const [editChapterId, setEditChapterId] = useState(null);
   const [ChapterIdFirstLvl, setChapterIdFirstLvl] = useState(null);
@@ -70,7 +69,6 @@ const QmAddDocContentComponent = ({ router }) => {
   const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
-    console.log('revisionElements------', revisionElements)
 
       window.$('#summernote').summernote({
           airMode: false,
@@ -212,12 +210,12 @@ const QmAddDocContentComponent = ({ router }) => {
               }
               setEditorContentChapterId(AllChapters[0].chapterId)
 
-              if (AllChapters[0][5] != null && AllChapters[0][5] + '' === 'Y') {
+              if (AllChapters[0].isPagebreakAfter != null && AllChapters[0].isPagebreakAfter + '' === 'Y') {
                   setIsPagebreakAfter(true);
               } else {
                   setIsPagebreakAfter(false);
               }
-              if (AllChapters[0][6] != null && AllChapters[0][6] + '' === 'Y') {
+              if (AllChapters[0].isLandscape != null && AllChapters[0].isLandscape + '' === 'Y') {
                   setIsLandscape(true);
               } else {
                   setIsLandscape(false);
@@ -245,7 +243,6 @@ const QmAddDocContentComponent = ({ router }) => {
 
       try {
           const response = await getSubChaptersById(chapterId);
-          console.log('response----', response)
 
           if (level === 1) {
               setChapterListFirstLvl(response);
@@ -290,7 +287,7 @@ const QmAddDocContentComponent = ({ router }) => {
                     }
                     getSubChapters(refreshChapterId, level);
                 } else {
-                    getAllChapters(qaqtDocTypeAndProjectDto);
+                    getAllChapters();
                 }
                 Swal.fire({
                     icon: "success",
@@ -311,7 +308,6 @@ const QmAddDocContentComponent = ({ router }) => {
     };
 
   const getQaQtQmChaptersDto = async (editChapter) => {
-    console.log('chapter----', editChapter)
     const chapter = await getChapterById(editChapter.chapterId);
       setEditorTitle(chapter.chapterName)
       if(chapter.chapterContent != null) {
@@ -319,13 +315,13 @@ const QmAddDocContentComponent = ({ router }) => {
           $('#summernote').summernote('code',chapter.chapterContent);
       }
       setEditorContentChapterId(chapter.chapterId);
-      if (chapter[5] != null && chapter[5] + '' === 'Y') {
+      if (chapter.isPagebreakAfter != null && chapter.isPagebreakAfter + '' === 'Y') {
           setIsPagebreakAfter(true);
       } else {
           setIsPagebreakAfter(false);
       }
 
-      if (chapter[6] != null && chapter[6] + '' === 'Y') {
+      if (chapter.isLandscape != null && chapter.isLandscape + '' === 'Y') {
           setIsLandscape(true);
       } else {
           setIsLandscape(false);
@@ -358,7 +354,7 @@ const QmAddDocContentComponent = ({ router }) => {
                 }
                 getSubChapters(deleteRefreshChapterId, deleteLevel);
             } else {
-                getAllChapters(qaqtDocTypeAndProjectDto);
+                getAllChapters();
             }
             Swal.fire({
                 icon: "success",
@@ -439,29 +435,7 @@ const QmAddDocContentComponent = ({ router }) => {
       setOpenEditorContentConfirmationDialog(false);
   };
 
-  
 
-  const handleEditorContentDialogConfirm = async () => {
-      const content = $('#summernote').summernote('code');
-      setOpenEditorContentConfirmationDialog(false)
-      let chaperContent= new Array;
-      chaperContent.push(editorContentChapterId)
-      // chaperContent.push(editorContent)
-      chaperContent.push(content)
-      let res = await updateChapterContent(chaperContent);
-
-      if (res && res > 0) {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setSnackbarMessage('Updated Content Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Update Content Unsuccessful!');
-      }
-      // setEditorContent('');
-      // setEditorContentChapterId('');
-  }
 
 
   const handleSnackbarClose = () => {
@@ -514,7 +488,7 @@ const QmAddDocContentComponent = ({ router }) => {
 
   const handleCloseSectionDialog = () => {
       setOpenDialog(false)
-      getAllChapters(qaqtDocTypeAndProjectDto);
+      getAllChapters();
   };
 
 
@@ -541,6 +515,22 @@ const QmAddDocContentComponent = ({ router }) => {
               </div>
 
               <div id="main-wrapper">
+                  <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
+                      <div align='left' className="d-flex flex-column flex-md-row gap-1">
+                      </div>
+                      <div className="d-flex flex-column flex-md-row gap-1">
+                          {/* <div className="doc-name">
+                                  QUALITY MANUAL
+                          </div> */}
+                      </div>
+                      <div className=" text-md-end mt-2 mt-md-0">
+                         <div className="doc-name">
+                              {/* <button className="doc-name"> */}
+                                  QUALITY MANUAL
+                              {/* </button> */}
+                          </div>
+                      </div>
+                  </div>
                   <div id="card-body" sx={{ marginBottom: '1px!important' }}>
                       {/* <Container maxWidth="xl"> */}
                       <Grid container spacing={2}>
@@ -549,7 +539,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                   <Grid item xs={12} md={6}>
                                       <Card>
                                           <CardContent
-                                              sx={{ height: '80vh', overflowY: 'auto', border: '0.3px solid #ABB2B9' }}
+                                              sx={{ height: '75vh', overflowY: 'auto', border: '0.3px solid #ABB2B9' }}
                                           >
                                               {AllChapters.map((chapter, i) => (
                                                   <Grid key={i}>
@@ -909,7 +899,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                           {AllChapters.length>0 && (
                                           <CardContent
                                               sx={{
-                                                  height: '80vh',
+                                                  height: '75vh',
                                                   overflowY: 'auto',
                                                   border: '0.3px solid #ABB2B9',
                                               }}
@@ -1011,7 +1001,7 @@ const QmAddDocContentComponent = ({ router }) => {
                       onClose={handleCloseSectionDialog}
                       versionElements={versionElements}
                   /> */}
-                  <QmAddIssueDialog
+                  <QmAddSectionDialog
                       open={openDialog}
                       onClose={handleCloseSectionDialog}
                       revisionElements={revisionElements}

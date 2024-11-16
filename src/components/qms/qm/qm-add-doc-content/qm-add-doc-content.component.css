@@ -45,13 +45,6 @@
     }
 }
 
-.ck-editor__editable_inline {
-    min-height: 500px !important;
-}
-
-:host ::ng-deep .ck-editor__editable_inline {
-    min-height: 500px !important;
-}
 
 /* .angular-editor img {
     width: 300px !important;
@@ -65,7 +58,7 @@
 
 .subHeadingLink {
     /* border-bottom: 5px solid #512D6D; */
-    border: 1.5px solid #96c6ea;
+    border: 1.5px solid #595454;
     border-radius: 6px;
     /* background-color: rgba(0, 0, 0, 0.03); */
     background-color: #ebf4f5;
@@ -85,13 +78,16 @@
     overflow-wrap: break-word;
 }
 
-.project-div {
+.doc-name {
     font-weight: bold;
     color: #FEF9EF;
     /* background-color: #17C3B2 !important; */
-    background: linear-gradient(to right, #727a9a, #ff7b74);
+    /* background-color: #a2451a; */
+    background: linear-gradient(to right, #ff4a17, #0a1647);
     border-radius: 1rem !important;
     text-transform: none !important;
+    border-color: #D6D4D4;
+    padding: 10px;
 }
 
 .topButtons {

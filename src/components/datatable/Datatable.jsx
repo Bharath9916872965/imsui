@@ -102,7 +102,7 @@ const Datatable = ({ columns, data }) => {
                 <button
                     key={pageNumber}
                     onClick={() => handlePageChange(pageNumber)}
-                    className={`btn btn-sm ${currentPage === pageNumber ? 'btn-active-page-no' : 'btn-outline-primary'} mx-1`}
+                    className={`btn btn-sm ${currentPage === pageNumber ? 'btn-active-page-no' : 'btn-outline-secondary'} mx-1`}
                 >
                     {pageNumber}
                 </button>
@@ -148,14 +148,14 @@ const Datatable = ({ columns, data }) => {
                 <div className="pagination-buttons">
                     <button
                         onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                        className="btn btn-sm btn-outline-primary mx-1"
+                        className="btn btn-sm btn-outline-secondary mx-1"
                     >
                         Prev
                     </button>
                     {pages}
                     <button
                         onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                        className="btn btn-sm btn-outline-primary mx-1"
+                        className="btn btn-sm btn-outline-secondary mx-1"
                     >
                         Next
                     </button>
