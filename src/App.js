@@ -7,6 +7,7 @@ import Dashboard from './components/dashboard/dashboard.component';
 import QmAddDocContentComponent from './components/qms/qm/qm-add-doc-content/qm-add-doc-content.component';
 import AuditorListComponent from './components/audit/auditor-list.component';
 import IqaListComponent from './components/audit/iqa-list.component';
+import AuditeeListComponent from './components/audit/auditee-list.component';
 
 function App() {
   return (
@@ -24,6 +25,7 @@ function App() {
         {/* Audit */}
         <Route path="/auditor-list" element={<AuditorListComponent />} />
         <Route path="/iqa-list" element={<IqaListComponent />} />
+        <Route path="/auditee-list" element={<AuditeeListComponent />} />
 
 
         

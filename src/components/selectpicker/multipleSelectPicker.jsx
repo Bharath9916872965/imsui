@@ -5,6 +5,7 @@ import { styled } from '@mui/system';
 //import CancelIcon from '@mui/icons-material/Cancel';
 import { MdClose } from "react-icons/md";
 import { MdCheck } from "react-icons/md";
+import { CustomMenuItem } from '../../services/auth.header';
 
 const CustomChip = styled(Chip)({
   margin: '4px',
@@ -12,12 +13,6 @@ const CustomChip = styled(Chip)({
   fontSize: '0.875rem', // Smaller font size
 });
 
-const CustomMenuItem = styled(ListItem)({
-  borderBottom: '1px solid #e0e0e0',
-  '&:last-child': {
-    borderBottom: 'none',
-  },
-});
 
 const HighlightedCross = styled(MdClose)({
   color: 'red', // Change this to your desired highlight color
