@@ -10,6 +10,7 @@ import { Autocomplete, ListItemText, Switch, IconButton, TextField } from "@mui/
 import {AuditeeDto, deleteAuditee, getAuditeeDtoList, getDivisionGroupList, getDivisionList, getEmployee, getProjectList, insertAuditee } from "../../services/audit.service";
 import { CustomMenuItem } from '../../services/auth.header';
 import { FaTrash } from "react-icons/fa";
+import AlertConfirmation from "../../common/AlertConfirmation.component";
 
 
 const AuditeeListComponent = () => {
@@ -175,14 +176,13 @@ const AuditeeListComponent = () => {
         const successMessage = isEditMode ? "Auditee updated Successfully!" : "Auditee Added Successfully!";
         const unsuccessMessage = isEditMode ? "Auditee update Unsuccessful!" : "Auditee Add Unsuccessful!";
         const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
-        Swal.fire({
+        const confirm = await AlertConfirmation({
             title: Title,
-            icon: 'question',
-            showCancelButton: true,
-            confirmButtonText: 'YES',
-            cancelButtonText: 'NO',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+            message: '',
+        });
+      
+          // if (!confirm.isConfirmed) return;
+          if(confirm) {
                 try {
                     const result = await insertAuditee(new AuditeeDto(values.empId, values.groupId, values.divisionId, values.projectId, values.headType, values.auditeeId));
                     if (result === 200) {
@@ -214,20 +214,16 @@ const AuditeeListComponent = () => {
                     Swal.fire('Error!', 'There was an issue adding the auditor.', 'error');
                 }
             }
-        });
     }; 
 
 const handleToggleIsActive = async (auditeeId) => {
-    const result = await Swal.fire({
+    const confirm = await AlertConfirmation({
         title: 'Are you sure to InActive ?',
-        icon: 'warning',
-        showCancelButton: true,
-        confirmButtonColor: '#3085d6',
-        cancelButtonColor: '#d33',
-        confirmButtonText: 'Yes',
-        cancelButtonText: 'No',
+        message: '',
     });
-    if (result.isConfirmed) {
+  
+      // if (!confirm.isConfirmed) return;
+      if(confirm) {
         try {
             const response = await deleteAuditee(auditeeId);
             if (response === 200) {

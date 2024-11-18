@@ -12,6 +12,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { TextareaAutosize, TextField } from "@mui/material";
 import { format } from 'date-fns';
+import AlertConfirmation from "../../common/AlertConfirmation.component";
 
 
 const IqaListComponent = () => {
@@ -114,15 +115,13 @@ const IqaListComponent = () => {
         const unsuccessMessage = isEditMode ? "IQA update Unsuccessful!" : "IQA Add Unsuccessful!";
         const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
         
-        Swal.fire({
-            icon: 'question',
-            title: Title,
-            // text: confirmationText,
-            showCancelButton: true,
-            confirmButtonText: 'YES',
-            cancelButtonText: 'NO',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+        const confirm = await AlertConfirmation({
+            title: 'Are you sure to Add ?',
+            message: '',
+        });
+      
+          // if (!confirm.isConfirmed) return;
+          if(confirm) {
                 try {
                     const result = await insertIqa(values);
                     if (result === 200) {
@@ -148,8 +147,8 @@ const IqaListComponent = () => {
                     Swal.fire('Error!', 'There was an issue inserting IQA the auditor.', 'error');
                 }
             }
-        });
-    }; 
+            };
+
 
     useEffect(() => {
         if (iqaList.length > 0) {

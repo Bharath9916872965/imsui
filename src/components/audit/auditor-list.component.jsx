@@ -7,6 +7,7 @@ import Navbar from "../Navbar/Navbar";
 import "./auditor-list.component.css";
 import Swal from "sweetalert2";
 import MultipleSelectPicker from "../selectpicker/multipleSelectPicker";
+import AlertConfirmation from "../../common/AlertConfirmation.component";
 
 const AuditorListComponent = () => {
   const [showModal, setShowModal] = useState(false);
@@ -82,29 +83,40 @@ const AuditorListComponent = () => {
       return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
     }
 
-    const confirm = await Swal.fire({
-      title: "Are you sure to Add?",
-      icon: "warning",
-      showCancelButton: true,
-      confirmButtonText: "YES",
-      cancelButtonText: "NO",
-    });
+    // const confirm = await Swal.fire({
+    //   title: "Are you sure to Add?",
+    //   icon: "warning",
+    //   showCancelButton: true,
+    //   confirmButtonText: "YES",
+    //   cancelButtonText: "NO",
+    // });
 
-    if (!confirm.isConfirmed) return;
+    const confirm = await AlertConfirmation({
+      title: 'Are you sure to Add ?',
+      message: '',
+  });
 
+    // if (!confirm.isConfirmed) return;
+    if(confirm) {
     try {
       const response = await insertAditor(values.empId);
       if (response === 200) {
         auditorlist();
         setShowModal(false);
         setInitialValues({ empId: [] });
-        Swal.fire("Success!", "Auditor Added Successfully!", "success");
+        Swal.fire({
+          icon: "success",
+          title: "Auditor Added Successfully!",
+          showConfirmButton: false,
+          timer: 1500
+      });
       } else {
         Swal.fire("Error!", "Failed to Add Auditor!", "error");
       }
     } catch (error) {
       console.error("Error adding auditor:", error);
       Swal.fire("Error!", "There was an issue adding the auditor.", "error");
+    }
     }
   };
 
@@ -129,7 +141,7 @@ const AuditorListComponent = () => {
             <div className="modal fade show" style={{ display: "block" }}>
               <div className="modal-dialog modal-lg modal-lg-custom">
                 <div className="modal-content modal-content-custom">
-                  <div className="modal-header d-flex justify-content-between bg-primary text-white modal-header-custom">
+                  <div className="modal-header bg-secondary d-flex justify-content-between text-white modal-header-custom">
                     <h5 className="modal-title">Auditor Add</h5>
                     <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
                       &times;
