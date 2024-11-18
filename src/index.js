@@ -6,6 +6,9 @@ import reportWebVitals from './reportWebVitals';
 import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.min.js"
+import Swal from 'sweetalert2';
+
+window.Swal = Swal;
 
 window.$ = window.jQuery = require("jquery");
 require("bootstrap");

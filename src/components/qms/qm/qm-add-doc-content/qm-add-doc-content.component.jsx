@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import withRouter from '../../../../common/with-router';
-import { addChapterNameById, deleteChapterByChapterIdId, getQmAllChapters, getSubChaptersById, updateChapterContent, updateChapterNameById, updatechapterPagebreakAndLandscape } from "../../../../services/qms.service";
-import {Button, Card, CardContent, FormControlLabel, Grid, IconButton, Snackbar, Switch, TextField, Tooltip, Typography, Alert} from '@mui/material';
+import { addChapterNameById, deleteChapterByChapterIdId, getChapterById, getQmAllChapters, getSubChaptersById, updateChapterContent, updateChapterNameById, updatechapterPagebreakAndLandscape } from "../../../../services/qms.service";
+import {Button, Card, CardContent, FormControlLabel, Grid, IconButton, Switch, TextField, Tooltip, Typography, Alert} from '@mui/material';
 import { Helmet } from 'react-helmet';
 
 import './qm-add-doc-content.component.css';
@@ -11,7 +11,9 @@ import $ from 'jquery';
 import 'summernote/dist/summernote-lite.css';
 import 'summernote/dist/summernote-lite.js';
 import Navbar from "../../../Navbar/Navbar";
-// import AlertConfirmation from "../../../../common/AlertConfirmation.component";
+import AlertConfirmation from "../../../../common/AlertConfirmation.component";
+import QmAddSectionDialog from "./qm-add-section-dialog";
+import QmDocPrint from "../../../prints/qms/qm-doc-print";
 
 const QmAddDocContentComponent = ({ router }) => {
 
@@ -19,12 +21,11 @@ const QmAddDocContentComponent = ({ router }) => {
   const { navigate, location } = router
   const [isLoading, setIsLoading] = useState(true);
   const [error, setError] = useState(null);
-  const { versionElements } = location.state || {};
+  const { revisionElements } = location.state || {};
   const [AllChapters, setAllChapters] = useState([]);
   const [ChapterListFirstLvl, setChapterListFirstLvl] = useState([]);
   const [ChapterListSecondLvl, setChapterListSecondLvl] = useState([]);
   const [ChapterListThirdLvl, setChapterListThirdLvl] = useState([]);
-  const [qaqtDocTypeAndProjectDto, setQaqtDocTypeAndProjectDto] = useState(null);
 
   const [editChapterId, setEditChapterId] = useState(null);
   const [ChapterIdFirstLvl, setChapterIdFirstLvl] = useState(null);
@@ -39,10 +40,7 @@ const QmAddDocContentComponent = ({ router }) => {
   const [AddNewChapterFormSecondLvl, setAddNewChapterFormSecondLvl] = useState({
       SubChapterName: ''
   });
-  const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
   const [openEditorContentConfirmationDialog, setOpenEditorContentConfirmationDialog] = useState(false);
-  const [openAddChapterConfirmationDialog, setOpenAddChapterConfirmationDialog] = useState(false);
-  const [openDeleteConfirmationDialog, setOpenDeleteConfirmationDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
 
   const [snackbarOpen, setSnackbarOpen] = useState(false);
@@ -66,8 +64,6 @@ const QmAddDocContentComponent = ({ router }) => {
 
   const [content, setContent] = useState('Enter something.....');
   const [openDialog, setOpenDialog] = useState(false);
-  const [openDialog2, setOpenDialog2] = useState(false);
-  const [openDialog3, setOpenDialog3] = useState(false);
 
   const [isPagebreakAfter, setIsPagebreakAfter] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
@@ -103,7 +99,7 @@ const QmAddDocContentComponent = ({ router }) => {
                   ]
               ]
           },
-          height: '500px',
+          height: '400px',
           placeholder: 'Enter text here...',
           toolbar: [
               ['misc', ['codeview', 'undo', 'redo', 'codeBlock']],
@@ -133,6 +129,7 @@ const QmAddDocContentComponent = ({ router }) => {
           
       });
 
+      $('#summernote').summernote('code', editorContent);
 
       return () => {
           $('#summernote').summernote('destroy');
@@ -204,23 +201,21 @@ const QmAddDocContentComponent = ({ router }) => {
 
           let AllChapters = await getQmAllChapters();
           AllChapters=AllChapters.filter(obj => obj.chapterParentId == 0)
-          console.log('-sfsdfsdfs----', AllChapters)
           if (AllChapters && AllChapters.length > 0) {
-              setEditorTitle(AllChapters[0][3]);
+              setEditorTitle(AllChapters[0].chapterName);
               // setEditorChapterId(AllChapters[0][0])
-              console.log('AllChapters[0][4]-----', AllChapters[0][4]);
-              if(AllChapters[0][4] !== null){
-                  setEditorContent(AllChapters[0][4]);
-                  $('#summernote').summernote('code', AllChapters[0][4]);
+              if(AllChapters[0].chapterContent !== null){
+                  setEditorContent(AllChapters[0].chapterContent);
+                  $('#summernote').summernote('code', AllChapters[0].chapterContent);
               }
-              setEditorContentChapterId(AllChapters[0][0])
+              setEditorContentChapterId(AllChapters[0].chapterId)
 
-              if (AllChapters[0][5] != null && AllChapters[0][5] + '' === 'Y') {
+              if (AllChapters[0].isPagebreakAfter != null && AllChapters[0].isPagebreakAfter + '' === 'Y') {
                   setIsPagebreakAfter(true);
               } else {
                   setIsPagebreakAfter(false);
               }
-              if (AllChapters[0][6] != null && AllChapters[0][6] + '' === 'Y') {
+              if (AllChapters[0].isLandscape != null && AllChapters[0].isLandscape + '' === 'Y') {
                   setIsLandscape(true);
               } else {
                   setIsLandscape(false);
@@ -248,7 +243,6 @@ const QmAddDocContentComponent = ({ router }) => {
 
       try {
           const response = await getSubChaptersById(chapterId);
-          console.log('response----', response)
 
           if (level === 1) {
               setChapterListFirstLvl(response);
@@ -275,200 +269,213 @@ const QmAddDocContentComponent = ({ router }) => {
       }
   };
 
-  const updateChapterName = (chapterId) => {
-      setOpenConfirmationDialog(true);
-      // setDialogMessage('Are you sure to update ?')
-  };
+    const updateChapterName = async () => {
+        const isConfirmed = await AlertConfirmation({
+            title: 'Are you sure to update ?',
+            message: '',
+        });
 
-  const getQaQtQmChaptersDto = (chapter) => {
+        if (isConfirmed) {
+            let res = await updateChapterNameById(editChapterId, editChapterForm.editChapterName);
+
+            if (res && res > 0) {
+                if (level > 0) {
+                    if (level === 1) {
+                        setChapterIdFirstLvl(null);
+                    } else if (level === 2) {
+                        setChapterIdSecondLvl(null);
+                    }
+                    getSubChapters(refreshChapterId, level);
+                } else {
+                    getAllChapters();
+                }
+                Swal.fire({
+                    icon: "success",
+                    title: "Updated Chapter Successfully!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: "error",
+                    title: "Update Chapter Unsuccessful!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+        }
+        setEditChapterId(null);
+    };
+
+  const getQaQtQmChaptersDto = async (editChapter) => {
+    const chapter = await getChapterById(editChapter.chapterId);
       setEditorTitle(chapter.chapterName)
-      if(chapter[4] != null) {
-          setEditorContent(chapter[4])
-          $('#summernote').summernote('code',chapter[4]);
+      if(chapter.chapterContent != null) {
+          setEditorContent(chapter.chapterContent)
+          $('#summernote').summernote('code',chapter.chapterContent);
       }
       setEditorContentChapterId(chapter.chapterId);
-      if (chapter[5] != null && chapter[5] + '' === 'Y') {
+      if (chapter.isPagebreakAfter != null && chapter.isPagebreakAfter + '' === 'Y') {
           setIsPagebreakAfter(true);
       } else {
           setIsPagebreakAfter(false);
       }
 
-      if (chapter[6] != null && chapter[6] + '' === 'Y') {
+      if (chapter.isLandscape != null && chapter.isLandscape + '' === 'Y') {
           setIsLandscape(true);
       } else {
           setIsLandscape(false);
       }
   };
 
-  const deleteChapterById = (reloadchpter, chapterId, level) => {
+  const deleteChapterById = async (reloadchpter, chapterId, level) => {
       // console.log('Deleting chapter', chapterId);
       setDeleteChapterId(chapterId)
       setDeleteRefreshChapterId(reloadchpter)
       setDeleteLevel(level)
-      setOpenDeleteConfirmationDialog(true)
+
+
+        
+        const isConfirmed = await AlertConfirmation({
+            title: 'Are you sure to delete ?',
+            message: '',
+        });
+
+        if (isConfirmed) {
+
+        let res = await deleteChapterByChapterIdId(chapterId);
+  
+        if (res && res > 0) {
+            if (deleteLevel > 0) {
+                if (deleteLevel === 1) {
+                    setChapterIdFirstLvl(null);
+                } else if (deleteLevel === 2) {
+                    setChapterIdSecondLvl(null);
+                }
+                getSubChapters(deleteRefreshChapterId, deleteLevel);
+            } else {
+                getAllChapters();
+            }
+            Swal.fire({
+                icon: "success",
+                title: "Deleted Chapter Successfully!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        } else {
+            Swal.fire({
+                icon: "error",
+                title: "Delete Chapter Unsuccessful!",
+                showConfirmButton: false,
+                timer: 1500
+            });
+        }
+  
+    }
+
   };
 
-  const submitAddSubChapterForm = (chapterId, level) => {
-      setAddChapterLevel(level);
-      setAddChapterToId(chapterId);
-      setOpenAddChapterConfirmationDialog(true);
-  };
+    const submitAddSubChapterForm = async (chapterId, level, chapterName) => {
+        setAddChapterLevel(level);
+        setAddChapterToId(chapterId);
 
-  const handleDialogClose = () => {
-      setOpenConfirmationDialog(false);
-  };
+        const isConfirmed = await AlertConfirmation({
+            title: 'Are you sure to add chapter ?',
+            message: '',
+        });
+
+        if (isConfirmed) {
+
+            try {
+
+                let res = await addChapterNameById(chapterId, chapterName);
+
+                if (res && res > 0) {
+                    if (level > 0) {
+                        if (level === 1) {
+                            setChapterIdFirstLvl(null);
+                        } else if (level === 2) {
+                            setChapterIdSecondLvl(null);
+                        }
+                        getSubChapters(chapterId, level);
+                    } else {
+                        getAllChapters();
+                    }
+                    Swal.fire({
+                        icon: "success",
+                        title: "Added Chapter Successfully!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Add Chapter Unsuccessful!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+
+                setAddChapterLevel(0);
+                setAddChapterToId(0);
+                setAddNewChapterFormSecondLvl({ SubChapterName: '' });
+                setAddNewChapterFormThirdLvl({ SubChapterName: '' });
+            } catch {
+                setError('An error occurred');
+                setIsLoading(false);
+                console.error(error)
+            }
+        }
+
+    };
+
 
   const handleEditorContentDialogClose = () => {
       setOpenEditorContentConfirmationDialog(false);
   };
 
-  const handleAddChapterDialogClose = () => {
-      setOpenAddChapterConfirmationDialog(false);
-  };
-  
-  const handleDeleteDialogClose = () => {
-      setOpenDeleteConfirmationDialog(false);
-      setDeleteChapterId('')
-      setDeleteRefreshChapterId('')
-      setDeleteLevel('')
-  };
 
-  const handleDialogConfirm = async () => {
-      setOpenConfirmationDialog(false);
 
-      let chapterName = new Array;
-      chapterName.push(editChapterId)
-      chapterName.push(editChapterForm.editChapterName)
-
-      let res = await updateChapterNameById(chapterName);
-
-      if (res && res > 0) {
-          if (level > 0) {
-              if (level === 1) {
-                  setChapterIdFirstLvl(null);
-              } else if (level === 2) {
-                  setChapterIdSecondLvl(null);
-              }
-              getSubChapters(refreshChapterId, level);
-          } else {
-              getAllChapters(qaqtDocTypeAndProjectDto);
-          }
-          setSnackbarOpen(true);
-          setSnackbarMessage('Updated Chapter Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Update Chapter Unsuccessful!');
-      }
-
-      setEditChapterId(null);
-  };
-
-  const handleEditorContentDialogConfirm = async () => {
-      const content = $('#summernote').summernote('code');
-      setOpenEditorContentConfirmationDialog(false)
-      let chaperContent= new Array;
-      chaperContent.push(editorContentChapterId)
-      // chaperContent.push(editorContent)
-      chaperContent.push(content)
-      let res = await updateChapterContent(chaperContent);
-
-      if (res && res > 0) {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setSnackbarMessage('Updated Content Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Update Content Unsuccessful!');
-      }
-      // setEditorContent('');
-      // setEditorContentChapterId('');
-  }
-
-  const handleDeleteDialogConfirm = async () => {
-      setOpenDeleteConfirmationDialog(false);
-      
-      let res = await deleteChapterByChapterIdId(deleteChapterId);
-
-      if (res && res > 0) {
-          if (deleteLevel > 0) {
-              if (deleteLevel === 1) {
-                  setChapterIdFirstLvl(null);
-              } else if (deleteLevel === 2) {
-                  setChapterIdSecondLvl(null);
-              }
-              getSubChapters(deleteRefreshChapterId, deleteLevel);
-          } else {
-              getAllChapters(qaqtDocTypeAndProjectDto);
-          }
-          setSnackbarOpen(true);
-          setSnackbarSeverity('success');
-          setSnackbarMessage('Deleted Chapter Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Delete Chapter Unsuccessful!');
-      }
-
-  };
-
-  const handleAddChapterDialogConfirm = async () => {
-
-      try {
-          setOpenAddChapterConfirmationDialog(false);
-          var ChapterNameAndId = new Array;
-          ChapterNameAndId.push(addChapterToId)
-          if (addChapterLevel === 1) {
-              // ChapterNameAndId = AddNewChapterFormSecondLvl.SubChapterName + '/-/' + addChapterToId;
-              ChapterNameAndId.push(AddNewChapterFormSecondLvl.SubChapterName)
-              // setAddNewChapterFormSecondLvl({SubChapterName : ''})
-          } else if (addChapterLevel == 2) {
-              // ChapterNameAndId = AddNewChapterFormThirdLvl.SubChapterName + '/-/' + addChapterToId;
-              ChapterNameAndId.push(AddNewChapterFormThirdLvl.SubChapterName)
-              // setAddNewChapterFormThirdLvl({SubChapterName : ''})
-          }
-
-          let res = await addChapterNameById(ChapterNameAndId);
-
-          if (res && res > 0) {
-              if (addChapterLevel > 0) {
-                  if (addChapterLevel === 1) {
-                      setChapterIdFirstLvl(null);
-                  } else if (addChapterLevel === 2) {
-                      setChapterIdSecondLvl(null);
-                  }
-                  getSubChapters(addChapterToId, addChapterLevel);
-              } else {
-                  getAllChapters(qaqtDocTypeAndProjectDto);
-              }
-              setSnackbarOpen(true);
-              setSnackbarMessage('Updated Chapter Successfully');
-          } else {
-              setSnackbarOpen(true);
-              setSnackbarSeverity('error');
-              setSnackbarMessage('Update Chapter Unsuccessful!');
-          }
-
-          setAddChapterLevel(0);
-          setAddChapterToId(0);
-          setAddNewChapterFormSecondLvl({ SubChapterName: '' });
-          setAddNewChapterFormThirdLvl({ SubChapterName: '' });
-      } catch {
-          setError('An error occurred');
-          setIsLoading(false);
-          console.error(error)
-      }
-
-  };
 
   const handleSnackbarClose = () => {
       setSnackbarOpen(false);
   };
 
-  const updateEditorContent = () => {
-      setOpenEditorContentConfirmationDialog(true);
-  };
+    const updateEditorContent = async () => {
+        //   setOpenEditorContentConfirmationDialog(true);
+
+        const isConfirmed = await AlertConfirmation({
+            title: 'Are you sure to update ?',
+            message: '',
+        });
+
+        if (isConfirmed) {
+            const content = $('#summernote').summernote('code');
+            setOpenEditorContentConfirmationDialog(false)
+            // let chaperContent = new Array;
+            // chaperContent.push(editorContentChapterId)
+            // chaperContent.push(content)
+            let res = await updateChapterContent(editorContentChapterId, content);
+
+            if (res && res > 0) {
+                Swal.fire({
+                    icon: "success",
+                    title: "Updated Content Successfully!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            } else {
+                Swal.fire({
+                    icon: "success",
+                    title: "Update Content Unsuccessful!",
+                    showConfirmButton: false,
+                    timer: 1500
+                });
+            }
+
+        }
+    };
 
   const handleChange = (e) => {
       // console.log('--editor value---',e.target.value)
@@ -481,46 +488,16 @@ const QmAddDocContentComponent = ({ router }) => {
 
   const handleCloseSectionDialog = () => {
       setOpenDialog(false)
-      getAllChapters(qaqtDocTypeAndProjectDto);
+      getAllChapters();
   };
-  const handleCloseAbbreviationDialog = () => {
-      setOpenDialog2(false)
-  };
-  const handleCloseRefDocDialog = () => {
-      setOpenDialog3(false)
-  };
-
-  const handleAbbreviationDialogConfirm = async (res)=>{
-      if (res && res>0) {
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-          setSnackbarMessage('Abbreviation Submitted Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Abbreviation Submit Unsuccessful!');
-      }
-  }
-
-  const handleRefDocConfirm = async (res)=>{
-      if (res && res>0) {
-          setSnackbarSeverity('success');
-          setSnackbarOpen(true);
-          setSnackbarMessage('Reference Document Added Successfully');
-      } else {
-          setSnackbarOpen(true);
-          setSnackbarSeverity('error');
-          setSnackbarMessage('Reference Document Add Unsuccessful!');
-      }
-  }
 
 
   const goBack = () => {
     navigate(-1);
   };
 
-  const getDocPDF = (docType, versionElements) => {
-
+  const getDocPDF = (action) => {
+    return <QmDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
   }
 
 
@@ -538,6 +515,22 @@ const QmAddDocContentComponent = ({ router }) => {
               </div>
 
               <div id="main-wrapper">
+                  <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
+                      <div align='left' className="d-flex flex-column flex-md-row gap-1">
+                      </div>
+                      <div className="d-flex flex-column flex-md-row gap-1">
+                          {/* <div className="doc-name">
+                                  QUALITY MANUAL
+                          </div> */}
+                      </div>
+                      <div className=" text-md-end mt-2 mt-md-0">
+                         <div className="doc-name">
+                              {/* <button className="doc-name"> */}
+                                  QUALITY MANUAL
+                              {/* </button> */}
+                          </div>
+                      </div>
+                  </div>
                   <div id="card-body" sx={{ marginBottom: '1px!important' }}>
                       {/* <Container maxWidth="xl"> */}
                       <Grid container spacing={2}>
@@ -546,7 +539,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                   <Grid item xs={12} md={6}>
                                       <Card>
                                           <CardContent
-                                              sx={{ height: '80vh', overflowY: 'auto', border: '0.3px solid #ABB2B9' }}
+                                              sx={{ height: '75vh', overflowY: 'auto', border: '0.3px solid #ABB2B9' }}
                                           >
                                               {AllChapters.map((chapter, i) => (
                                                   <Grid key={i}>
@@ -795,7 +788,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                                                                                       </Grid>
                                                                                                       <Grid item xs={2.5}>
                                                                                                           <Button
-                                                                                                              onClick={() => submitAddSubChapterForm(chapter1.chapterId, 2)}
+                                                                                                              onClick={() => submitAddSubChapterForm(chapter1.chapterId, 2, AddNewChapterFormThirdLvl.SubChapterName)}
                                                                                                               disabled={!AddNewChapterFormThirdLvl.SubChapterName}
                                                                                                               variant="contained"
                                                                                                               color="primary"
@@ -832,7 +825,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                                                               </Grid>
                                                                               <Grid item xs={2}>
                                                                                   <Button
-                                                                                      onClick={() => submitAddSubChapterForm(chapter.chapterId, 1)}
+                                                                                      onClick={() => submitAddSubChapterForm(chapter.chapterId, 1, AddNewChapterFormSecondLvl.SubChapterName)}
                                                                                       disabled={!AddNewChapterFormSecondLvl.SubChapterName}
                                                                                       variant="contained"
                                                                                       color="primary"
@@ -858,36 +851,61 @@ const QmAddDocContentComponent = ({ router }) => {
 
 
                                               ))}
-                                              <Grid>
-                                              <Tooltip title="Add Sections">
-                                                  <Button 
-                                                      variant="contained" 
-                                                      color="primary" 
-                                                      // title='Add Sections'
-                                                      sx={{ mt: 3 }} // MUI spacing instead of Bootstrap's mt-3
-                                                      onClick={handleOpenUnaddedSections}
-                                                  >
-                                                      <i className="material-icons">playlist_add</i>
-                                                  </Button>
-                                              </Tooltip>
-                                              </Grid>
+                                              <div className="text-start"> 
+                                                  <div title="Add Sections">
+                                                      <button
+                                                          className="btn btn-primary mt-3"
+                                                          onClick={handleOpenUnaddedSections}
+                                                      >
+                                                          <i className="material-icons">playlist_add</i>
+                                                      </button>
+                                                  </div>
+                                              </div>
+                                              {/* <Grid className="custom-header" alignItems="center">
+                                                  <Grid item xs={8}>
+                                                      <Grid container spacing={2} alignItems="center">
+                                                          <Grid item xs={1}>
+                                                              {AllChapters?.length > 0 ? AllChapters.length + 1 : 1}.
+                                                          </Grid>
+                                                          <Grid item xs={9}>
+                                                              <TextField size="small"
+                                                                  fullWidth
+                                                                  label="Add New Sub Chapter"
+                                                                  value={AddNewChapterFormThirdLvl.SubChapterName}
+                                                                  onChange={(e) => setAddNewChapterFormThirdLvl({ SubChapterName: e.target.value })}
+                                                              />
+                                                          </Grid>
+                                                          <Grid item xs={2}>
+                                                              <Button
+                                                                  onClick={() => submitAddSubChapterForm(0, 0, AddNewChapterFormThirdLvl.SubChapterName)}
+                                                                  disabled={!AddNewChapterFormThirdLvl.SubChapterName}
+                                                                  variant="contained"
+                                                                  color="primary"
+                                                              >
+                                                                  Add
+                                                              </Button>
+                                                          </Grid>
+                                                      </Grid>
+
+                                                  </Grid>
+                                              </Grid> */}
                                           </CardContent>
                                       </Card>
                                   </Grid>
 
 
                                   <Grid item xs={12} md={6}>
-                                      <Card>
+                                      <Card className="text-start">
                                           {AllChapters.length>0 && (
                                           <CardContent
                                               sx={{
-                                                  height: '80vh',
+                                                  height: '75vh',
                                                   overflowY: 'auto',
                                                   border: '0.3px solid #ABB2B9',
                                               }}
                                           >
-                                              <div className="m-2" display="flex" flexDirection="row">
-                                                  <div flexGrow={1}>
+                                              <div className="d-flex flex-row m-2" >
+                                                  <div >
                                                       <Typography
                                                           // variant="h5"
                                                           component="div"
@@ -943,14 +961,13 @@ const QmAddDocContentComponent = ({ router }) => {
                                               </div>
                                                   {/* <div>{editorContent}</div> */}
 
-                                              <div textAlign="center" mt={3}>
-                                                  <Button
-                                                      variant="contained"
-                                                      className='edit'
+                                              <div mt={3} className="text-center mt-1">
+                                                  <button
+                                                      className='btn edit'
                                                       onClick={() => updateEditorContent()}
                                                   >
                                                       Update
-                                                  </Button>
+                                                  </button>
                                               </div>
                                           </CardContent>
                                           )}
@@ -965,29 +982,30 @@ const QmAddDocContentComponent = ({ router }) => {
                       {/* </Container> */}
                       <div className='m-3' align="center" >
                               {getDocPDF()}
-                              <Button
+                              <button
                                 onClick={goBack}
                                 className="back ms-1"
                             >
                                 Back
-                            </Button>
+                            </button>
                       </div>
                   </div>
-                  {/*<AlertConfirmation open={openConfirmationDialog} onClose={handleDialogClose} onConfirm={handleDialogConfirm} message={'Are you sure to update ?'} />*/}
-                  {/* <ConfirmationDialog open={openConfirmationDialog} onClose={handleDialogClose} onConfirm={handleDialogConfirm} message={'Are you sure to update ?'} />
-                  <ConfirmationDialog open={openEditorContentConfirmationDialog} onClose={handleEditorContentDialogClose} onConfirm={handleEditorContentDialogConfirm} message={'Are you sure to update ?'} />
-                  <ConfirmationDialog open={openAddChapterConfirmationDialog} onClose={handleAddChapterDialogClose} onConfirm={handleAddChapterDialogConfirm} message={'Are you sure to add chapter ?'} />
-                  <ConfirmationDialog open={openDeleteConfirmationDialog} onClose={handleDeleteDialogClose} onConfirm={handleDeleteDialogConfirm} message={'Are you sure to delete ?'} />*/}
-                  <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} sx={{ marginTop: '50px' }}> 
+                  {/* <ConfirmationDialog open={openEditorContentConfirmationDialog} onClose={handleEditorContentDialogClose} onConfirm={handleEditorContentDialogConfirm} message={'Are you sure to update ?'} />*/}
+                  {/* <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} sx={{ marginTop: '50px' }}> 
                       <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                           {snackbarMessage}
                       </Alert>
-                  </Snackbar>
+                  </Snackbar> */}
                   {/* <QaqtDocsAddDocContentAddSectionDialog
                       open={openDialog}
                       onClose={handleCloseSectionDialog}
                       versionElements={versionElements}
                   /> */}
+                  <QmAddSectionDialog
+                      open={openDialog}
+                      onClose={handleCloseSectionDialog}
+                      revisionElements={revisionElements}
+                  />
               </div>
           </div>
 

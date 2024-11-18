@@ -5,6 +5,8 @@ import withRouter from '../../../common/with-router';
 import { IconButton} from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import "./qm-revisionrecords.component.css"
+import QmDocPrint from "../../prints/qms/qm-doc-print";
+import { format } from "date-fns";
 
 
 const QmRevisionRecordsComponent = ({router}) => {
@@ -29,16 +31,18 @@ const QmRevisionRecordsComponent = ({router}) => {
               from: index+1 < VersionRecorList.length ? 'I'+VersionRecorList[index+1].issueNo+'-R'+VersionRecorList[index+1].revisionNo : '--',
               to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
               issueDate: item.dateOfRevision,
+              issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
               status: item.statusCode || '--',
               action: (
                   <div>
                       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
                           <>
-                              <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
-                              <button className="btn summary-btn-outline btn-sm"  onClick={() => {
+                              <button className="icon-button edit-icon-button me-1" style={{color: "red"}} onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
+                              {/* <button className="btn summary-btn-outline btn-sm"  onClick={() => {
                                   // setOpenDialog2(true);
                                   // setSingleDoc(item);
-                              }} title="Document Summary"> <i className="material-icons" >summarize</i></button>
+                              }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
+                              {getDocPDF('', item)}
                           </>
                       )}
                   </div>
@@ -57,19 +61,19 @@ const QmRevisionRecordsComponent = ({router}) => {
         fetchData();
       }, []);
 
-    //   const getDocPDF = (action, versionElements) => {
-
-    //   }
+      const getDocPDF = (action, revisionElements) => {
+        return <QmDocPrint action={action} revisionElements={revisionElements}  />
+      }
 
       const redirecttoQmDocument = useCallback((element) => {
         console.log('hhh---')
-        navigate('/qm-add-content', { state: { versionElements: element } })
+        navigate('/qm-add-content', { state: { revisionElements: element } })
       }, [navigate]);
 
 
       const columns = [
         { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-        { name: 'Description', selector: (row) => row.description , sortable: true, grow: 2, align: 'text-center' },
+        { name: 'Description', selector: (row) => row.description , sortable: true, grow: 2, align: 'text-start' },
         { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
         { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
         { name: 'Date Of Revision', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
