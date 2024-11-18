@@ -159,7 +159,7 @@ const Login = (props) => {
                     </div>
                     <div className="toggle-panel toggle-right">
                         <h1>ISO Monitoring <br /> System</h1>
-                        <p>Register with your personal details</p>
+                        {/* <p>Register with your personal details</p> */}
 
                     </div>
                 </div>

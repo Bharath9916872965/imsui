@@ -3,7 +3,6 @@ import 'bootstrap/dist/css/bootstrap.min.css';
 import './Datatable.css'; // Import custom CSS
 
 const Datatable = ({ columns, data }) => {
-    console.log('columns-------- ',columns)
     const [filterText, setFilterText] = useState('');
     const [currentPage, setCurrentPage] = useState(1);
     const [sortConfig, setSortConfig] = useState({ key: null, direction: 'asc' });
@@ -48,8 +47,6 @@ const Datatable = ({ columns, data }) => {
         return sortedData.filter(item =>
             columns.some(column => {
                 const value = column.selector(item);
-                console.log('value------ ',value)
-                console.log('column------ ',column)
                 return value ? value.toString().toLowerCase().includes(filterText.toLowerCase()) : false;
             })
         );
@@ -105,7 +102,7 @@ const Datatable = ({ columns, data }) => {
                 <button
                     key={pageNumber}
                     onClick={() => handlePageChange(pageNumber)}
-                    className={`btn btn-sm ${currentPage === pageNumber ? 'btn-active-page-no' : 'btn-outline-primary'} mx-1`}
+                    className={`btn btn-sm ${currentPage === pageNumber ? 'btn-active-page-no' : 'btn-outline-secondary'} mx-1`}
                 >
                     {pageNumber}
                 </button>
@@ -151,14 +148,14 @@ const Datatable = ({ columns, data }) => {
                 <div className="pagination-buttons">
                     <button
                         onClick={() => handlePageChange(Math.max(currentPage - 1, 1))}
-                        className="btn btn-sm btn-outline-primary mx-1"
+                        className="btn btn-sm btn-outline-secondary mx-1"
                     >
                         Prev
                     </button>
                     {pages}
                     <button
                         onClick={() => handlePageChange(Math.min(currentPage + 1, totalPages))}
-                        className="btn btn-sm btn-outline-primary mx-1"
+                        className="btn btn-sm btn-outline-secondary mx-1"
                     >
                         Next
                     </button>
