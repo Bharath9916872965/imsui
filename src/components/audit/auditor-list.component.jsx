@@ -1,153 +1,110 @@
 import React, { useEffect, useState } from "react";
 import { deleteAditor, getAuditorDtoList, getEmployee, insertAditor } from "../../services/audit.service";
 import Datatable from "../datatable/Datatable";
-import { Alert, Autocomplete, Snackbar, Switch, TextField, Tooltip } from '@mui/material';
+import { Switch } from "@mui/material";
+import { Field, Formik, Form } from "formik";
 import Navbar from "../Navbar/Navbar";
-import './auditor-list.component.css';
-import Swal from 'sweetalert2';
+import "./auditor-list.component.css";
+import Swal from "sweetalert2";
+import MultipleSelectPicker from "../selectpicker/multipleSelectPicker";
 
 const AuditorListComponent = () => {
-
-  const [error, setError] = useState(null);
-  const [auditorDtoList, setAuditorDtoList] = useState([]);
   const [showModal, setShowModal] = useState(false);
-  const [empdetails, setEmployeeList] = useState([]);
-  const [empIds, setEmpIds] = useState([]);
-  const [touched, setTouched] = useState(false);
-  const [modalVisible, setModalVisible] = useState(false);
-
-  const handleOnBlur = () => {
-    setTouched(true);
-  };
+  const [filOptions, setFilOptions] = useState([]);
+  const [tblauditorData, setTblAuditorData] = useState([]);
+  const [initialValues, setInitialValues] = useState({ empId: [] });
 
   const columns = [
-    { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-    { name: 'Auditor', selector: (row) => row.employeeName, sortable: true, grow: 2, align: 'text-start' },
-    { name: 'Division', selector: (row) => row.divisionCode, sortable: true, grow: 2, align: 'text-center' },
-    { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center', },
+    { name: "SN", selector: (row) => row.sn, sortable: true, align: 'text-center' },
+    { name: "Auditor", selector: (row) => row.employeeName, sortable: true, align: 'text-start' },
+    { name: "Division", selector: (row) => row.divisionCode, sortable: true, align: 'text-center'  },
+    { name: "Action", selector: (row) => row.action, sortable: true,align: 'text-center', },
   ];
 
-  const fetchData = async () => {
-    auditorlist();
-  };
-
   useEffect(() => {
-    fetchData();
+    auditorlist();
   }, []);
 
   const auditorlist = async () => {
     try {
-      const AuditorDtoList = await getAuditorDtoList();
-      const Emp = await getEmployee();
-      setEmployeeList(Emp);
-      setAuditorDtoList(AuditorDtoList);
+      const [AuditorDtoList, Emp] = await Promise.all([getAuditorDtoList(), getEmployee()]);
+      const filteredMemberAssignList = Emp.filter(
+        (employee) => !AuditorDtoList.some((auditor) => auditor.empId === employee.empId)
+      );
+      setFilOptions(
+        filteredMemberAssignList.map((item) => ({
+          value: item.empId,
+          label: `${item.empName}, ${item.empDesigName}`,
+        }))
+      );
+      setTableDate(AuditorDtoList);
     } catch (error) {
       console.error("Error fetching data:", error);
+    } finally {
+    
     }
   };
 
-  const toggleModal = () => {
-    setShowModal(!showModal);
-    if (!showModal) {
-      setTimeout(() => setModalVisible(true), 10);
-    } else {
-      setModalVisible(false);
-    }
-  };
-
-  useEffect(() => {
-    if (!showModal) {
-      setModalVisible(false);
-    }
-  }, [showModal]);
-
-  const mappedData = auditorDtoList.map((item, index) => ({
-    sn: index + 1,
-    employeeName: item.empName + ', ' + item.designation || '-',
-    divisionCode: item.divisionName || '-',
-    action: (
-      <Switch
-      checked={item.isActive === 1}
-      onChange={() => handleToggleIsActive(item.auditorId, item.isActive)} // Toggle function
-      color="default"
-      sx={{
-        '& .MuiSwitch-switchBase.Mui-checked': { color: 'green' },
-        '& .MuiSwitch-switchBase': { color: 'red' },
-        '& .MuiSwitch-track': { backgroundColor: item.isActive === 1 ? 'green' : 'red' },
-      }}
-    />
-    ),
-}));
-
-
-  const filteredMemberAssignList = empdetails.filter(
-    (employee) => !auditorDtoList.some((auditor) => auditor.empId === employee.empId)
-  );
-
-  const handleSubmit = async (event) => {
-    event.preventDefault();
-
-    if (empIds.length === 0) {
-      Swal.fire({
-        icon: "warning",
-        title: "Warning",
-        text: "Please Select Atleast One Employee ..!",
-        showConfirmButton: true,
-      });
-      return;
-    }
-
-    Swal.fire({
-      title: 'Are you sure Add ?',
-      // text: "Do you want to add the selected employees?",
-      icon: 'warning',
-      showCancelButton: true,
-      confirmButtonColor: '#3085d6',
-      cancelButtonColor: '#d33',
-      confirmButtonText: 'YES',
-      cancelButtonText: 'NO',
-    }).then(async (result) => {
-      if (result.isConfirmed) {
-        try {
-          const result = await insertAditor(empIds);
-          if (result === 200) {
-            auditorlist();
-            setShowModal(false);
-            setEmpIds([]);
-            Swal.fire({
-              icon: "success",
-              title: "Auditor Added Successfully!",
-              showConfirmButton: false,
-              timer: 1500
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: "Auditor Add Unsuccessful!",
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-        } catch (error) {
-          console.error('Error adding employee:', error);
-          Swal.fire('Error!', 'There was an issue adding the auditor.', 'error');
-        }
-      }
-    });
+  const setTableDate = (list) => {
+    setTblAuditorData(
+      list.map((item, index) => ({
+        sn: index + 1,
+        employeeName: `${item.empName || "-"}, ${item.designation || "-"}`,
+        divisionCode: item.divisionName || "-",
+        action: (
+          <Switch
+            checked={item.isActive === 1}
+            onChange={() => handleToggleIsActive(item.auditorId, item.isActive)}
+            color="default"
+            sx={{
+              "& .MuiSwitch-switchBase.Mui-checked": { color: "green" },
+              "& .MuiSwitch-switchBase": { color: "red" },
+              "& .MuiSwitch-track": { backgroundColor: item.isActive === 1 ? "green" : "red" },
+            }}
+          />
+        ),
+      }))
+    );
   };
 
   const handleToggleIsActive = async (auditorId, currentStatus) => {
-    const isActive = currentStatus === 1 ? 0 : 1;
     try {
-      const response = await deleteAditor(auditorId, isActive);
-      if (response === 200) {
-        auditorlist();  
-      } else {
-
-      }
+      const response = await deleteAditor(auditorId, currentStatus === 1 ? 0 : 1);
+      if (response === 200) auditorlist();
     } catch (error) {
       console.error("Error updating auditor status:", error);
-      Swal.fire('Error!', 'There was an issue updating the auditor status.', 'error');
+      Swal.fire("Error!", "There was an issue updating the auditor status.", "error");
+    }
+  };
+
+  const handleSubmit = async (values) => {
+    if (values.empId.length === 0) {
+      return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
+    }
+
+    const confirm = await Swal.fire({
+      title: "Are you sure to Add?",
+      icon: "warning",
+      showCancelButton: true,
+      confirmButtonText: "YES",
+      cancelButtonText: "NO",
+    });
+
+    if (!confirm.isConfirmed) return;
+
+    try {
+      const response = await insertAditor(values.empId);
+      if (response === 200) {
+        auditorlist();
+        setShowModal(false);
+        setInitialValues({ empId: [] });
+        Swal.fire("Success!", "Auditor Added Successfully!", "success");
+      } else {
+        Swal.fire("Error!", "Failed to Add Auditor!", "error");
+      }
+    } catch (error) {
+      console.error("Error adding auditor:", error);
+      Swal.fire("Error!", "There was an issue adding the auditor.", "error");
     }
   };
 
@@ -158,86 +115,62 @@ const AuditorListComponent = () => {
         <div className="card-body text-center">
           <h3>Auditor List</h3>
           <div id="card-body customized-card">
-            {/* {isLoading ? (
-                          <h3>Loading...</h3>
-                      ) : error ? (
-                          <h3 color="error">{error}</h3>
-                      ) : ( */}
-            <Datatable columns={columns} data={mappedData} />
-            {/* )} */}
+            {<Datatable columns={columns} data={tblauditorData} />}
           </div>
           <div>
-            <button className="btn add" onClick={toggleModal}>
+            <button className="btn add" onClick={() => setShowModal(true)}>
               Add
             </button>
           </div>
-
           {showModal && (
-            <div className={`modal fade show ${modalVisible ? 'modal-visible' : ''}`} style={{ display: 'block' }} aria-modal="true" role="dialog">
+            <>
+              {/* Backdrop */}
+              <div className="modal-backdrop show" style={{ zIndex: 1040 }}></div>
+            <div className="modal fade show" style={{ display: "block" }}>
               <div className="modal-dialog modal-lg modal-lg-custom">
-                <div className="modal-content modal-content-custom" >
-                  <div className="modal-header d-flex justify-content-between bg-primary text-white">
+                <div className="modal-content modal-content-custom">
+                  <div className="modal-header d-flex justify-content-between bg-primary text-white modal-header-custom">
                     <h5 className="modal-title">Auditor Add</h5>
-                    <button type="button" className="btn btn-danger" onClick={toggleModal} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
+                    <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
+                      &times;
                     </button>
                   </div>
-
                   <div className="modal-body">
-                    <form onSubmit={handleSubmit}>
-                      <div className="form-group row align-items-center">
-                        <label htmlFor="employeeSelect" className="col-sm-2 col-form-label">Employee</label>
-                        <div className="col-sm-10">
-                          <Autocomplete
-                            multiple
-                            options={filteredMemberAssignList}
-                            getOptionLabel={(employee) => `${employee.empName}, ${employee.empDesigName}`}
-                            value={
-                              (empIds || [])
-                                .map((empId) => filteredMemberAssignList.find((emp) => Number(emp.empId) === Number(empId)))
-                                .filter(Boolean)
-                            }
-                            onChange={(event, newValue) => {
-                              const updatedEmpIds = newValue.map((option) => option.empId);
-                              setEmpIds(updatedEmpIds);
-                            }}
-                            onBlur={handleOnBlur}
-                            renderInput={(params) => (
-                              <TextField
-                                {...params}
-                                label="Select Employee"
-                                fullWidth
-                                variant="outlined"
-                                size="small"
-                                margin="normal"
-                                error={touched && empIds.length === 0}
-                                helperText={touched && empIds.length === 0 ? "This field is required." : ""}
-                              />
-                            )}
-                            ListboxProps={{
-                              sx: {
-                                maxHeight: 200,
-                                overflowY: "auto",
-                              },
-                            }}
-                            disableCloseOnSelect
-                          />
-                        </div>
-                      </div>
-                      <div className="col text-center subclass">
-                        <button type="submit" className="btn btn-success">Submit</button>
-                      </div>
-                    </form>
+                    <Formik initialValues={initialValues} enableReinitialize onSubmit={handleSubmit}>
+                      {({ values, setFieldValue }) => (
+                        <Form>
+                          <div className="form-group">
+                            <Field name="empId">
+                              {({ form }) => (
+                                <MultipleSelectPicker
+                                  options={filOptions}
+                                  label="Employee"
+                                  value={filOptions.filter((item) => values.empId.includes(item.value))}
+                                  handleChange={(newValue) =>
+                                    setFieldValue("empId", newValue.map((item) => item.value))
+                                  }
+                                />
+                              )}
+                            </Field>
+                          </div>
+                          <div className="col text-center subclass">
+                          <button type="submit" className="btn btn-success">
+                            Submit
+                          </button>
+                          </div>
+                        </Form>
+                      )}
+                    </Formik>
                   </div>
                 </div>
               </div>
             </div>
-
+            </>
           )}
         </div>
       </div>
     </div>
   );
+};
 
-}
 export default AuditorListComponent;
