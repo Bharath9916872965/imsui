@@ -3,7 +3,7 @@ import Datatable from "../datatable/Datatable";
 import withRouter from "../../common/with-router";
 import Navbar from "../Navbar/Navbar";
 import Swal from 'sweetalert2';
-import { getIqaById, getIqaDtoList, insertIqa } from "../../services/audit.service";
+import {getIqaDtoList, insertIqa } from "../../services/audit.service";
 import { ErrorMessage, Field, Formik, Form } from "formik";
 import './auditor-list.component.css';
 import * as Yup from 'yup';
@@ -12,6 +12,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { TextareaAutosize, TextField } from "@mui/material";
 import { format } from 'date-fns';
+import AlertConfirmation from "../../common/AlertConfirmation.component";
 
 
 const IqaListComponent = () => {
@@ -20,6 +21,7 @@ const IqaListComponent = () => {
     const [iqaList, setIqaList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [nextIqaNo, setNextIqaNo] = useState(null);
+    const [actionFrom, setActionFrom] = useState("Add");
 
     const [initialValues, setInitialValues] = useState({
         iqaNo: (iqaList.length+1)+"",
@@ -55,6 +57,7 @@ const IqaListComponent = () => {
         fetchData();
     }, []);
 
+    
     const iqalist = async () => {
         try {
             const IqaLidst = await getIqaDtoList();
@@ -73,7 +76,6 @@ const IqaListComponent = () => {
         }
         if (iqaList.length > 0 && action === 'Add') {
             const lastIqaNo = iqaList[0].iqaNo;
-            console.log('lastIqaNo',lastIqaNo);
             setNextIqaNo("IQA-" + (Number(lastIqaNo )+ 1));  
         } else {
             
@@ -94,15 +96,17 @@ const IqaListComponent = () => {
         scope: item.scope || '-',
         description: item.description || '-',
         action: (
-            <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editIqa(item.iqaId)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>
+            <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editIqa(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>
                 ),
     }));
 
-    const editIqa = async (iqaId) => {
-        const getIqaDataById=await getIqaById(iqaId);
-        setNextIqaNo('IQA-  '+getIqaDataById.iqaNo)
-        setInitialValues(getIqaDataById);
+    const editIqa = async (item) => {
+        // const getIqaDataById=await getIqaById(iqaId);
+        setNextIqaNo('IQA-  '+item.iqaNo)
+        setInitialValues(item);
+        setActionFrom('Edit');
         toggleModal('Edit');
+
       };
 
     const handleSubmit = async (values) => {
@@ -110,15 +114,14 @@ const IqaListComponent = () => {
         const successMessage = isEditMode ? "IQA updated Successfully!" : "IQA Added Successfully!";
         const unsuccessMessage = isEditMode ? "IQA update Unsuccessful!" : "IQA Add Unsuccessful!";
         const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
-        Swal.fire({
-            icon: 'question',
-            title: Title,
-            // text: confirmationText,
-            showCancelButton: true,
-            confirmButtonText: 'YES',
-            cancelButtonText: 'NO',
-        }).then(async (result) => {
-            if (result.isConfirmed) {
+        
+        const confirm = await AlertConfirmation({
+            title: 'Are you sure to Add ?',
+            message: '',
+        });
+      
+          // if (!confirm.isConfirmed) return;
+          if(confirm) {
                 try {
                     const result = await insertIqa(values);
                     if (result === 200) {
@@ -144,8 +147,8 @@ const IqaListComponent = () => {
                     Swal.fire('Error!', 'There was an issue inserting IQA the auditor.', 'error');
                 }
             }
-        });
-    }; 
+            };
+
 
     useEffect(() => {
         if (iqaList.length > 0) {
@@ -180,12 +183,12 @@ const IqaListComponent = () => {
                                 onClick={()=>toggleModal("")} // Close modal when clicking backdrop
                                 style={{ zIndex: 1040 }} // Ensure backdrop is behind modal
                             ></div>
-                            <div className={`modal fade show ${modalVisible ? 'modal-visible' : ''}`} style={{ display: 'block' }} aria-modal="true" role="dialog">
+                            <div className={`modal fade show modal-show-custom ${modalVisible ? 'modal-visible' : ''}`} style={{ display: 'block' }} aria-modal="true" role="dialog">
                                 <div className="modal-dialog modal-lg modal-lg-custom">
                                     <div className="modal-content modal-content-custom">
-                                        <div className="modal-header d-flex justify-content-between bg-primary text-white">
-                                            <h5 className="modal-title">IQA Add</h5>
-                                            <button type="button" className="btn btn-danger" onClick={()=>toggleModal("")} aria-label="Close">
+                                        <div className="modal-header d-flex justify-content-between bg-primary text-white modal-header-custom">
+                                            <h5 className="modal-title">IQA {actionFrom===""?"Add" : actionFrom}</h5>
+                                            <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={()=>toggleModal("")} aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
@@ -242,8 +245,8 @@ const IqaListComponent = () => {
                                                                 <Field name="fromDate">
                                                                     {({ field, form }) => (
                                                                         <DatePicker
-                                                                            label="From Date"
-                                                                            value={form.values.fromDate ? dayjs(form.values.fromDate) : null}
+                                                                            label="From Date"  maxDate={form.values.toDate ? dayjs(form.values.toDate) : null} 
+                                                                            value={form.values.fromDate ? dayjs(form.values.fromDate) : null} views={['year', 'month', 'day']}
                                                                             onChange={(date) => form.setFieldValue('fromDate', date ? date.format('YYYY-MM-DD') : '')}
                                                                             format="DD-MM-YYYY"
                                                                             slotProps={{
@@ -262,8 +265,8 @@ const IqaListComponent = () => {
                                                                 <Field name="toDate">
                                                                     {({ field, form }) => (
                                                                         <DatePicker
-                                                                            label="To Date"
-                                                                            value={form.values.toDate ? dayjs(form.values.toDate) : null}
+                                                                            label="To Date"  minDate={form.values.fromDate ? dayjs(form.values.fromDate) : null} 
+                                                                            value={form.values.toDate ? dayjs(form.values.toDate) : null} views={['year', 'month', 'day']}
                                                                             onChange={(date) => form.setFieldValue('toDate', date ? date.format('YYYY-MM-DD') : '')}
                                                                             format="DD-MM-YYYY"
                                                                             slotProps={{

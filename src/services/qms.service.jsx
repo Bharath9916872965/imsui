@@ -11,7 +11,6 @@ console.log('authHeader-------', authHeader())
 export const getQmVersionRecordDtoList = async () => {
     
     try {
-        console.log('authHeader-----', authHeader());
         return (await axios.post(`${API_URL}get-qm-version-record-list`,{} , {
             headers: authHeader()
         })).data;
@@ -24,7 +23,7 @@ export const getQmVersionRecordDtoList = async () => {
 
 export const updatechapterPagebreakAndLandscape = async (chapterPagebreakOrLandscape) => {
     try {
-        return (await axios.post(`${API_URL}updatechapterPagebreakAndLandscape`, chapterPagebreakOrLandscape, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}updatechapter-pagebreak-landscape`, chapterPagebreakOrLandscape, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updatechapterPagebreakAndLandscape', error);
         throw error;
@@ -49,18 +48,18 @@ export const getSubChaptersById = async (chapterId) => {
     }
 }
 
-export const updateChapterNameById = async (chapterName) => {
+export const updateChapterNameById = async (chapterId, chapterName) => {
     try {
-        return (await axios.post(`${API_URL}QaQtupdateChapterNameById`, chapterName, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}update-qm-chaptername/${chapterId}`, chapterName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updateChapterNameById', error);
         throw error;
     }
 }
 
-export const updateChapterContent = async (chaperContent) => {
+export const updateChapterContent = async (chapterId, chaperContent) => {
     try {
-        return (await axios.post(`${API_URL}QaQtupdateChapterContentById`, chaperContent, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}update-qm-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updateChapterContent', error);
         throw error;
@@ -69,18 +68,99 @@ export const updateChapterContent = async (chaperContent) => {
 
 export const deleteChapterByChapterIdId = async (chapterId) => {
     try {
-        return (await axios.post(`${API_URL}deleteChapterById.htm`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}delete-qm-chapteId`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in deleteChapterById', error);
         throw error;
     }
 }
 
-export const addChapterNameById = async (chapterName) => {
+export const addChapterNameById = async (chapterId, chapterName) => {
     try {
-        return (await axios.post(`${API_URL}QaQtAddNewSubChapter`, chapterName, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}add-qm-new-subchapter/${chapterId}`, chapterName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in addChapterNameById', error);
+        throw error;
+    }
+}
+
+export const getChapterById = async (chapterId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qm-chapter`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addChapterNameById', error);
+        throw error;
+    }
+}
+
+export const getUnAddedChapters = async () => {
+    try {
+        return (await axios.post(`${API_URL}un-added-qm-section-list`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getUnAddedChapters', error);
+        throw error;
+    }
+}
+
+export const UnAddListToAddList = async (SelectedSections) => {
+    try {
+        return (await axios.post(`${API_URL}qm-unaddlist-to-addlist`, SelectedSections, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in UnAddListToAddList', error);
+        throw error;
+    }
+}
+
+export const AddNewSection = async (sectionName) => {
+    try {
+        return (await axios.post(`${API_URL}add-new-qm-section`, sectionName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getUnAddedChapters', error);
+        throw error;
+    }
+}
+
+export const getLabDetails = async () => {
+    try {
+        return (await axios.get(`${API_URL}lab-details`, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getLabDetails', error);
+        throw error;
+    }
+}
+
+export const getLogoImage = async () => {
+    try {
+        return (await axios.get(`${API_URL}lab-logo`, null, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getLogoImage', error);
+        throw error;
+    }
+}
+
+export const getDocSummarybyId = async (documentId) => {
+    try {
+        return (await axios.post(`${API_URL}get-docsummary`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDocSummarybyId', error);
+        throw error;
+    
+    }
+}
+export const getQmAbbreviationsById = async (documentId) => {
+    try {
+        // return (await axios.post(`${API_URL}getQAQTDocSummarybyId.htm`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQmAbbreviationsById', error);
+        throw error;
+    }
+}
+
+export const getDocTemplateAttributes = async () => {
+    try {
+        return (await axios.post(`${API_URL}get-DocTemplateAttributes`, null, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDocTemplateAttributes', error);
         throw error;
     }
 }

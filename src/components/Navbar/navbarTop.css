@@ -16,6 +16,47 @@
   transition: opacity 0.3s ease, visibility 0.3s ease;
 }
 
+.i-name {
+  color: red;
+}
+.nav-item:hover .i-name {
+  color: white;
+}
+
+.ms-name {
+  color: white;
+}
+.nav-item:hover .ms-name {
+  color: red;
+}
+
+/*  */
+
+.nav-animate::after {
+  content: '';
+  position: absolute;
+  top: 0; 
+  left: 0;
+  width: 0;
+  height: 3px;
+  background-color: #FF3800;
+  color: #FF3800;
+  opacity: 0;
+  transition: opacity 0.5s ease, width 1s ease-out;
+}
+
+.nav-animate:hover::after {
+  opacity: 1;
+  width: 100%;
+}
+
+.nav-animate:hover {
+  padding-left: 10px;
+}
+
+
+
+
 
 
   
