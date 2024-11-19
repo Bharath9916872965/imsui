@@ -7,6 +7,7 @@ import Dashboard from './components/dashboard/dashboard.component';
 import QmAddDocContentComponent from './components/qms/qm/qm-add-doc-content/qm-add-doc-content.component';
 import AuditorListComponent from './components/audit/auditor-list.component';
 import IqaListComponent from './components/audit/iqa-list.component';
+import ScheduleListComponent from './components/audit/scheduler/schedule-list.component';
 
 function App() {
   return (
@@ -25,7 +26,8 @@ function App() {
         <Route path="/auditor-list" element={<AuditorListComponent />} />
         <Route path="/iqa-list" element={<IqaListComponent />} />
 
-
+        {/* Schedule */}
+        <Route path="/schedule-list" element={<ScheduleListComponent />} />
         
       </Routes>
 {/* <Login/> */}

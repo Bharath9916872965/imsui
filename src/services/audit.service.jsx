@@ -107,4 +107,50 @@ export const getIqaById = async (iqaId) => {
     }
   };
 
+  export const getScheduleList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}schedule-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getScheduleList:', error);
+        throw error;
+    }
+}
+
+export const getTeamList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-team-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getTeamList:', error);
+        throw error;
+    }
+}
+
+export const addSchedule = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}insert-audit-schedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addSchedule:', error);
+        throw error;
+    }
+}
+
+export const editScheduleSubmit = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}edit-audit-schedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in editScheduleSubmit:', error);
+        throw error;
+    }
+}
+
+export const reScheduleSubmit = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}insert-audit-reschedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in reScheduleSubmit:', error);
+        throw error;
+    }
+}
+
+
 
