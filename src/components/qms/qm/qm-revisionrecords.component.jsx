@@ -7,6 +7,7 @@ import Navbar from "../../Navbar/Navbar";
 import "./qm-revisionrecords.component.css"
 import QmDocPrint from "../../prints/qms/qm-doc-print";
 import { format } from "date-fns";
+import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
 
 
 const QmRevisionRecordsComponent = ({router}) => {
@@ -15,6 +16,8 @@ const QmRevisionRecordsComponent = ({router}) => {
     const [error, setError] = useState(null);
     const [versionRecordList, setVersionRecordList] = useState([]);
     const [versionRecordPrintList, setVersionRecordPrintList] = useState([]);
+    const [openDialog2, setOpenDialog2] = useState(false);
+    const [singleDoc, setSingleDoc] = useState([]);
 
 
     const { navigate, location } = router;
@@ -37,12 +40,13 @@ const QmRevisionRecordsComponent = ({router}) => {
                   <div>
                       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
                           <>
-                              <button className="icon-button edit-icon-button me-1" style={{color: "red"}} onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
+                              <button className="icon-button edit-icon-button me-1" onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
                               {/* <button className="btn summary-btn-outline btn-sm"  onClick={() => {
                                   // setOpenDialog2(true);
                                   // setSingleDoc(item);
                               }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
                               {getDocPDF('', item)}
+                              <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => setOpenDialog2(true)} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
                           </>
                       )}
                   </div>
@@ -69,6 +73,11 @@ const QmRevisionRecordsComponent = ({router}) => {
         console.log('hhh---')
         navigate('/qm-add-content', { state: { revisionElements: element } })
       }, [navigate]);
+
+      const handleCloseDocSummaryDialog = () => {
+        setOpenDialog2(false)
+        setSingleDoc([]);
+    };
 
 
       const columns = [
@@ -97,6 +106,14 @@ const QmRevisionRecordsComponent = ({router}) => {
                         )}
                     </div>
             </div>
+            <AddDocumentSummaryDialog
+                open={openDialog2}
+                onClose={handleCloseDocSummaryDialog}
+                versionElements={singleDoc}
+                // onConfirm={handleDocSummaryConfirm}
+            />
+
+
         </div>
 
     )

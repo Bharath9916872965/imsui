@@ -91,8 +91,9 @@
 }
 
 .topButtons {
-    background-color: #103783 !important;
+    background-color: #000000a4 !important;
     text-transform: none !important;
+    color: white;
 }
 
 .main-container{
@@ -109,4 +110,9 @@
     height: 1.5em;
     transform: scale(1.5); /* Adjust the scale factor as needed */
     margin-right: 10px; /* Add spacing between checkbox and label */
+  }
+
+  .form-check-input-lg {
+    width: 1.3em;
+    height: 1.3em;
   }
