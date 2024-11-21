@@ -147,14 +147,7 @@ export const getDocSummarybyId = async (documentId) => {
     
     }
 }
-export const getQmAbbreviationsById = async (documentId) => {
-    try {
-        // return (await axios.post(`${API_URL}getQAQTDocSummarybyId.htm`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
-    } catch (error) {
-        console.error('Error occurred in getQmAbbreviationsById', error);
-        throw error;
-    }
-}
+
 
 export const getDocTemplateAttributes = async () => {
     try {
@@ -164,3 +157,60 @@ export const getDocTemplateAttributes = async () => {
         throw error;
     }
 }
+
+export const addNewAbbreviation = async (qaqtDocAbbreviations) => {
+    try {
+        return (await axios.post(`${API_URL}addNewDocAbbreviation`, qaqtDocAbbreviations, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addNewAbbreviation', error);
+        throw error;
+    }
+}
+
+export const getAbbreviationsByIdNotReq = async (abbreviationIdNotReq) => {
+    try {
+        return (await axios.post(`${API_URL}get-abbreviationlist`, abbreviationIdNotReq, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getAbbreviationsByDocVersionReleaseId', error);
+        throw error;
+    }
+}
+
+export const getQmRevistionRecordById = async (revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qm-revision-record`, revisionRecordId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQmRevistionRecordById', error);
+        throw error;
+    }
+}
+
+export const updateNotReqAbbreviationIds = async (abbreviationIds, revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}update-qm-notreq-abbreviation/${revisionRecordId}`, abbreviationIds, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateNotReqAbbreviationIds', error);
+        throw error;
+    }
+}
+
+export const addDocSummary = async (DocSummary, VersionReleaseId) => {
+    try {
+        return (await axios.post(`${API_URL}addQAQTDocSummary/${VersionReleaseId}`, DocSummary, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addDocSummary', error);
+        throw error;
+    }
+}
+
+
+export const getDrdoLogo = async () => {
+    try {
+        return (await axios.post(`${API_URL}drdo-logo`, null, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDrdoLogo', error);
+        throw error;
+    }
+}
+
+

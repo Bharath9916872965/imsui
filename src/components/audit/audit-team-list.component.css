@@ -1,0 +1,62 @@
+.team-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 16px; /* Adjust the spacing between cards */
+    justify-content: center; /* Center align all the rows */
+  }
+  
+  .team-card {
+    flex: 1 1 calc(25% - 16px);
+    max-width: calc(25% - 16px);
+    height: 200px; /* Adjust height to your preference */
+    min-height: 150px; /* Minimum height for cards */
+    padding: 16px;
+    border-radius: 8px;
+    text-align: left; /* Align text to the left */
+    background-color: #05a4ee;
+    background: linear-gradient(to right, #253046, #4286f4) !important;
+    color: white;
+    border: 1px solid #ccc;
+    position: relative; /* Enable absolute positioning for child elements */
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2); /* Optional for a shadow effect */
+  }
+  
+  .team-card p {
+    position: absolute; /* Position it relative to the card */
+    top: 8px; /* Distance from the top */
+    left: 8px; /* Distance from the left */
+    margin: 0; /* Reset margin for better positioning */
+    font-size: 14px; /* Adjust font size */
+    color: #333; /* Font color */
+  }
+  
+  @media (max-width: 768px) {
+    .team-card {
+      flex: 1 1 calc(50% - 16px); /* 2 cards per row for smaller screens */
+    }
+  }
+  
+  @media (max-width: 480px) {
+    .team-card {
+      flex: 1 1 100%; /* 1 card per row for extra-small screens */
+    }
+  }
+  
+
+  .full-width {
+    margin-top: 1rem;
+  }
+
+  .edit-button {
+    position: absolute;
+    bottom: 10px; /* Adjust to fit your design */
+    right: 10px;  /* Adjust to fit your design */
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover {
+    background-color: #0056b3;
+  }

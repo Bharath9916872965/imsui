@@ -38,7 +38,7 @@ export class AuditRescheduleDto{
 export const getAuditorDtoList = async () => {
     
     try {
-        return (await axios.post(`${API_URL}audit-list`,{} , {
+        return (await axios.post(`${API_URL}auditor-list`,{} , {
             headers: authHeader()
         })).data;
     } catch (error) {
@@ -277,3 +277,71 @@ export const rescheduleMailSend = async (values)=>{
         throw error;
     }
 }
+  export const getAuditeeTeamDtoList = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}audit-team-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getAuditeeTeamDtoList', error);
+        throw error; 
+    }
+    
+};
+
+export const insertAuditTeam = async (values) => {
+    try {
+      const response = await axios.post(
+          `${API_URL}audit-team-insert`,
+            values,
+         {headers: authHeader() }
+      );
+      return response.data;
+  
+    } catch (error) {
+      console.error('Error occurred in insertAuditTeam:', error);
+      throw error;
+    }
+  };
+
+  export const getAuditorIsActiveList = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}auditor-isactive-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getAuditorIsActiveList', error);
+        throw error; 
+    }
+    
+};
+
+export const getTeamMemberIsActiveList = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}team-member-isactive-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getTeamMemberIsActiveList', error);
+        throw error; 
+    }
+    
+};
+
+export const getAuditTeamMemberList = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}audit-team-member-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getAuditTeamMemberList', error);
+        throw error; 
+    }
+    
+};
+
+
