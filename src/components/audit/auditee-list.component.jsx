@@ -3,25 +3,24 @@ import Datatable from "../datatable/Datatable";
 import withRouter from "../../common/with-router";
 import Navbar from "../Navbar/Navbar";
 import Swal from 'sweetalert2';
-import { ErrorMessage, Field, Formik, Form } from "formik";
+import { Field, Formik, Form } from "formik";
 import './auditor-list.component.css';
 import * as Yup from 'yup';
-import { Autocomplete, ListItemText, Switch, IconButton, TextField } from "@mui/material";
-import {AuditeeDto, deleteAuditee, getAuditeeDtoList, getDivisionGroupList, getDivisionList, getEmployee, getProjectList, insertAuditee } from "../../services/audit.service";
+import { Autocomplete, ListItemText, IconButton, TextField } from "@mui/material";
+import { AuditeeDto, deleteAuditee, getAuditeeDtoList, getDivisionGroupList, getDivisionList, getEmployee, getProjectList, insertAuditee } from "../../services/audit.service";
 import { CustomMenuItem } from '../../services/auth.header';
 import { FaTrash } from "react-icons/fa";
 import AlertConfirmation from "../../common/AlertConfirmation.component";
 
 
 const AuditeeListComponent = () => {
-    const [error, setError] = useState(null);
     const [showModal, setShowModal] = useState(false);
     const [auditeeList, setAuditeeList] = useState([]);
     const [empdetails, setEmployeeList] = useState([]);
     const [divisionList, setDivisionList] = useState([]);
     const [divisionGroupList, setDivisionGroupList] = useState([]);
     const [projectList, setProjectList] = useState([]);
-    const [tblauditeeList,setTblAuditeeList] = useState([]);
+    const [tblauditeeList, setTblAuditeeList] = useState([]);
     //const [isReady, setIsReady] = useState(false);
 
     const [filtereddivisionList, setFilteredDivisionList] = useState([]);
@@ -29,15 +28,15 @@ const AuditeeListComponent = () => {
     const [filteredprojectList, setFilteredProjectList] = useState([]);
     const [modalVisible, setModalVisible] = useState(false);
     const [actionFrom, setActionFrom] = useState("Add");
-    const [initialValues, setInitialValues] =  useState({
-        empId: "", 
+    const [initialValues, setInitialValues] = useState({
+        empId: "",
         headType: "",
         divisionId: "",
         groupId: "",
         projectId: "",
-      });
+    });
 
-      const validationSchema = Yup.object().shape({
+    const validationSchema = Yup.object().shape({
         empId: Yup.string().required("Employee required"),
         headType: Yup.string().required("HeadType required"),
     });
@@ -53,7 +52,7 @@ const AuditeeListComponent = () => {
 
     useEffect(() => {
         auditeelist();
-      }, []);
+    }, []);
 
     const auditeelist = async () => {
         try {
@@ -65,17 +64,16 @@ const AuditeeListComponent = () => {
 
             const filtereddivisionList = division.filter(
                 (div) => !AuditeeList.some((auditee) => auditee.divisionId === div.divisionId)
-              );
+            );
 
-              const filtereddivisionGroupList = divisionGroup.filter(
+            const filtereddivisionGroupList = divisionGroup.filter(
                 (divgroup) => !AuditeeList.some((auditee) => auditee.groupId === divgroup.groupId)
-              );
+            );
 
-              const filteredprojectList = project.filter(
+            const filteredprojectList = project.filter(
                 (proj) => !AuditeeList.some((auditee) => auditee.projectId === proj.projectId)
-              );
+            );
 
-              console.log('filtereddivisionList-----------',filtereddivisionList);
             setFilteredDivisionList(filtereddivisionList);
             setFilteredDivisionGroupList(filtereddivisionGroupList);
             setFilteredProjectList(filteredprojectList);
@@ -86,16 +84,15 @@ const AuditeeListComponent = () => {
             setAuditeeList(AuditeeList);
             // setTableData(AuditeeList);
             // setIsReady(true);
-            
+
         } catch (error) {
             console.error("Error fetching data:", error);
         }
     };
 
     useEffect(() => {
-        console.log('useEffect-----')
         setTableData(auditeeList);
-      }, [auditeeList]);
+    }, [auditeeList]);
 
     const resetInitialValues = () => {
         setInitialValues({
@@ -106,7 +103,7 @@ const AuditeeListComponent = () => {
             projectId: "",
         });
     };
-    
+
     const toggleModal = (action) => {
         setShowModal(!showModal);
         if (!showModal) {
@@ -118,28 +115,28 @@ const AuditeeListComponent = () => {
             setModalVisible(false);
         }
     };
-    
 
-    const setTableData = (list) =>{
+
+    const setTableData = (list) => {
         const mappedData = list.map((item, index) => ({
             sn: index + 1,
             auditee: item.auditee || '-',
-            group: item.groupName===""?'-' : item.groupName,
-            division: item.divisionName ===""?'-' : item.divisionName,
-            project: item.projectName===""?'-' : item.projectName,
+            group: item.groupName === "" ? '-' : item.groupName,
+            division: item.divisionName === "" ? '-' : item.divisionName,
+            project: item.projectName === "" ? '-' : item.projectName,
             action: (
-                <><button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editAuditee(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>
-                <IconButton id="iconButtons" onClick={() => handleToggleIsActive(item.auditeeId)} title="Delete"><FaTrash  className='trash-btn'/></IconButton>
+                <><button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editAuditee(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
+                    <IconButton id="iconButtons" onClick={() => handleToggleIsActive(item.auditeeId)} title="Delete"><FaTrash className='trash-btn' /></IconButton>
                 </>
-                    ),
+            ),
         }));
         setTblAuditeeList(mappedData);
     }
-   
+
 
     const editAuditee = async (item) => {
         const { divisionId, groupId, projectId } = item;
-        
+
         const divisionIds = auditeeList.filter(data => data.auditeeId !== item.auditeeId).map(req => req.divisionId);
         const filDivivsionList = divisionList.filter(div => !divisionIds.includes(div.divisionId));
         setFilteredDivisionList(filDivivsionList);
@@ -151,7 +148,7 @@ const AuditeeListComponent = () => {
         const projectIds = auditeeList.filter(data => data.auditeeId !== item.auditeeId).map(req => req.projectId);
         const filProjectList = projectList.filter(project => !projectIds.includes(project.projectId));
         setFilteredProjectList(filProjectList);
-         
+
         // Determine headType based on the values
         let headType = "";
         if (divisionId > 0) {
@@ -162,7 +159,7 @@ const AuditeeListComponent = () => {
             headType = "P"; // Project
         } else {
             headType = "Unknown"; // Fallback
-        }        
+        }
         setInitialValues({
             ...item,
             headType, // Update headType dynamically
@@ -173,103 +170,121 @@ const AuditeeListComponent = () => {
 
     const handleSubmit = async (values) => {
         const isEditMode = Boolean(values.auditeeId);
-        const successMessage = isEditMode ? "Auditee updated Successfully!" : "Auditee Added Successfully!";
-        const unsuccessMessage = isEditMode ? "Auditee update Unsuccessful!" : "Auditee Add Unsuccessful!";
+        const successMessage = isEditMode ? "updated Successfully!" : " Added Successfully ";
+        const unsuccessMessage = isEditMode ? "update Unsuccessful!" : " Add Unsuccessful ";
         const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
         const confirm = await AlertConfirmation({
             title: Title,
             message: '',
         });
-      
-          // if (!confirm.isConfirmed) return;
-          if(confirm) {
-                try {
-                    const result = await insertAuditee(new AuditeeDto(values.empId, values.groupId, values.divisionId, values.projectId, values.headType, values.auditeeId));
-                    if (result === 200) {
-                        auditeelist();
-                        setShowModal(false);
-                        setInitialValues({
-                            empId: "",
-                            headType: "",
-                            divisionId: "",
-                            groupId: "",
-                            projectId: "",
-                        });
-                        Swal.fire({
-                            icon: "success",
-                            title: successMessage,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    } else {
-                        Swal.fire({
-                            icon: "error",
-                            title: unsuccessMessage,
-                            showConfirmButton: false,
-                            timer: 1500
-                        });
-                    }
-                } catch (error) {
-                    console.error('Error adding employee:', error);
-                    Swal.fire('Error!', 'There was an issue adding the auditor.', 'error');
-                }
-            }
-    }; 
 
-const handleToggleIsActive = async (auditeeId) => {
-    const confirm = await AlertConfirmation({
-        title: 'Are you sure to InActive ?',
-        message: '',
-    });
-  
-      // if (!confirm.isConfirmed) return;
-      if(confirm) {
-        try {
-            const response = await deleteAuditee(auditeeId);
-            if (response === 200) {
-                await auditeelist(); 
-                Swal.fire({
-                    icon: "success",
-                    title: "Auditee InActivated Successfully!",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
-            } else {
-                Swal.fire({
-                    icon: "error",
-                    title: "Auditee InActive Unsuccessful!",
-                    showConfirmButton: false,
-                    timer: 1500
-                });
+        // if (!confirm.isConfirmed) return;
+        if (confirm) {
+            try {
+                const result = await insertAuditee(new AuditeeDto(values.empId, values.groupId, values.divisionId, values.projectId, values.headType, values.auditeeId));
+                if (result === 200) {
+                    const addedAuditee = empdetails.find((employee) => employee.empId === values.empId)?.empName || "Auditee";
+
+                    // Determine the type (Division, Group, Project) and name
+                    let targetType = "";
+                    let targetName = "";
+                    if (values.headType === "D") {
+                        targetType = "Division";
+                        targetName = divisionList.find((div) => div.divisionId === values.divisionId)?.divisionCode || "Unknown Division";
+                    } else if (values.headType === "G") {
+                        targetType = "Group";
+                        targetName = divisionGroupList.find((group) => group.groupId === values.groupId)?.groupCode || "Unknown Group";
+                    } else if (values.headType === "P") {
+                        targetType = "Project";
+                        targetName = projectList.find((proj) => proj.projectId === values.projectId)?.projectCode || "Unknown Project";
+                    }
+
+
+                    auditeelist();
+                    setShowModal(false);
+                    setInitialValues({
+                        empId: "",
+                        headType: "",
+                        divisionId: "",
+                        groupId: "",
+                        projectId: "",
+                    });
+                    Swal.fire({
+                        icon: "success",
+                        title: `${addedAuditee} for ${targetType} - ${targetName} `,
+                        text: `${successMessage}`,
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: unsuccessMessage,
+                        showConfirmButton: false,
+                        timer: 2500
+                    });
+                }
+            } catch (error) {
+                console.error('Error adding employee:', error);
+                Swal.fire('Error!', 'There was an issue adding the auditor.', 'error');
             }
-        } catch (error) {
-            console.error("Error updating auditee status:", error);
-            Swal.fire('Error!', 'There was an issue updating the auditee status.', 'error');
         }
-    }
-};
+    };
+
+    const handleToggleIsActive = async (auditeeId) => {
+        const confirm = await AlertConfirmation({
+            title: 'Are you sure to InActive ?',
+            message: '',
+        });
+
+        // if (!confirm.isConfirmed) return;
+        if (confirm) {
+            try {
+                const response = await deleteAuditee(auditeeId);
+                if (response === 200) {
+                    await auditeelist();
+                    Swal.fire({
+                        icon: "success",
+                        title: "Auditee InActivated Successfully!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                } else {
+                    Swal.fire({
+                        icon: "error",
+                        title: "Auditee InActive Unsuccessful!",
+                        showConfirmButton: false,
+                        timer: 1500
+                    });
+                }
+            } catch (error) {
+                console.error("Error updating auditee status:", error);
+                Swal.fire('Error!', 'There was an issue updating the auditee status.', 'error');
+            }
+        }
+    };
 
 
     return (
-            <div>
-                <Navbar />
-                <div className="card">
-                    <div className="card-body text-center">
-                        <h3>Auditee List</h3>
-                        <div id="card-body customized-card">
-                            <Datatable columns={columns} data={tblauditeeList} />
-                        </div>
-                        <div>
-                            <button className="btn add" onClick={()=>toggleModal('Add')}>
-                                Add
-                            </button>
-                        </div>
-                        {showModal && (
-                            <>
+        <div>
+            <Navbar />
+            <div className="card">
+                <div className="card-body text-center">
+                    <h3>Auditee List</h3>
+                    <div id="card-body customized-card">
+                        <Datatable columns={columns} data={tblauditeeList} />
+                    </div>
+                    <div>
+                        <button className="btn add" onClick={() => toggleModal('Add')}>
+                            Add
+                        </button>
+                    </div>
+                    {showModal && (
+                        <>
                             {/* Backdrop */}
-                            <div 
-                                className={`modal-backdrop fade ${modalVisible ? 'show' : ''}`} 
-                                onClick={()=>toggleModal("")} // Close modal when clicking backdrop
+                            <div
+                                className={`modal-backdrop fade ${modalVisible ? 'show' : ''}`}
+                                onClick={() => toggleModal("")} // Close modal when clicking backdrop
                                 style={{ zIndex: 1040 }} // Ensure backdrop is behind modal
                             ></div>
                             <div className={`modal fade show modal-show-custom  ${modalVisible ? 'modal-visible' : ''}`} style={{ display: 'block' }} aria-modal="true" role="dialog">
@@ -277,14 +292,14 @@ const handleToggleIsActive = async (auditeeId) => {
                                     <div className="modal-content modal-content-custom">
                                         <div className="modal-header d-flex justify-content-between bg-primary text-white modal-header-custom">
                                             <h5 className="modal-title">Auditee {actionFrom}</h5>
-                                            <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={()=>toggleModal("")} aria-label="Close">
+                                            <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => toggleModal("")} aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>
                                             </button>
                                         </div>
 
                                         <div className="modal-body">
                                             <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema} onSubmit={handleSubmit}>
-                                                {({setFieldValue, values, touched, errors  }) => (
+                                                {({ setFieldValue, values, touched, errors }) => (
                                                     <Form>
                                                         <div className="row">
                                                             <div className="col-md-6">
@@ -384,7 +399,7 @@ const handleToggleIsActive = async (auditeeId) => {
                                                                                                     <ListItemText primary={`${option.divisionCode} - ${option.divisionName}`} />
                                                                                                 </CustomMenuItem>
                                                                                             );
-                                                                                        }} 
+                                                                                        }}
                                                                                         value={filtereddivisionList.find((division) => division.divisionId === form.values.divisionId) || null}
                                                                                         onChange={(event, newValue) => {
                                                                                             form.setFieldValue("divisionId", newValue ? newValue.divisionId : "");
@@ -516,11 +531,11 @@ const handleToggleIsActive = async (auditeeId) => {
                                     </div>
                                 </div>
                             </div>
-                            </>
-                        )}
-                    </div>
+                        </>
+                    )}
                 </div>
             </div>
+        </div>
     );
 }
 export default withRouter(AuditeeListComponent);

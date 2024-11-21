@@ -18,8 +18,8 @@ const AuditorListComponent = () => {
   const columns = [
     { name: "SN", selector: (row) => row.sn, sortable: true, align: 'text-center' },
     { name: "Auditor", selector: (row) => row.employeeName, sortable: true, align: 'text-start' },
-    { name: "Division", selector: (row) => row.divisionCode, sortable: true, align: 'text-center'  },
-    { name: "Action", selector: (row) => row.action, sortable: true,align: 'text-center', },
+    { name: "Division", selector: (row) => row.divisionCode, sortable: true, align: 'text-center' },
+    { name: "Action", selector: (row) => row.action, sortable: true, align: 'text-center', },
   ];
 
   useEffect(() => {
@@ -42,7 +42,7 @@ const AuditorListComponent = () => {
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
-    
+
     }
   };
 
@@ -82,41 +82,38 @@ const AuditorListComponent = () => {
     if (values.empId.length === 0) {
       return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
     }
-
-    // const confirm = await Swal.fire({
-    //   title: "Are you sure to Add?",
-    //   icon: "warning",
-    //   showCancelButton: true,
-    //   confirmButtonText: "YES",
-    //   cancelButtonText: "NO",
-    // });
-
     const confirm = await AlertConfirmation({
       title: 'Are you sure to Add ?',
       message: '',
-  });
+    });
 
     // if (!confirm.isConfirmed) return;
-    if(confirm) {
-    try {
-      const response = await insertAditor(values.empId);
-      if (response === 200) {
-        auditorlist();
-        setShowModal(false);
-        setInitialValues({ empId: [] });
-        Swal.fire({
-          icon: "success",
-          title: "Auditor Added Successfully!",
-          showConfirmButton: false,
-          timer: 1500
-      });
-      } else {
-        Swal.fire("Error!", "Failed to Add Auditor!", "error");
+    if (confirm) {
+      try {
+        const response = await insertAditor(values.empId);
+
+        if (response === 200) {
+          const addedEmployees = filOptions
+            .filter(option => values.empId.includes(option.value))
+            .map(option => option.label)
+            .join(", ");
+          auditorlist();
+          setShowModal(false);
+          setInitialValues({ empId: [] });
+          Swal.fire({
+            icon: "success",
+            title: `${addedEmployees} `,
+            text: "Added Successfully!",
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire("Error!", "Failed to Add Auditor!", "error");
+        }
+      } catch (error) {
+        console.error("Error adding auditor:", error);
+        Swal.fire("Error!", "There was an issue adding the auditor.", "error");
       }
-    } catch (error) {
-      console.error("Error adding auditor:", error);
-      Swal.fire("Error!", "There was an issue adding the auditor.", "error");
-    }
     }
   };
 
@@ -138,45 +135,45 @@ const AuditorListComponent = () => {
             <>
               {/* Backdrop */}
               <div className="modal-backdrop show" style={{ zIndex: 1040 }}></div>
-            <div className="modal fade show" style={{ display: "block" }}>
-              <div className="modal-dialog modal-lg modal-lg-custom">
-                <div className="modal-content modal-content-custom">
-                  <div className="modal-header bg-secondary d-flex justify-content-between text-white modal-header-custom">
-                    <h5 className="modal-title">Auditor Add</h5>
-                    <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
-                      &times;
-                    </button>
-                  </div>
-                  <div className="modal-body">
-                    <Formik initialValues={initialValues} enableReinitialize onSubmit={handleSubmit}>
-                      {({ values, setFieldValue }) => (
-                        <Form>
-                          <div className="form-group">
-                            <Field name="empId">
-                              {({ form }) => (
-                                <MultipleSelectPicker
-                                  options={filOptions}
-                                  label="Employee"
-                                  value={filOptions.filter((item) => values.empId.includes(item.value))}
-                                  handleChange={(newValue) =>
-                                    setFieldValue("empId", newValue.map((item) => item.value))
-                                  }
-                                />
-                              )}
-                            </Field>
-                          </div>
-                          <div className="col text-center subclass">
-                          <button type="submit" className="btn btn-success">
-                            Submit
-                          </button>
-                          </div>
-                        </Form>
-                      )}
-                    </Formik>
+              <div className="modal fade show" style={{ display: "block" }}>
+                <div className="modal-dialog modal-lg modal-lg-custom">
+                  <div className="modal-content modal-content-custom">
+                    <div className="modal-header bg-secondary d-flex justify-content-between text-white modal-header-custom">
+                      <h5 className="modal-title">Auditor Add</h5>
+                      <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
+                        &times;
+                      </button>
+                    </div>
+                    <div className="modal-body">
+                      <Formik initialValues={initialValues} enableReinitialize onSubmit={handleSubmit}>
+                        {({ values, setFieldValue }) => (
+                          <Form>
+                            <div className="form-group">
+                              <Field name="empId">
+                                {({ form }) => (
+                                  <MultipleSelectPicker
+                                    options={filOptions}
+                                    label="Employee"
+                                    value={filOptions.filter((item) => values.empId.includes(item.value))}
+                                    handleChange={(newValue) =>
+                                      setFieldValue("empId", newValue.map((item) => item.value))
+                                    }
+                                  />
+                                )}
+                              </Field>
+                            </div>
+                            <div className="col text-center subclass">
+                              <button type="submit" className="btn btn-success">
+                                Submit
+                              </button>
+                            </div>
+                          </Form>
+                        )}
+                      </Formik>
+                    </div>
                   </div>
                 </div>
               </div>
-            </div>
             </>
           )}
         </div>
