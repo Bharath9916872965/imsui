@@ -71,3 +71,16 @@
   .mg-down-10{
     margin-bottom: 10px;
   }
+
+  .model-max-height{
+    max-height: 530px !important;
+    overflow-y: auto;
+  }
+
+  .text-color-green{
+    color: green;
+  }
+
+  .text-bold{
+    font-weight: 550;
+  }

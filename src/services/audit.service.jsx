@@ -28,6 +28,13 @@ export class AuditeeDto{
 
 };
 
+export class AuditRescheduleDto{
+    constructor(auditScheduleDto,auditScheduleListDto){
+        this.auditScheduleDto=auditScheduleDto;
+        this.auditScheduleListDto=auditScheduleListDto;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -234,3 +241,39 @@ export const reScheduleSubmit = async (values)=>{
       throw error;
     }
   };
+
+  export const forwardSchedule = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}forward-schedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in forwardSchedule:', error);
+        throw error;
+    }
+}
+
+export const scheduleMailSend = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}schedule-mail-send`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in scheduleMailSend:', error);
+        throw error;
+    }
+}
+
+export const getTotalTeamMembersList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-total-team-members-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getTotalTeamMembersList:', error);
+        throw error;
+    }
+}
+
+export const rescheduleMailSend = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}insert-audit-reschedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in rescheduleMailSend:', error);
+        throw error;
+    }
+}
