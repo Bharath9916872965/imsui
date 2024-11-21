@@ -14,6 +14,7 @@ import Navbar from "../../../Navbar/Navbar";
 import AlertConfirmation from "../../../../common/AlertConfirmation.component";
 import QmAddSectionDialog from "./qm-add-section-dialog";
 import QmDocPrint from "../../../prints/qms/qm-doc-print";
+import QmAddAbbreviationDialog from "./qm-add-abbreviation-dialog";
 
 const QmAddDocContentComponent = ({ router }) => {
 
@@ -40,10 +41,8 @@ const QmAddDocContentComponent = ({ router }) => {
   const [AddNewChapterFormSecondLvl, setAddNewChapterFormSecondLvl] = useState({
       SubChapterName: ''
   });
-  const [openEditorContentConfirmationDialog, setOpenEditorContentConfirmationDialog] = useState(false);
   const [dialogMessage, setDialogMessage] = useState('');
 
-  const [snackbarOpen, setSnackbarOpen] = useState(false);
   const [snackbarMessage, setSnackbarMessage] = useState('');
   const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
@@ -64,11 +63,13 @@ const QmAddDocContentComponent = ({ router }) => {
 
   const [content, setContent] = useState('Enter something.....');
   const [openDialog, setOpenDialog] = useState(false);
+  const [openDialog2, setOpenDialog2] = useState(false);
 
   const [isPagebreakAfter, setIsPagebreakAfter] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
+    console.log('versionElements----in add-content---',revisionElements)
 
       window.$('#summernote').summernote({
           airMode: false,
@@ -431,19 +432,7 @@ const QmAddDocContentComponent = ({ router }) => {
     };
 
 
-  const handleEditorContentDialogClose = () => {
-      setOpenEditorContentConfirmationDialog(false);
-  };
-
-
-
-
-  const handleSnackbarClose = () => {
-      setSnackbarOpen(false);
-  };
-
     const updateEditorContent = async () => {
-        //   setOpenEditorContentConfirmationDialog(true);
 
         const isConfirmed = await AlertConfirmation({
             title: 'Are you sure to update ?',
@@ -452,7 +441,6 @@ const QmAddDocContentComponent = ({ router }) => {
 
         if (isConfirmed) {
             const content = $('#summernote').summernote('code');
-            setOpenEditorContentConfirmationDialog(false)
             // let chaperContent = new Array;
             // chaperContent.push(editorContentChapterId)
             // chaperContent.push(content)
@@ -491,6 +479,10 @@ const QmAddDocContentComponent = ({ router }) => {
       getAllChapters();
   };
 
+  const handleCloseAbbreviationDialog = () => {
+    setOpenDialog2(false)
+}
+
 
   const goBack = () => {
     navigate(-1);
@@ -517,6 +509,7 @@ const QmAddDocContentComponent = ({ router }) => {
               <div id="main-wrapper">
                   <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
                       <div align='left' className="d-flex flex-column flex-md-row gap-1">
+                      <button className='btn topButtons' onClick={()=>setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button>
                       </div>
                       <div className="d-flex flex-column flex-md-row gap-1">
                           {/* <div className="doc-name">
@@ -922,7 +915,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                                           {EditorTitle}
                                                       </Typography>
                                                   </div>
-                                                  <div className="w-50">
+                                                  {/* <div className="w-50">
                                                       <ol className="w-100">
                                                           <li className="mb-2">
                                                               <div className="d-flex align-items-center">
@@ -953,7 +946,7 @@ const QmAddDocContentComponent = ({ router }) => {
                                                               </div>
                                                           </li>
                                                       </ol>
-                                                  </div>
+                                                  </div> */}
                                               </div>
 
                                               <div>
@@ -961,14 +954,48 @@ const QmAddDocContentComponent = ({ router }) => {
                                               </div>
                                                   {/* <div>{editorContent}</div> */}
 
-                                              <div mt={3} className="text-center mt-1">
+                                              {/* <div mt={3} className="text-center mt-1">
                                                   <button
                                                       className='btn edit'
                                                       onClick={() => updateEditorContent()}
                                                   >
                                                       Update
                                                   </button>
-                                              </div>
+                                              </div> */}
+                                                  <div className="row g-3 mt-2">
+                                                      <div className="col-md-4">
+                                                      <span className='me-3'>1. Is Pagebreak?</span>
+                                                                  <FormControlLabel
+                                                                      control={
+                                                                          <Switch
+                                                                              color="primary"
+                                                                              checked={isPagebreakAfter}
+                                                                              onChange={handlePagebreakChange}
+                                                                          />
+                                                                      }
+                                                                  />
+                                                      </div>
+                                                      <div className="col-md-4">
+                                                          <span className='me-3' >2. Is Landscape?</span>
+                                                          <FormControlLabel
+                                                              control={
+                                                                  <Switch
+                                                                      color="primary"
+                                                                      checked={isLandscape}
+                                                                      onChange={handleLandscapeChange}
+                                                                  />
+                                                              }
+                                                          />
+                                                      </div>
+                                                      <div className="col-md-4 text-end">
+                                                          <button
+                                                              className='btn edit'
+                                                              onClick={() => updateEditorContent()}
+                                                          >
+                                                              Update
+                                                          </button>
+                                                      </div>
+                                                  </div>
                                           </CardContent>
                                           )}
                                       </Card>
@@ -990,20 +1017,20 @@ const QmAddDocContentComponent = ({ router }) => {
                             </button>
                       </div>
                   </div>
-                  {/* <ConfirmationDialog open={openEditorContentConfirmationDialog} onClose={handleEditorContentDialogClose} onConfirm={handleEditorContentDialogConfirm} message={'Are you sure to update ?'} />*/}
                   {/* <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} sx={{ marginTop: '50px' }}> 
                       <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
                           {snackbarMessage}
                       </Alert>
                   </Snackbar> */}
-                  {/* <QaqtDocsAddDocContentAddSectionDialog
-                      open={openDialog}
-                      onClose={handleCloseSectionDialog}
-                      versionElements={versionElements}
-                  /> */}
+
                   <QmAddSectionDialog
                       open={openDialog}
                       onClose={handleCloseSectionDialog}
+                      revisionElements={revisionElements}
+                  />
+                  <QmAddAbbreviationDialog
+                      open={openDialog2}
+                      onClose={handleCloseAbbreviationDialog}
                       revisionElements={revisionElements}
                   />
               </div>

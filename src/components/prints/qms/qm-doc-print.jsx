@@ -3,7 +3,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 // import { styles } from 'assets/customStyles';
 // import { defaultStyle } from 'assets/customStyles';
-import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById } from '../../../services/qms.service';
+import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById, getAbbreviationsByIdNotReq, getQmRevistionRecordById } from '../../../services/qms.service';
 import htmlToPdfmake from 'html-to-pdfmake';
 // import "../../../static/buttons.css"
 
@@ -25,26 +25,34 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
 
   useEffect(() => {
+    console.log('hi---from--qm--doc----')
 
+    const fetchData = async () => {
+      try {
+        const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
 
-    Promise.all([getLabDetails(), getLogoImage(), getQmAbbreviationsById(revisionElements.RevisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), ]).then(([labDetails, logoimage, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
-      setLabDetails(labDetails);
-      setLogoimage(logoimage);
-      // console.log('DocTemplateAttributes--pdf---', DocTemplateAttributes)
-      // setDocAbbreviationsResponse(docAbbreviationsResponse);
-      setAllChaptersList(allChaptersLists);
-      setDocumentSummaryDto(DocumentSummaryDto);
-      setDocTemplateAttributes(DocTemplateAttributes);
-      setIsReady(true);
-    });
-
-    if (isReady && triggerEffect) {
-      setTriggerEffect(false);
-      setIsReady(false);
-      handlePdfGeneration();
+        Promise.all([getLabDetails(), getLogoImage(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+          setLabDetails(labDetails);
+          setLogoimage(logoimage);
+          setDocAbbreviationsResponse(docAbbreviationsResponse);
+          setAllChaptersList(allChaptersLists);
+          setDocumentSummaryDto(DocumentSummaryDto);
+          setDocTemplateAttributes(DocTemplateAttributes);
+          setIsReady(true);
+        });
+      } catch (error) {
+        console.error('Error in useEffect:', error);
+      }
+      
+      
     }
-
-  }, [triggerEffect, isReady]);
+    fetchData();
+    // if (isReady && triggerEffect) {
+    //   setTriggerEffect(false);
+    //   setIsReady(false);
+    //   handlePdfGeneration();
+    // }
+  }, [triggerEffect]);
 
 
 
@@ -52,6 +60,14 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     setTriggerEffect(true);
     setIsReady(false);
   }
+
+  useEffect(() => {
+    if (isReady && triggerEffect) {
+      setTriggerEffect(false);
+      setIsReady(false);
+      handlePdfGeneration();
+    }
+  }, [isReady]);
 
 
 
@@ -294,7 +310,7 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     let docAbbreviations = [];
     docAbbreviations.push([{ text: 'SN', style: 'tableLabel', alignment: 'center' }, { text: 'Abbreviation ', style: 'tableLabel', alignment: 'center' }, { text: 'Expansion', style: 'tableLabel', alignment: 'center' }])
     for (let i = 0; i < docAbbreviationsResponse.length; i++) {
-      docAbbreviations.push([{ text: (i + 1), style: 'tdData', alignment: 'center' }, { text: docAbbreviationsResponse[i][1], style: 'tdData', alignment: 'center' }, { text: docAbbreviationsResponse[i][2], style: 'tdData' }])
+      docAbbreviations.push([{ text: (i + 1), style: 'tdData', alignment: 'center' }, { text: docAbbreviationsResponse[i].abbreviation, style: 'tdData', alignment: 'center' }, { text: docAbbreviationsResponse[i].meaning, style: 'tdData' }])
     }
 
     // ----------Document Abbreviation table end----------------
