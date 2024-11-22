@@ -1,0 +1,55 @@
+.custom-textfield {
+    position: relative;
+    margin-bottom: 1.5rem;
+  }
+  
+  .textarea {
+    width: 100%;
+    font-size: 16px;
+    padding: 16px 12px 8px; /* Padding for space below and for the label */
+    border: 1px solid #ced4da;
+    border-radius: 4px;
+    outline: none;
+    background: transparent;
+    transition: border-color 0.3s, box-shadow 0.3s;
+  }
+  
+  .textarea:focus {
+    border-color: #1976d2; /* Adjust to your primary color */
+    box-shadow: 0 0 0 0.2rem rgba(25, 118, 210, 0.25);
+  }
+  
+  .textarea-label {
+    position: absolute;
+    top: 16px; /* Match padding-top of input */
+    left: 12px;
+    font-size: 16px;
+    color: #6c757d;
+    pointer-events: none;
+    transition: all 0.2s ease;
+    background: white; /* For better visibility */
+    padding: 0 4px; /* Add padding for label overlap */
+  }
+  
+  .textarea:focus + .textarea-label,
+  .textarea:not(:placeholder-shown) + .textarea-label {
+    top: -0.3em; /* Moves above the field */
+    left: 1em; /* Aligns left with padding */
+    font-size: 12px;
+    color: #1976d2;
+  }
+  
+  .error-text {
+    color: #dc3545;
+    font-size: 0.875rem;
+    margin-top: 4px;
+  }
+  
+  .textarea.error {
+    border-color: #dc3545;
+  }
+  
+  .textarea.error + .textarea-label {
+    color: #dc3545;
+  }
+  

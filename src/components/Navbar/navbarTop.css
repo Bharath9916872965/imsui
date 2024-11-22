@@ -21,6 +21,7 @@
 }
 .nav-item:hover .i-name {
   color: white;
+  transition: color 0.3s ease;
 }
 
 .ms-name {
@@ -28,6 +29,7 @@
 }
 .nav-item:hover .ms-name {
   color: red;
+  transition: color 1.5s ease;
 }
 
 /*  */
@@ -52,6 +54,12 @@
 
 .nav-animate:hover {
   padding-left: 10px;
+}
+
+.dropdown-item:hover {
+  background-color: #FF3800;
+  transition: background-color 0.3s ease;
+  color: white;
 }
 
 

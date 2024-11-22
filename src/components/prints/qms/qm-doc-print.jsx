@@ -3,7 +3,7 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 // import { styles } from 'assets/customStyles';
 // import { defaultStyle } from 'assets/customStyles';
-import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById, getAbbreviationsByIdNotReq, getQmRevistionRecordById } from '../../../services/qms.service';
+import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById, getAbbreviationsByIdNotReq, getQmRevistionRecordById, getDrdoLogo, getMocListById } from '../../../services/qms.service';
 import htmlToPdfmake from 'html-to-pdfmake';
 // import "../../../static/buttons.css"
 
@@ -16,32 +16,36 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   const [DocTemplateAttributes, setDocTemplateAttributes] = useState([]);
   const [labDetails, setLabDetails] = useState([]);
   const [logoimage, setLogoimage] = useState(null);
+  const [drdoLogo, setDrdoLogo] = useState(null);
   const [AllChaptersList, setAllChaptersList] = useState([]);
   const [DocumentSummaryDto, setDocumentSummaryDto] = useState(null);
   const [docAbbreviationsResponse, setDocAbbreviationsResponse] = useState([]);
+  const [docMoc, setDocMoc] = useState([]);
   const [ApprovedVersionReleaseList, setApprovedVersionReleaseList] = useState([]);
   const [isReady, setIsReady] = useState(false);
 
 
 
   useEffect(() => {
-    console.log('hi---from--qm--doc----')
 
     const fetchData = async () => {
       try {
         const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
 
-        Promise.all([getLabDetails(), getLogoImage(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
           setLabDetails(labDetails);
+          console.log('labDetails------', labDetails)
           setLogoimage(logoimage);
+          setDrdoLogo(drdoLogo);
           setDocAbbreviationsResponse(docAbbreviationsResponse);
+          setDocMoc(docMoc);
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);
           setIsReady(true);
         });
       } catch (error) {
-        console.error('Error in useEffect:', error);
+        console.error('Error in useEffect : ' , error);
       }
       
       
@@ -125,6 +129,51 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   
     return container.innerHTML.replace(/<v:[^>]*>[\s\S]*?<\/v:[^>]*>/gi, '');
   };
+
+  function splitTextIntoLines(text, maxLength) {
+    const lines = [];
+      let currentLine = '';
+
+    for (const word of text.split(' ')) {
+        if ((currentLine + word).length > maxLength) {
+            lines.push(currentLine.trim());
+            currentLine = word + ' ';
+        } else {
+          currentLine += word + ' ';
+        }
+    }
+      lines.push(currentLine.trim());
+      return lines;
+}
+
+// Generate rotated text image with line-wrapped text
+function generateRotatedTextImage(text) {
+    const maxLength = 260;
+    const lines = splitTextIntoLines(text, maxLength);
+    
+    const canvas = document.createElement('canvas');
+    const ctx = canvas.getContext('2d');
+    
+    // Set canvas dimensions based on anticipated text size and rotation
+    canvas.width = 200;
+    canvas.height = 1560;
+    
+    // Set text styling
+    ctx.font = '14px Roboto';
+    ctx.fillStyle = 'rgba(128, 128, 128, 1)'; // Gray color for watermark
+    
+    // Position and rotate canvas
+    ctx.translate(80, 1480); // Adjust position as needed
+    ctx.rotate(-Math.PI / 2); // Rotate 270 degrees
+    
+    // Draw each line with a fixed vertical gap
+    const lineHeight = 20; // Adjust line height if needed
+    lines.forEach((line, index) => {
+      ctx.fillText(line, 0, index * lineHeight); // Position each line below the previous
+    });
+    
+    return canvas.toDataURL();
+}
   
 
 
@@ -288,19 +337,19 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
     var docSummary = [];
 
-    docSummary.push([{stack :[{text: [{text :'1. Title:', style :'tableLabel'}, {text :'ISO 9001 :2001, Quality Manual of '+sessionStorage.getItem('labcode')}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'2. Type of report:', style :'tableLabel'}, {text :'QMS'}]}]}, {stack :[{text: [{text :'3. Classification:', style :'tableLabel'}, {text :'RESTRICTED'}]}]}])
-    docSummary.push([{stack :[{text: [{text :'4. '+sessionStorage.getItem('labcode')+' Document Number:', style :'tableLabel'}, {text : sessionStorage.getItem('labcode')+'/QMS/QM/'+'I' + revisionElements[5] + '-R' + revisionElements[6]}]}]}, {stack :[{text: [{text :'5. Project Document Number: ', style :'tableLabel'}, {text :'NA'}]}]}])
-    docSummary.push([{stack :[{text: [{text :'6. Month and Year:', style :'tableLabel'}, {text : datePart1}]}]}, {stack :[{text: [{text :'7. Number of Pages: ', style :'tableLabel'}, {text :'70'}]}]}])
-    docSummary.push([{stack :[{text: [{text :'8. Additional Information:', style :'tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.additionalInfo !== null && DocumentSummaryDto.additionalInfo !== undefined ? DocumentSummaryDto.additionalInfo: ''}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'9. Project  Number & Project Name: ', style :'tableLabel'}, {text : 'Quality Management System of '+sessionStorage.getItem('labcode')}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'10. Abstract:', style :'tableLabel'}, {text :  DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.abstract !== null && DocumentSummaryDto.abstract !== undefined ? DocumentSummaryDto.abstract: ''}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'11. Keywords:', style :'tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.keywords !== null && DocumentSummaryDto.keywords !== undefined ? DocumentSummaryDto.keywords: ''}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'12. Organization and address:', style :'tableLabel'}, {text : labDetails[2] + ' (' + labDetails[1] + ') '+'Government of India, Ministry of Defence ' + 'Defence Research Development Organization '+labDetails[4] + ', ' + labDetails[5] + ' PIN-' + labDetails[6]}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'13. Distribution:', style :'tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.distribution !== null && DocumentSummaryDto.distribution !== undefined ? DocumentSummaryDto.distribution: ''}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'14. Revision:', style :'tableLabel'}, {text : 'Issue ' + revisionElements[5] + '-Rev ' + revisionElements[6]}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text :'15. Reviewed by:', style :'tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
-    docSummary.push([{stack :[{text: [{text :'16. Approved by:', style :'tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 1. Title : ' , style  : ' tableLabel'}, {text  : ' ISO 9001 :2001, Quality Manual of '+labDetails.labCode}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 2. Type of report : ' , style  : ' tableLabel'}, {text  : ' QMS'}]}]}, {stack :[{text: [{text  : ' 3. Classification : ' , style  : ' tableLabel'}, {text  : ' RESTRICTED'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 6. Month and Year : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: [{text  : ' 7. Number of Pages: ', style  : ' tableLabel'}, {text  : ' 70'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 8. Additional Information : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.additionalInfo !== null && DocumentSummaryDto.additionalInfo !== undefined ? DocumentSummaryDto.additionalInfo: ''}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 9. Project  Number & Project Name: ', style  : ' tableLabel'}, {text : 'Quality Management System of '+labDetails.labCode}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 10. Abstract : ' , style  : ' tableLabel'}, {text :  DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.abstract !== null && DocumentSummaryDto.abstract !== undefined ? DocumentSummaryDto.abstract: ''}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 11. Keywords : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.keywords !== null && DocumentSummaryDto.keywords !== undefined ? DocumentSummaryDto.keywords: ''}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 12. Organization and address : ' , style  : ' tableLabel'}, {text : labDetails.labName + ' (' + labDetails.labCode + '), '+'Government of India, Ministry of Defence ' + 'Defence Research Development Organization '+labDetails[4] + ', ' + labDetails[5] + ' PIN-' + labDetails[6]}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 13. Distribution : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.distribution !== null && DocumentSummaryDto.distribution !== undefined ? DocumentSummaryDto.distribution: ''}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 14. Revision : ' , style  : ' tableLabel'}, {text : 'Issue ' + revisionElements.issueNo + '-Rev ' + revisionElements.revisionNo}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 15. Reviewed by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 16. Approved by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
 
     // ----------Document summary table end----------------
 
@@ -316,47 +365,68 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     // ----------Document Abbreviation table end----------------
 
 
+    let docMappingOfClasses = [];
+    docMappingOfClasses.push([{ text: 'QM Section No. ', style: 'tableLabel', alignment: 'center' }, { text: 'ISO 9001:2015 Clause. No.', style: 'tableLabel', alignment: 'center' }, { text: 'Description', style: 'tableLabel', alignment: 'center' }])
+    for (let i = 0; i < docMoc.length; i++) {
+      docMappingOfClasses.push([{ text: docMoc[i][0] }, { text: docMoc[i][1] }, { text: docMoc[i][2] }])
+    }
+
+
     let docDefinition = {
       info: {
         title: "Quality Manual Print",
       },
       pageSize: 'A4',
       pageOrientation: 'portrait',
-      pageMargins: [40, 50, 40, 40],
-      header: function (currentPage, pageCount) {
-        if (currentPage == 1) {
-          return {
-            margin: [0, 20, 0, 10],
-            columns: [
-              { text: 'RESTRICTED', style: 'headerrNote' }
+      pageMargins: [50, 50, 40, 40],
+      header: function (currentPage) {
+        return {
+            stack: [
+                
+                {
+                    columns: [
+                        {
+                            // Left: Lab logo
+                            image: JSON.stringify(logoimage) == 'null' ? "data:image/png;base64," + 'iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC'
+                                        : "data:image/png;base64," + JSON.stringify(logoimage),
+                            width: 30,
+                            height: 30,
+                            alignment: 'left',
+                            margin: [35, 10, 0, 10]
+                        },
+                        { text: 'RESTRICTED', style: 'headerrNote', margin: [0, 10, 0, 0] },
+                        {
+                            // Right: DRDO logo
+                            image: JSON.stringify(drdoLogo) == 'null' ? "data:image/png;base64," + 'iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC'
+                            : "data:image/png;base64," + JSON.stringify(drdoLogo),
+                            width: 30,
+                            height: 30,
+                            alignment: 'right',
+                            margin: [0, 10, 20, 10]
+                        }
+                    ]
+                },
+                
             ]
-          }
-        } else {
-          return {
-            margin: [0, 20, 0, 10],
-            columns: [
-              { text: '', style: '' }
-            ]
-          }
-        }
-      },
+        };
+    },
       footer: function (currentPage, pageCount) {
         if (currentPage >= 2) {
           return {
-            // style: [alignment:''],
+            // style: [alignment : ' '],
             alignment: 'center',
             margin: [0, 15, 0, 10],
             stack: [{
               columns: [
 
-                {},
+                { text: labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo, fontSize : 9 },
                 { text: 'RESTRICTED', style: 'footerNote', },
                 {
                   text: "Page " + currentPage.toString() + ' of ' + pageCount, margin: [45, 0, 0, 0], fontSize : 9
                 },
               ]
             },
-            { text: 'The information given in this document is not to be published or communicated, either directly or indirectly, to the press or to any personnel not authorized to receive it.', style: 'footertext' },
+            // { text: 'The information given in this document is not to be published or communicated, either directly or indirectly, to the press or to any personnel not authorized to receive it.', style: 'footertext' },
             ]
 
           }
@@ -367,18 +437,32 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
             margin: [0, 15, 0, 10],
             stack: [{
               columns: [
+                // { text: today.getFullYear() + '/' + labDetails.labCode + '/MQAP/', fontSize : 9 },
                 {},
                 { text: 'RESTRICTED', style: 'footerNote', },
                 {
                 },
               ]
             },
-            { text: 'The information given in this document is not to be published or communicated, either directly or indirectly, to the press or to any personnel not authorized to receive it.', style: 'footertext' },
+            // { text: 'The information given in this document is not to be published or communicated, either directly or indirectly, to the press or to any personnel not authorized to receive it.', style: 'footertext' },
             ]
 
           };
         }
       },
+
+      watermark: { text: 'DRAFT', opacity: 0.1, bold: true, italics: false, fontSize: 150,  },
+
+      background: function (currentPage) {
+        return [
+          {
+            image: generateRotatedTextImage((DocTemplateAttributes?.restrictionOnUse ?? '')),
+            width: 100, // Adjust as necessary for your content
+            absolutePosition: { x: -10, y: 50 }, // Position as needed
+          }
+        ];
+      },
+
       // defaultStyle,
 
       content: [
@@ -456,9 +540,9 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
           },
           pageBreak: 'after'
         },
-        {
-          text: 'APPROVAL PAGE', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
-        },
+        // {
+        //   text: 'APPROVAL PAGE', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10], pageBreak: 'after'
+        // },
         // {
         //   table: {
         //     widths: [100, 'auto', 120, 130],
@@ -467,6 +551,16 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
         //   },
         //   pageBreak: 'after'
         // },
+        {
+          text: 'MAPPING OF CLAUSES', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
+        },
+        {
+          table: {
+            widths: [100,100,290],
+            body: docMappingOfClasses
+          },
+          pageBreak: 'after'
+        },
         {
           text: 'LIST OF ABBREVIATIONS', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
         },
