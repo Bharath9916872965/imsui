@@ -344,4 +344,40 @@ export const getAuditTeamMemberList = async () => {
     
 };
 
+export const getScheduleApprovalList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}schedule-approval-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getScheduleApprovalList:', error);
+        throw error;
+    }
+}
+
+
+export const approveSchedule = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}approve-schedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in approveSchedule:', error);
+        throw error;
+    }
+}
+
+export const returnSchedule = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}return-schedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in returnSchedule:', error);
+        throw error;
+    }
+}
+
+export const getScheduleRemarks = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}schedule-remarks`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getScheduleRemarks:', error);
+        throw error;
+    }
+}
 

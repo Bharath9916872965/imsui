@@ -29,7 +29,6 @@ const QmAddSectionDialog = ({ open, onClose }) => {
     const getUnAddedChapterlist = async () => {
         try {
             let unAddedChapterList = await getUnAddedChapters();
-            console.log('unAddedChapterList------', unAddedChapterList)
             setUnAddedChapterList(unAddedChapterList);
         } catch (error) {
             setError('An error occurred');

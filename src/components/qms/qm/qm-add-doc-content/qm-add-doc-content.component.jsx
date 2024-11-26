@@ -69,7 +69,6 @@ const QmAddDocContentComponent = ({ router }) => {
   const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
-    console.log('versionElements----in add-content---',revisionElements)
 
       window.$('#summernote').summernote({
           airMode: false,
@@ -330,7 +329,6 @@ const QmAddDocContentComponent = ({ router }) => {
   };
 
   const deleteChapterById = async (reloadchpter, chapterId, level) => {
-      // console.log('Deleting chapter', chapterId);
       setDeleteChapterId(chapterId)
       setDeleteRefreshChapterId(reloadchpter)
       setDeleteLevel(level)
@@ -469,6 +467,7 @@ const QmAddDocContentComponent = ({ router }) => {
       // console.log('--editor value---',e.target.value)
       // setSnackbarOpen(false);
   };
+  
 
   const handleOpenUnaddedSections = () => {
       setOpenDialog(true)

@@ -30,8 +30,6 @@ const Login = (props) => {
         setLoading(true);
         const username = values.username;
         const password = values.password;
-        console.log('Username:', username);
-        console.log('Password:', password);
         await login(username, password).then(
             (response) => {
                 if (!response.access_token) {
@@ -45,8 +43,6 @@ const Login = (props) => {
             },
             (error) => {
                 let resMessage;
-                console.log('sdfsdfsdfsf----')
-                console.log('error.response----', error.response)
                 if (error.response && error.response.status === 401) {
                     resMessage = "Username or password is incorrect";
                 } else {

@@ -40,6 +40,15 @@
   }
 }
 
+.material-icons {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  vertical-align: middle;
+}
+
+
+
 /* .modal {
   background-color: rgba(70, 68, 68, 0.5); 
 } */
