@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from "react";
 import { addSchedule, editScheduleSubmit,getScheduleList,getTeamList,reScheduleSubmit,getIqaDtoList,getAuditeeDtoList,forwardSchedule,scheduleMailSend,
-         AuditRescheduleDto,getTotalTeamMembersList,rescheduleMailSend } from "../../../services/audit.service";
+         AuditRescheduleDto,getTotalTeamMembersList,rescheduleMailSend,getScheduleRemarks } from "../../../services/audit.service";
 import Datatable from "../../datatable/Datatable";
-import { Box, Typography, Button, Switch, TextField,Autocomplete, ListItemText } from '@mui/material';
+import { Box, Typography, Button, Switch, TextField,Autocomplete, ListItemText,TableContainer,Table,TableHead,TableRow,TableCell,TableBody,Paper } from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import '../auditor-list.component.css';
+import '../../datatable/Datatable.css'
 import Swal from 'sweetalert2';
 import { format } from "date-fns";
 import dayjs from 'dayjs';
@@ -41,11 +42,16 @@ const ScheduleListComponent = () => {
   const [iqaToDate,setIqaToDate] = useState(dayjs(new Date()));
   const [auditeeList,setAuditeeList] = useState([]);
   const [filauditeeList,setFilAuditeeList] = useState([]);
-  const [forwardFlag,setForwardFlag] = useState(true);
+  const [forwardFlag,setForwardFlag] = useState(false);
   const [element,setElement] = useState('');
   const [teamMemberDetails,setTeamMemberDetails] = useState([]);
   const [filTeamMemberDetails,setFilTeamMemberDetails] = useState([]);
   const [filMembersTotalData,setFilMembersTotalData] = useState([]);
+  const [totalAuditeeCount,setTotalAuditeeCount] = useState(0);
+  const [assignedAuditeeCount,setAssignedAuditeeCount] = useState(0);
+  const [pendingAuditeeCount,setPendingAuditeeCount] = useState(0);
+  const [schRemarks,setSchRemarks] = useState([]);
+  const [filSchRemarks,setFilSchRemarks] = useState([]);
 
   const scheduleValidation = Yup.object().shape({
     scheduleDate: Yup.date().required('Schedule Date is required'),
@@ -93,11 +99,14 @@ const ScheduleListComponent = () => {
       const iqaList        = await getIqaDtoList();
       const auditList      = await getAuditeeDtoList();
       const teamMemDetails = await getTotalTeamMembersList();
+      const remarksSch     =     await getScheduleRemarks();
+      setSchRemarks(remarksSch);
       setTeamMemberDetails(teamMemDetails)
       setAuditeeList(auditList)
+      setTotalAuditeeCount(auditList.length)
       setIqaFullList(iqaList);
       setScheduleList(scdList)
-
+      console.log('scdList------ ',scdList)
       const iqaData = iqaList.map(data => ({
                       value : data.iqaId,
                       label : data.iqaNo
@@ -139,11 +148,13 @@ const ScheduleListComponent = () => {
 
   const setDataTable = (list)=>{
     setFilFullScheduleList(list)
-    if(list.length >0 && list[0].scheduleStatus === 'INI'){
+    if(list.length >0 && list[0].scheduleStatus === 'INI' && (Number(totalAuditeeCount)-Number(list.length)) === 0){
       setForwardFlag(true)
     }else{
       setForwardFlag(false)
     }
+    setAssignedAuditeeCount(list.length)
+    setPendingAuditeeCount(Number(totalAuditeeCount)-Number(list.length))
     const mappedData = list.map((item,index)=>({
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',
@@ -252,6 +263,7 @@ const ScheduleListComponent = () => {
   }
 
   const reSchedule = (item)=>{
+    setFilSchRemarks(schRemarks.filter(data =>data.scheduleId === item.scheduleId))
     const auditees = scheduleList.filter(data => data.iqaId === iqaId && data.auditeeId !== item.auditeeId).map(data => data.auditeeId);
     setFilAuditeeList(auditeeList.filter(data => !auditees.includes(data.auditeeId)))
     setTeamMembers(item.teamId)
@@ -278,6 +290,7 @@ const ScheduleListComponent = () => {
     setDataTable(scdList.filter(data => data.iqaId === iqaId))
     setScheduleList(scdList)
     setAuditeeList(auditList)
+    setTotalAuditeeCount(auditList.length)
     const auditees = scdList.filter(data => data.iqaId === iqaId).map(data => data.auditeeId);
     setFilAuditeeList(auditList.filter(data => !auditees.includes(data.auditeeId)))
   }
@@ -380,7 +393,8 @@ const ScheduleListComponent = () => {
         }).then(async (result) => {
           if(result){
             try {
-            const response = await forwardSchedule(filFullScheduleList.map(data => data.scheduleId));
+            const created = filFullScheduleList.filter(data => data.scheduleStatus === 'INI')
+            const response = await forwardSchedule(created.map(data => data.scheduleId));
             if(response.status === 'S'){
               afterSubmit();
               setShowModal(false);
@@ -391,7 +405,7 @@ const ScheduleListComponent = () => {
                 timer: 1500
               });
               setForwardFlag(false)
-              await scheduleMailSend(filFullScheduleList);
+              await scheduleMailSend(created);
             } else {
               Swal.fire({
                 icon: "error",
@@ -436,8 +450,13 @@ const ScheduleListComponent = () => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="80%" className='text-center'><h3>{iqaNo} : Audit Schedule</h3></Box>
-          <Box flex="20%">
+          <Box flex="55%" className='text-center'><h3>{iqaNo} : Audit Schedule</h3></Box>
+          <Box flex="35%">
+            <span className="text-heading">Auditees : </span><button className="button-count total-auditee-count">{totalAuditeeCount}</button>
+            <span className="text-heading">&nbsp;  Auditee Assigned : </span><button className="button-count assigned-count">{assignedAuditeeCount}</button>
+            <span className="text-heading">&nbsp;  Auditee Pending : </span><button className="button-count pending-count">{pendingAuditeeCount}</button>
+          </Box>
+          <Box flex="10%">
             <SelectPicker options={iqaOptions} label="IQA No"
             value={iqaOptions && iqaOptions.length >0 && iqaOptions.find(option => option.value === iqaId) || null}
              handleChange={(newValue) => {onIqaChange( newValue?.value) }}/>
@@ -447,9 +466,7 @@ const ScheduleListComponent = () => {
             <Datatable columns={columns} data={filScheduleList} />
           </div>
           <div>
-            <button className="btn add" onClick={scheduleAdd}>
-              Add
-            </button>
+            {!forwardFlag && pendingAuditeeCount !== 0 &&  <button className="btn add" onClick={scheduleAdd}> Add </button>}
             {forwardFlag && <button className="btn back" onClick={() => scheduleForward()}>Forward</button>}
           </div>
 
@@ -465,6 +482,28 @@ const ScheduleListComponent = () => {
                   </div>
 
                   <div className="modal-body model-max-height">
+                  {(filSchRemarks || []).length>0?(
+                    <>
+                     <table className="table table-bordered table-hover">
+                      <thead>
+                       <tr>
+                          <th className='width5'>SN</th>
+                          <th className='width35'>Employee</th>
+                          <th className='width60'>Remarks</th>
+                       </tr>
+                      </thead> 
+                      {filSchRemarks.map((item,index) =>(
+                        <tbody>
+                          <tr key={index}>
+                              <td className='width5'>{index + 1 }</td>
+                              <td className='width35 text-start'>{item.empName}<Box className='date-color'>{format(new Date(item.transactionDate),'MMM d, y h:mm a')}</Box></td>
+                              <td className='width60 text-start'>{item.remarks}</td>
+                          </tr>
+                        </tbody>
+                      ))}
+                     </table>
+                    </>
+                       ) : ('')}<br/>
                    <Formik initialValues={initialValues} validationSchema={scheduleValidation} enableReinitialize  onSubmit={async (values) => { await handleSubmitClick(values);}}>
                         {({setFieldValue,isValid,isSubmitting,dirty ,errors,touched, }) =>(
                           <Form>
