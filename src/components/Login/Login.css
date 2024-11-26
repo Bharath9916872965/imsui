@@ -199,3 +199,11 @@
 .container.active .toggle-right{
   transform: translateX(200%);
 }
+
+.text-center{
+  text-align: center;
+}
+
+.mg-top-10{
+  margin-top: 10px;
+}
