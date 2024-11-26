@@ -18,9 +18,7 @@ export const login = async (username, password) => {
       params.append('client_secret', CLIENT_SECRET); 
       params.append('username', username);
       params.append('password', password);
-      for (const [key, value] of params.entries()) {
-        console.log(`${key}: ${value}`);
-    }
+
   
       const headers = {'Content-Type': 'application/x-www-form-urlencoded',};
       const response = await axios.post(TOKEN_URL, params, { headers });
@@ -34,7 +32,6 @@ export const login = async (username, password) => {
         // await customAuditStampingLogin(username);
         // const emp = await getEmpDetails(username);
         // localStorage.setItem('roleId',emp.qmsFormRoleId)
-        console.log('response.data------', response.data);
         return response.data;
       }
     } catch (error) {

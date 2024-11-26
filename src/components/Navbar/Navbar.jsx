@@ -13,7 +13,6 @@ const Navbar = (props) => {
 
   useEffect(() => {
     try {
-      console.log('----nav--header----')
       const imsFormRoleId = 2;
       fetchHeaderModuleList(imsFormRoleId);
       fetchHeaderModuleDetailList(imsFormRoleId);
@@ -32,7 +31,6 @@ const Navbar = (props) => {
   const fetchHeaderModuleList = async (imsFormRoleId) => {
     try {
       const moduleListResponse = await getHeaderModuleList(imsFormRoleId);
-      console.log('moduleListResponse--', moduleListResponse)
       setHeaderModuleList(moduleListResponse);
     } catch (error) {
       console.error('Error fetching Header Module list:', error);
@@ -42,7 +40,6 @@ const Navbar = (props) => {
   const fetchHeaderModuleDetailList = async (imsFormRoleId) => {
     try {
       const moduleDetailListResponse = await getHeaderModuleDetailList(imsFormRoleId);
-      console.log('moduleDetailListResponse--', moduleDetailListResponse)
       setHeaderModuleDetailList(moduleDetailListResponse);
     } catch (error) {
       console.error('Error fetching Header Module Detail list:', error);

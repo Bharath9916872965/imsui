@@ -15,9 +15,6 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
     const [formData, setFormData] = useState(null);
     const [revistionRecord, setRevistionRecord] = useState(null);
 
-    const [openConfirmationDialog, setOpenConfirmationDialog] = useState(false);
-    const [openConfirmationDialog2, setOpenConfirmationDialog2] = useState(false);
-
     const [openDialog, setOpenDialog] = useState(false);
 
 
@@ -27,7 +24,6 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log('revisionElements-----', revisionElements)
             try {
                 getAbbreviationsList();
                 getQmRevistionRecord();
@@ -41,15 +37,7 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
     }, [open]);
 
 
-    const handleDialogClose = () => {
-        setOpenConfirmationDialog(false);
-    };
-    const handleDialogClose2 = () => {
-        setOpenConfirmationDialog2(false);
-    };
-
     const handleDialogConfirm = async () => {
-        setOpenConfirmationDialog(false);
         setOpenDialog(false);
 
         let res = await addNewAbbreviation(formData);
@@ -67,7 +55,6 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
     };
 
     const submitReqAbbreviation = async () => {
-        setOpenConfirmationDialog2(false);
 
         const isConfirmed = await AlertConfirmation({
             title: 'Are you sure to submit ?',
@@ -104,13 +91,7 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
 
     };
 
-    const handleSnackbarClose = () => {
-        setSnackbarOpen(false);
-        onClose(false)
-    };
-
     const addRemoveAbbreviation = (checked, id) => {
-        console.log('added.......');
         if (checked) {
             setSelectedAbbre([...selectedAbbre, id])
             setUnSelectedAbbre(unSelectedAbbre.filter((val) => val !== id));
@@ -124,7 +105,6 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
     const getAbbreviationsList = async () => {
         try {
             let list = await getAbbreviationsByIdNotReq("0");
-            console.log('abbre--list***-------', list);
             setbbreviationsList(list);
         } catch (error) {
             setError('An error occurred');
@@ -139,17 +119,12 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
             if(revistionRecord != undefined && revistionRecord !=null && revistionRecord.abbreviationIdNotReq != null) {
                 abbreviationIdNotReq =revistionRecord.abbreviationIdNotReq
             }
-            console.log('rev-rec--', revistionRecord)
             setUnSelectedAbbre(abbreviationIdNotReq.split(',').map(Number));
         } catch (error) {
             setError('An error occurred');
         }
     };
 
-    const handleClose = () => {
-        setOpenDialog(false);
-        // setQualifyCategoryName(null);
-    };
 
     const validationSchema = Yup.object({
         abbreviation: Yup.string().max(255, 'Must be 255 characters or less').required('Abbreviation is required'),
@@ -157,9 +132,7 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
     });
 
     const handleSubmit = async (values) => {
-        console.log('Form Values:', values);
         setFormData(values)
-        setOpenConfirmationDialog(true);
         //   const response = await addNewAbbreviation(values);
     };
 
@@ -184,7 +157,7 @@ const QmAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm })
                                 <div className="modal-body">
                                     <br />
                                     <div className="container">
-                                        <div className="row row-cols-3">
+                                        <div className="row row-cols-2">
                                             {abbreviationsList.map((item, index) => (
                                                 <div key={index} className="col" style={{ border: '0.5px solid #d7ebeb' }}>
                                                     <div className="d-flex py-2 text-start">
