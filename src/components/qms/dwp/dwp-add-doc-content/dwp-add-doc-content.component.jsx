@@ -12,7 +12,7 @@ import 'summernote/dist/summernote-lite.js';
 import Navbar from "../../../Navbar/Navbar";
 import AlertConfirmation from "../../../../common/AlertConfirmation.component";
 import DwpAddSectionDialog from "./dwp-add-section-dialog";
-import QmDocPrint from "../../../prints/qms/qm-doc-print";
+import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 
 const DwpAddDocContentComponent = ({ router }) => {
 
@@ -439,9 +439,6 @@ const DwpAddDocContentComponent = ({ router }) => {
 
         if (isConfirmed) {
             const content = $('#summernote').summernote('code');
-            // let chaperContent = new Array;
-            // chaperContent.push(editorContentChapterId)
-            // chaperContent.push(content)
             let res = await updateDwpChapterContent(editorContentChapterId, content);
 
             if (res && res > 0) {
@@ -461,11 +458,6 @@ const DwpAddDocContentComponent = ({ router }) => {
             }
 
         }
-    };
-
-    const handleChange = (e) => {
-        // console.log('--editor value---',e.target.value)
-        // setSnackbarOpen(false);
     };
 
 
@@ -488,7 +480,7 @@ const DwpAddDocContentComponent = ({ router }) => {
     };
 
     const getDocPDF = (action) => {
-        return <QmDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
+        return <DwpDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
     }
 
 

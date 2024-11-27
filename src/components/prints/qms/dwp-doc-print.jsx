@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById, getAbbreviationsByIdNotReq, getQmRevistionRecordById, getDrdoLogo, getMocListById } from '../../../services/qms.service';
 import htmlToPdfmake from 'html-to-pdfmake';
+import { getAbbreviationsByIdNotReq, getDocSummarybyId, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getLabDetails, getLogoImage, getMocListById, getQmRevistionRecordById } from 'services/qms.service';
 
-const QmDocPrint = ({ action, revisionElements, buttonType }) => {
+
+const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [today, setToday] = useState(new Date());
@@ -23,11 +24,12 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
   useEffect(() => {
 
+
     const fetchData = async () => {
       try {
         const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
 
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getDwpAllChapters(revisionElements.divisionId), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
@@ -333,7 +335,7 @@ function generateRotatedTextImage(text) {
 
     docSummary.push([{stack :[{text: [{text  : ' 1. Title : ' , style  : ' tableLabel'}, {text  : ' ISO 9001 :2001, Quality Manual of '+labDetails.labCode}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 2. Type of report : ' , style  : ' tableLabel'}, {text  : ' QMS'}]}]}, {stack :[{text: [{text  : ' 3. Classification : ' , style  : ' tableLabel'}, {text  : ' RESTRICTED'}]}]}])
-    docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : labDetails.labCode+'/QMS/DWP/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
     docSummary.push([{stack :[{text: [{text  : ' 6. Month and Year : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: [{text  : ' 7. Number of Pages: ', style  : ' tableLabel'}, {text  : ' 70'}]}]}])
     docSummary.push([{stack :[{text: [{text  : ' 8. Additional Information : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.additionalInfo !== null && DocumentSummaryDto.additionalInfo !== undefined ? DocumentSummaryDto.additionalInfo: ''}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 9. Project  Number & Project Name: ', style  : ' tableLabel'}, {text : 'Quality Management System of '+labDetails.labCode}]}], colSpan :2}, {}])
@@ -368,7 +370,7 @@ function generateRotatedTextImage(text) {
 
     let docDefinition = {
       info: {
-        title: "Quality Manual Print",
+        title: "DWP Print",
       },
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -413,7 +415,7 @@ function generateRotatedTextImage(text) {
             stack: [{
               columns: [
 
-                { text: labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo, fontSize : 9 },
+                { text: labDetails.labCode+'/QMS/DWP/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo, fontSize : 9 },
                 { text: 'RESTRICTED', style: 'footerNote', },
                 {
                   text: "Page " + currentPage.toString() + ' of ' + pageCount, margin: [45, 0, 0, 0], fontSize : 9
@@ -489,7 +491,7 @@ function generateRotatedTextImage(text) {
           ]
         },
         {
-          text: 'Quality Manual (QM)', style: 'DocumentName', alignment: 'center',
+          text: 'Division Work Procedure (DWP)', style: 'DocumentName', alignment: 'center',
         },
         // {
         //   text: '(Quality Assurance, Qualification & Acceptance Test Conditions/Plan, Reliability and Test Report Formats)', style: 'DocumentSubName', alignment: 'center',
@@ -716,4 +718,4 @@ function generateRotatedTextImage(text) {
   
 }
 
-export default QmDocPrint;
+export default DwpDocPrint;

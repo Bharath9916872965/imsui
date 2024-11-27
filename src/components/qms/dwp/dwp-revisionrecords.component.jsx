@@ -2,11 +2,10 @@ import { useCallback, useEffect, useState } from "react";
 import { getDwpVersionRecordDtoList, getQmVersionRecordDtoList } from "../../../services/qms.service";
 import Datatable from "../../datatable/Datatable";
 import withRouter from '../../../common/with-router';
-import { IconButton } from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import "./dwp-revisionrecords.component.css"
-import QmDocPrint from "../../prints/qms/qm-doc-print";
 import { format } from "date-fns";
+import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 // import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
 
 
@@ -66,7 +65,7 @@ const DwpRevisionRecordsComponent = ({ router }) => {
   }, []);
 
   const getDocPDF = (action, revisionElements) => {
-    return <QmDocPrint action={action} revisionElements={revisionElements} />
+    return <DwpDocPrint action={action} revisionElements={revisionElements} />
   }
 
   const redirecttoQmDocument = useCallback((element) => {

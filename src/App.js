@@ -12,7 +12,7 @@ import IqaListComponent from './components/audit/iqa-list.component';
 import ScheduleListComponent from './components/audit/scheduler/schedule-list.component';
 import AuditeeListComponent from './components/audit/auditee-list.component';
 import AuditTeamListComponent from './components/audit/audit-team-list.component';
-import DwpRevisionrecordsComponent from './components/qms/dwp/dwp-revisionrecords.component';
+import DwpRevisionrecordsComponent from 'components/qms/dwp/dwp-revisionrecords.component';
 import DwpAddDocContentComponent from './components/qms/dwp/dwp-add-doc-content/dwp-add-doc-content.component';
 import ScheduleApprovalComponent from './components/audit/scheduler/schedule-approval.component';
 
