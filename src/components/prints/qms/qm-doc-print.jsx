@@ -34,7 +34,6 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
 
         Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
           setLabDetails(labDetails);
-          console.log('labDetails------', labDetails)
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
           setDocAbbreviationsResponse(docAbbreviationsResponse);

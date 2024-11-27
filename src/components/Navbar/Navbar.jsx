@@ -54,7 +54,7 @@ const Navbar = (props) => {
         <ul className="navbar-nav">
           <li className="nav-item">
             <a href="/dashboard" className="nav-link">
-              <h3><span className="i-name">I</span><span  className="ms-name">MS</span></h3>
+              <h3><span className="i-name">I</span><span className="ms-name">MS</span></h3>
             </a>
           </li>
         </ul>
@@ -66,29 +66,47 @@ const Navbar = (props) => {
               <i className="material-icons" style={{ fontSize: '20px' }}>home</i> Home
             </a>
           </li>
-          {headerModuleList.map((module, index) => (
-            <li key={index} className="nav-item dropdown">
-              <a
-                href="#"
-                className="nav-link dropdown-toggle nav-animate"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="material-icons" style={{ fontSize: '20px' }}>{module.moduleIcon}</i> {module.formModuleName}
-              </a>
-              <ul className="dropdown-menu">
-                {headerModuleDetailList
-                  .filter(detail => detail.formModuleId === module.formModuleId)
-                  .map((detail, idx) => (
+          {headerModuleList.map((module, index) => {
+            const filteredDetails = headerModuleDetailList.filter(
+              (detail) => detail.formModuleId === module.formModuleId
+            );
+
+            return filteredDetails.length > 1 ? (
+              <li key={index} className="nav-item dropdown">
+                <a
+                  href="#"
+                  className="nav-link dropdown-toggle nav-animate"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i className="material-icons" style={{ fontSize: '20px' }}>
+                    {module.moduleIcon}
+                  </i>{' '}
+                  {module.formModuleName}
+                </a>
+                <ul className="dropdown-menu">
+                  {filteredDetails.map((detail, idx) => (
                     <li key={idx}>
                       <a className="dropdown-item" href={`/${detail.formUrl}`}>
-                        {detail.formName}
+                        {detail.formDispName}
                       </a>
                     </li>
                   ))}
-              </ul>
-            </li>
-          ))}
+                </ul>
+              </li>
+            ) : (
+              <li key={index} className="nav-item dropdown">
+                <a
+                  href={`/${filteredDetails[0]?.formUrl}`}
+                  className="nav-link nav-animate"
+                >
+                  <i className="material-icons" style={{ fontSize: '20px' }}>{module.moduleIcon}</i>
+                  {module.formModuleName}
+                </a>
+              </li>
+            );
+          })}
+
 
           {/* <li className="nav-item dropdown">
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">

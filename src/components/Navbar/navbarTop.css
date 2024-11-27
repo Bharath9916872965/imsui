@@ -18,6 +18,7 @@
 
 .i-name {
   color: red;
+  transition: color 1.5s ease;
 }
 .nav-item:hover .i-name {
   color: white;
@@ -26,6 +27,7 @@
 
 .ms-name {
   color: white;
+  transition: color 1.5s ease;
 }
 .nav-item:hover .ms-name {
   color: red;
@@ -61,6 +63,11 @@
   transition: background-color 0.3s ease;
   color: white;
 }
+
+.dropdown {
+  margin-right: 10px;
+}
+
 
 
 
