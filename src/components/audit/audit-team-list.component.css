@@ -60,3 +60,23 @@
   .edit-button:hover {
     background-color: #0056b3;
   }
+
+  .width5{
+    width: 5%;
+  }
+
+  .width60{
+    width: 60%;
+  }
+
+  .width35{
+    width: 35%;
+  }
+
+  .fw-bolder{
+    font-weight: bolder;
+  }
+
+  .date-color{
+    color: #3426b4 !important;
+  }

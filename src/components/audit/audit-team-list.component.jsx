@@ -206,11 +206,11 @@ const AuditTeamListComponent = () => {
     const leadDetails = editTeamMembers.filter(data => data.isLead === 1);
     const memberDetails = editTeamMembers.filter(data => data.isLead === 0);
     const filteredAuditorList = fullAuditorList.filter(
-      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.auditorId !== leadDetails[0].auditorId)
+      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.auditorId !== leadDetails[0].auditorId && auditor.iqaId === iqaId )
     );
 
     const filteredTeamMemberList = fullAuditorList.filter(
-      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && !memberDetails.some(member => member.auditorId === aud.auditorId))
+      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.iqaId === iqaId && !memberDetails.some(member => member.auditorId === aud.auditorId ))
     );
 
     setTeamLeadFilOptions(
@@ -246,13 +246,18 @@ const AuditTeamListComponent = () => {
       <div className="card">
         <div className="card-body text-center">
           <div className="row">
-            <div className="col-md-10">
-              <h3>Auditee Team List</h3>
+            <div className="col-md-9">
+              <h3>{iqaNo} : Auditee Team List</h3>
             </div>
             <div className="col-md-2">
               <SelectPicker options={iqaOptions} label="IQA No"
                 value={iqaOptions && iqaOptions.length > 0 && iqaOptions.find(option => option.value === iqaId) || null}
                 handleChange={(newValue) => { onIqaChange(newValue?.value) }} />
+            </div>
+            <div className="col-md-1">
+            <button className="btn add" onClick={() => addTeam('Add')}>
+              Add
+            </button>
             </div>
           </div><br />
           <div className="team-list">
@@ -278,12 +283,6 @@ const AuditTeamListComponent = () => {
                 <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editAuditTeam(team)} title="Edit" style={{ position: "absolute", bottom: "10px", right: "10px", }}> <i className="material-icons"  >edit_note</i></button>
               </div>
             ))}
-          </div>
-          <br />
-          <div>
-            <button className="btn add" onClick={() => addTeam('Add')}>
-              Add
-            </button>
           </div>
           {showModal && (
             <>
