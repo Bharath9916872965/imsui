@@ -59,10 +59,11 @@
 }
 
 .dropdown-item:hover {
-  background-color: #FF3800;
-  transition: background-color 0.3s ease;
-  color: white;
+  background-color: #FF3800 !important;
+  transition: background-color 0.3s ease !important;
+  color: white !important;
 }
+
 
 .dropdown {
   margin-right: 10px;
