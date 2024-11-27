@@ -1,6 +1,8 @@
 import logo from './logo.svg';
 import './App.css';
-import Login from './components/Login/Login';
+//import Login from './components/Login/Login';
+import Login from  './components/Login/login.component.jsx'
+import AuditStampingComponent from './components/admin/auditStamping.component.jsx';
 import { Routes, Route } from "react-router-dom";
 import QmRevisionRecordsComponent from './components/qms/qm/qm-revisionrecords.component';
 import Dashboard from './components/dashboard/dashboard.component';
@@ -19,7 +21,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
-
+        <Route path="/audit-stamping" element={<AuditStampingComponent />} />
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
         <Route path="/qm-add-content" element={<QmAddDocContentComponent />} />

@@ -4,7 +4,7 @@ import { logout } from "../../services/auth.service";
 import "./navbarTop.css"
 import "../../static/buttons.css"
 import { useEffect, useState } from "react";
-import { getHeaderModuleDetailList, getHeaderModuleList } from "../../services/admin.serive";
+import { getHeaderModuleDetailList, getHeaderModuleList,changePassword } from "../../services/admin.serive";
 
 const Navbar = (props) => {
 
@@ -89,6 +89,27 @@ const Navbar = (props) => {
               </ul>
             </li>
           ))}
+
+        <li className="nav-item dropdown">
+            <a href="/dashboard" className="nav-link nav-animate">
+              <i className="material-icons" style={{ fontSize: '20px' }}>help</i> Help
+            </a>
+            <ul className="dropdown-menu">
+              
+                    <li>
+                      <a className="dropdown-item" href='#'  onClick={changePassword}>
+                        Change Password
+                      </a>
+                    </li>
+
+                    <li>
+                      <a className="dropdown-item" href='audit-stamping'>
+                        Audit Stamping
+                      </a>
+                    </li>
+               
+              </ul>
+          </li>
 
           {/* <li className="nav-item dropdown">
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
