@@ -5,20 +5,38 @@ import "./navbarTop.css"
 import "../../static/buttons.css"
 import { useEffect, useState } from "react";
 import { getHeaderModuleDetailList, getHeaderModuleList,changePassword } from "../../services/admin.serive";
+import { getLoginEmployeeDetails } from "services/header.service";
 
 const Navbar = (props) => {
 
   const [headerModuleList, setHeaderModuleList] = useState([]);
   const [headerModuleDetailList, setHeaderModuleDetailList] = useState([]);
+  const [empName, setEmpName] = useState('');
+  const [designation, setDesignation] = useState('');
+  const [formRoleName, setFormRoleName] = useState('');
 
   useEffect(() => {
-    try {
-      const imsFormRoleId = 2;
-      fetchHeaderModuleList(imsFormRoleId);
-      fetchHeaderModuleDetailList(imsFormRoleId);
-    } catch (error) {
-      console.error("Error fetching data:", error);
+    const fetchData = async () => {
+      try {
+
+        const { empName, designation, empId, imsFormRoleId, formRoleName  } = await getLoginEmployeeDetails();
+
+        setEmpName(empName);
+        setDesignation(designation);
+        setFormRoleName(formRoleName);
+
+        // const imsFormRoleId = 2;
+        if(imsFormRoleId){
+          fetchHeaderModuleList(imsFormRoleId);
+          fetchHeaderModuleDetailList(imsFormRoleId);
+        }
+      } catch (error) {
+        console.error("Error fetching data:", error);
+      }
+
     }
+
+    fetchData();
 
   }, []);
 
@@ -54,8 +72,16 @@ const Navbar = (props) => {
         <ul className="navbar-nav">
           <li className="nav-item">
             <a href="/dashboard" className="nav-link">
-              <h3><span className="i-name">I</span><span  className="ms-name">MS</span></h3>
+              <div className="d-flex">
+                <h3 className="mb-0 d-flex align-items-center me-2">
+                  <span className="i-name">I</span><span className="ms-name">MS</span>
+                </h3>
+                <h6 className="mb-0 d-flex align-items-end">
+                  {empName && empName}, {designation && designation} ({formRoleName && formRoleName})
+                </h6>
+              </div>
             </a>
+            
           </li>
         </ul>
 
@@ -66,29 +92,47 @@ const Navbar = (props) => {
               <i className="material-icons" style={{ fontSize: '20px' }}>home</i> Home
             </a>
           </li>
-          {headerModuleList.map((module, index) => (
-            <li key={index} className="nav-item dropdown">
-              <a
-                href="#"
-                className="nav-link dropdown-toggle nav-animate"
-                data-bs-toggle="dropdown"
-                aria-expanded="false"
-              >
-                <i className="material-icons" style={{ fontSize: '20px' }}>{module.moduleIcon}</i> {module.formModuleName}
-              </a>
-              <ul className="dropdown-menu">
-                {headerModuleDetailList
-                  .filter(detail => detail.formModuleId === module.formModuleId)
-                  .map((detail, idx) => (
+          {headerModuleList.map((module, index) => {
+            const filteredDetails = headerModuleDetailList.filter(
+              (detail) => detail.formModuleId === module.formModuleId
+            );
+
+            return filteredDetails.length > 1 ? (
+              <li key={index} className="nav-item dropdown">
+                <a
+                  href="#"
+                  className="nav-link dropdown-toggle nav-animate"
+                  data-bs-toggle="dropdown"
+                  aria-expanded="false"
+                >
+                  <i className="material-icons" style={{ fontSize: '20px' }}>
+                    {module.moduleIcon}
+                  </i>{' '}
+                  {module.formModuleName}
+                </a>
+                <ul className="dropdown-menu">
+                  {filteredDetails.map((detail, idx) => (
                     <li key={idx}>
                       <a className="dropdown-item" href={`/${detail.formUrl}`}>
-                        {detail.formName}
+                        {detail.formDispName}
                       </a>
                     </li>
                   ))}
-              </ul>
-            </li>
-          ))}
+                </ul>
+              </li>
+            ) : (
+              <li key={index} className="nav-item dropdown">
+                <a
+                  href={`/${filteredDetails[0]?.formUrl}`}
+                  className="nav-link nav-animate"
+                >
+                  <i className="material-icons" style={{ fontSize: '20px' }}>{module.moduleIcon}</i>
+                  {module.formModuleName}
+                </a>
+              </li>
+            );
+          })}
+
 
         <li className="nav-item dropdown">
             <a href="/dashboard" className="nav-link nav-animate">
