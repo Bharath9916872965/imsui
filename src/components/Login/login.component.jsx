@@ -128,8 +128,6 @@ const Login = (props) => {
                     {({ errors, touched, handleChange }) => (
                         <Form className="login">
 
-
-
                   <div className="form">
                          <h2>Login</h2>
                
@@ -145,7 +143,7 @@ const Login = (props) => {
                                 ? " is-invalid"
                                 : "")
                         }
-                    />
+                       />
                           <span>Username</span>
                           <i></i>
                        </div>
@@ -180,7 +178,8 @@ const Login = (props) => {
 
 
                 <div className="links">
-                    <a href="">Forgot password?</a>
+                    <br></br>
+                    {/* <a href="">Forgot password?</a> */}
        
                 </div>
                 <div className="form-group">

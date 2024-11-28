@@ -14,7 +14,7 @@ const Dashboard = () => {
           <div className="row">
             <div className="col">
               <h2 className="text-center mb-4">
-                <span style={{ color: "black" }}>DASHBOARD</span>
+            
               </h2>
             </div>
           </div>

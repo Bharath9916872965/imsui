@@ -10,10 +10,12 @@ import {
   Box,
   ListItemText
 } from "@mui/material";
-import { MobileDatePicker, LocalizationProvider } from "@mui/x-date-pickers";
+import {DatePicker, LocalizationProvider } from "@mui/x-date-pickers";
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { Formik, Form, Field } from "formik";
 import {  getAuditStampingList,getEmployeesList,getLoginEmployeeDetails } from '../../services/header.service';
+import SelectPicker from 'components/selectpicker/selectPicker'
+import { CustomMenuItem } from "services/auth.header";
 
 
 import Datatable from "../datatable/Datatable";
@@ -57,38 +59,37 @@ const AuditStamping = () => {
     const fetchData = async () => {
       try {
         const employees = await getEmployeesList();
-        const { empId, qmsFormRoleId } = await getLoginEmployeeDetails();
-
+        const { empId, imsFormRoleId } = await getLoginEmployeeDetails();
         const defaultEmpId = empId;
-        const roleId = qmsFormRoleId;
-
+        const roleId = imsFormRoleId;
         const { fromDate, toDate } = initialValues;
-
-        if(roleId === 2 || roleId === 7){
-          setEmployeesList(employees);
-        }else{
-          const filteredEmployees = employees.filter(emp => emp.empId === defaultEmpId);
-          setEmployeesList(filteredEmployees);
-        }
-
+  
+        const filteredEmployees =
+          roleId === 2 || roleId === 7
+            ? employees
+            : employees.filter(emp => emp.empId === defaultEmpId);
+  
+        setEmployeesList(filteredEmployees);
+        console.log('getEmployeesList-------', getEmployeesList())
+        console.log('getEmployeesList-------', filteredEmployees)
+  
         const auditList = await getAuditStampingList(defaultEmpId, fromDate, toDate);
-
         const mappedData = auditList.map((item, index) => ({
           sn: index + 1,
-          loginDate:  formatDate(item.loginDateTime) || '--',
-          loginTime:  formatTime(item.loginTime) || '--',
-          ipAddress:  item.ipAddress  || '--',
+          loginDate: formatDate(item.loginDateTime) || '--',
+          loginTime: formatTime(item.loginTime) || '--',
+          ipAddress: item.ipAddress || '--',
           logoutType: item.logoutTypeDisp || '--',
           logoutDateTime: formatDateTime(item.logOutDateTime) || '--'
         }));
+  
         setAuditStampingList(mappedData);
-        setIsLoading(false);
-        
-
-        setInitialValues({
-          ...initialValues,
+  
+        // Update initialValues
+        setInitialValues(prev => ({
+          ...prev,
           selectedEmp: defaultEmpId
-        });
+        }));
         setIsLoading(false);
       } catch (error) {
         setError(error);
@@ -98,9 +99,10 @@ const AuditStamping = () => {
         setSnackbarSeverity("error");
       }
     };
-
+  
     fetchData();
-  }, []); // Empty dependency array ensures this runs only once after initial render
+  }, []);
+  
 
 
   const columns = [
@@ -111,8 +113,6 @@ const AuditStamping = () => {
     { name: 'Logout Type', selector: (row) => row.logoutType, sortable: true, grow: 2, align: 'text-center' },
     { name: 'Logout Date Time', selector: (row) => row.logoutDateTime, sortable: true, grow: 2 }
   ];
-
-
 
 
   const handleSubmit = async (values) => {
@@ -140,19 +140,12 @@ const AuditStamping = () => {
   };
 
   const handleFieldChange = async (field, value, values) => {
-    const newValues = { ...values, [field]: value };
-    await handleSubmit(newValues);
+    const updatedValues = { ...values, [field]: value };
+    await handleSubmit(updatedValues);
   };
-
-
-
 
   const empOptions = employeesList.map((emp) => [emp.empId, `${emp.empName}, ${emp.empDesigName}`]);
 
-  // const filterEmpOptions = createFilterOptions({
-  //   matchFrom: "start",
-  //   stringify: (option) => option[1],
-  // });
 
   const customFilterOptions = (options, { inputValue }) => {
     const lowerCaseInput = inputValue.toLowerCase();
@@ -189,16 +182,33 @@ const AuditStamping = () => {
                     <Grid container spacing={3}>
                     <Grid item xs={12} md={2}></Grid>
                       <Grid item xs={12} md={3}>
-                        <Field name="selectedEmp">
-                          {({ field, form }) => (
-                            <Autocomplete
+                      <Field name="selectedEmp">
+                       {({ field, form }) => (
+                      //      <SelectPicker
+                      //        options={empOptions.map(emp => ({
+                      //        value: emp[0],
+                      //        label: emp[1]
+                      //   }))}
+                      //   label="Employee"
+                      //   value={form.values.selectedEmp || null}
+                      //   onChange={newValue => {
+                      //     form.setFieldValue("selectedEmp", newValue || "");
+                      //     handleFieldChange("selectedEmp", newValue || "", form.values);
+                      //  }}
+                      //  placeholder="Select Employee"
+                      //  style={{ width: 300 }}
+                      //  searchable
+                      //  block
+                      // />
+                          
+                          <Autocomplete
                               options={empOptions}
                               getOptionLabel={(option) => option[1]}
-                              // renderOption={(props, option) => (
-                              //   <CustomMenuItem {...props} key={option[0]}>
-                              //     <ListItemText primary={`${option[1]}`} />
-                              //   </CustomMenuItem>
-                              // )}  
+                              renderOption={(props, option) => (
+                                <CustomMenuItem {...props} key={option[0]}>
+                                  <ListItemText primary={`${option[1]}`} />
+                                </CustomMenuItem>
+                              )}  
                               value={
                                 empOptions.find(
                                   (emp) =>
@@ -206,6 +216,7 @@ const AuditStamping = () => {
                                     Number(values.selectedEmp)
                                 ) || null
                               }
+                              
                               onChange={(event, newValue) => {
                                 setFieldValue(
                                   "selectedEmp",
@@ -229,7 +240,10 @@ const AuditStamping = () => {
                                   margin="normal"
                                   required
                                   size="small"
-                                  sx={{ width: '300px' }}
+                                  sx={{ 
+                                    width: '300px', 
+                                    marginTop: '0px' 
+                                  }}
                                 />
                               )}
                               ListboxProps={{
@@ -245,55 +259,60 @@ const AuditStamping = () => {
                       </Grid>
 
                       <Grid item xs={12} md={2}>
-                        <MobileDatePicker
-                          label="From Date"
-                          format="DD/MM/YYYY"
-                          disableUnderline
-                          value={dayjs(values.fromDate)}
-                          onChange={(date) => {
-                            const formattedDate = date ? date.format("YYYY-MM-DD") : "";
-                            setFieldValue("fromDate", formattedDate);
-                            handleFieldChange("fromDate", formattedDate, values);
-                          }}
-                          slots={{
-                            textField: (params) => (
-                              <TextField
-                                {...params}
-                                fullWidth
-                                variant="outlined"
-                                margin="normal"
-                                placeholder="From Date"
-                                size="small"
-                              />
-                            ),
-                          }}
-                        />
-                      </Grid>
+                <Field name="fromDate">
+                   {({ field, form }) => (
+                         <DatePicker
+                              label="From Date"
+                              maxDate={form.values.toDate ? dayjs(form.values.toDate) : null}
+                              value={form.values.fromDate ? dayjs(form.values.fromDate) : null}
+                              views={['year', 'month', 'day']}
+                              onChange={(date) => {
+                                const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+                                //console.log("Selected From Date:", formattedDate);
+                                form.setFieldValue('fromDate', formattedDate);
+                                handleFieldChange('fromDate', formattedDate, form.values);
+                               }}
+                               format="DD-MM-YYYY"
+                               slotProps={{
+                                     textField: {
+                                        size: 'small',
+                                        error: Boolean(form.errors.fromDate && form.touched.fromDate),
+                                        helperText: form.touched.fromDate && form.errors.fromDate,
+                               },
+                             }}
+                           />
+                    )}
+              </Field>
 
-                      <Grid item xs={12} md={2}>
-                        <MobileDatePicker
-                          label="To Date"
-                          format="DD/MM/YYYY"
-                          disableUnderline
-                          value={dayjs(values.toDate)}
-                          minDate={dayjs(values.fromDate)} // Set minDate to the to Date based on fromDate
-                          onChange={(date) => {
-                            const formattedDate = date ? date.format("YYYY-MM-DD") : "";
-                            setFieldValue("toDate", formattedDate);
-                            handleFieldChange("toDate", formattedDate, values);
-                          }}
-                          slots={{
-                            textField: (params) => (
-                              <TextField
-                                {...params}
-                                fullWidth
-                                variant="outlined"
-                                margin="normal"
-                               size="small"
-                              />
-                            ),
-                          }}
-                        />
+            </Grid>
+
+           <Grid item xs={12} md={2}>
+            
+                      <Field name="toDate">
+                      {({ field, form }) => (
+                       <DatePicker
+                             label="To Date"
+                             minDate={form.values.fromDate ? dayjs(form.values.fromDate) : null}
+                             value={form.values.toDate ? dayjs(form.values.toDate) : null}
+                             views={['year', 'month', 'day']}
+                              onChange={(date) => {
+                                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
+                                 form.setFieldValue('toDate', formattedDate);
+                                // console.log('toDate value:', formattedDate); 
+                                handleFieldChange('toDate', formattedDate, form.values);
+                             }}
+                             format="DD-MM-YYYY"
+                             slotProps={{
+                             textField: {
+                                size: 'small',
+                                error: Boolean(form.errors.toDate && form.touched.toDate),
+                               helperText: form.touched.toDate && form.errors.toDate,
+                              },
+                        }}
+                      />
+                     )}
+                  </Field>
+
                       </Grid>
 
                       <Grid item xs={12} md={2}></Grid>
