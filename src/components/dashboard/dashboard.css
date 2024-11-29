@@ -1,9 +1,45 @@
-.dashboardContainer{
-    
+.dashboard-container {
+    /* background: #000000 !important; */
+    background: #ffffff !important; 
+    padding-left: 0;
+    padding-right: 0;
+    min-height: 100vh; /* Fill the full viewport height */
+    display: flex;
+    flex-direction: column; /* Arrange children vertically */
+}
+
+.main-panel {
+    width: 100%;
+}
+
+.rounded {
+    border-radius: 5px !important;
+}
+.bg-secondary {
+    background-color: #191C24 !important;
+}
+
+.text-primary {
+    color: #EB1616 !important;
+}
+
+.ms-3 {
+    white-space: nowrap; /* Prevents text from breaking into multiple lines */
+    overflow: hidden;    /* Hides any overflowing text */
+    text-overflow: ellipsis; /* Adds an ellipsis (...) if text overflows */
 }
 
 
-.mainDashBoard{
- 
+.box-label{
+    color: #0fe1fd !important;
+    font-weight: 500!important;
+    font-size:15px!important;
+}
 
+.box-data{
+    font-family: "Roboto", sans-serif!important;
+    font-weight: 700!important;
+    line-height: 1.2!important;
+    color: #fff!important;
+    font-size:18px!important;
 }
