@@ -193,7 +193,7 @@ export const updateNotReqAbbreviationIds = async (abbreviationIds, revisionRecor
     }
 }
 
-export const addDocSummary = async (DocSummary, VersionReleaseId) => {
+export const addDocSummary = async (DocSummary) => {
     try {
         return (await axios.post(`${API_URL}add-docsummary`, DocSummary, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
@@ -352,4 +352,41 @@ export const dwpUnAddListToAddList = async (SelectedSections) => {
     }
 }
 
+export const getDwpRevistionRecordById = async (revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}get-dwp-revision-record`, revisionRecordId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpRevistionRecordById', error);
+        throw error;
+    }
+}
+
+export const updateDwpNotReqAbbreviationIds = async (abbreviationIds, revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}update-dwp-notreq-abbreviation/${revisionRecordId}`, abbreviationIds, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateNotReqAbbreviationIds', error);
+        throw error;
+    }
+}
+
+export const addDwpDocSummary = async (DocSummary) => {
+    try {
+        return (await axios.post(`${API_URL}add-dwp-docsummary`, DocSummary, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addDocSummary', error);
+        throw error;
+    }
+}
+
+
+export const getDwpDocSummarybyId = async (documentId) => {
+    try {
+        return (await axios.post(`${API_URL}get-dwp-docsummary-byid`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDocSummarybyId', error);
+        throw error;
+    
+    }
+}
 
