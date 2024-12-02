@@ -6,6 +6,7 @@ import Navbar from "../../Navbar/Navbar";
 import "./dwp-revisionrecords.component.css"
 import { format } from "date-fns";
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
+import AddDocumentSummaryDialog from "./dwp-add-document-summary-dialog";
 // import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
 
 
@@ -44,7 +45,7 @@ const DwpRevisionRecordsComponent = ({ router }) => {
                                   setSingleDoc(item);
                               }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
                   {getDocPDF('', item)}
-                  <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true) }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
+                  <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true); }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
                   {/* <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button> */}
                 </>
               )}
@@ -106,11 +107,11 @@ const DwpRevisionRecordsComponent = ({ router }) => {
           )}
         </div>
       </div>
-      {/* <AddDocumentSummaryDialog
+      <AddDocumentSummaryDialog
         open={openDialog2}
         onClose={handleCloseDocSummaryDialog}
         revisionElements={singleDoc}
-      /> */}
+      />
       
 
     </div>

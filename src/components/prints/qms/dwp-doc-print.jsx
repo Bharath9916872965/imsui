@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import pdfFonts from 'pdfmake/build/vfs_fonts';
 import htmlToPdfmake from 'html-to-pdfmake';
-import { getAbbreviationsByIdNotReq, getDocSummarybyId, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getLabDetails, getLogoImage, getMocListById, getQmRevistionRecordById } from 'services/qms.service';
+import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage } from 'services/qms.service';
 
 
 const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
@@ -16,7 +16,6 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [AllChaptersList, setAllChaptersList] = useState([]);
   const [DocumentSummaryDto, setDocumentSummaryDto] = useState(null);
   const [docAbbreviationsResponse, setDocAbbreviationsResponse] = useState([]);
-  const [docMoc, setDocMoc] = useState([]);
   const [ApprovedVersionReleaseList, setApprovedVersionReleaseList] = useState([]);
   const [isReady, setIsReady] = useState(false);
 
@@ -27,14 +26,13 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
 
     const fetchData = async () => {
       try {
-        const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
+        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
 
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getDwpAllChapters(revisionElements.divisionId), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(revisionElements.divisionId), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
           setDocAbbreviationsResponse(docAbbreviationsResponse);
-          setDocMoc(docMoc);
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);
@@ -361,12 +359,6 @@ function generateRotatedTextImage(text) {
     // ----------Document Abbreviation table end----------------
 
 
-    let docMappingOfClasses = [];
-    docMappingOfClasses.push([{ text: 'QM Section No. ', style: 'tableLabel', alignment: 'center' }, { text: 'ISO 9001:2015 Clause. No.', style: 'tableLabel', alignment: 'center' }, { text: 'Description', style: 'tableLabel', alignment: 'center' }])
-    for (let i = 0; i < docMoc.length; i++) {
-      docMappingOfClasses.push([{ text: docMoc[i][0] }, { text: docMoc[i][1] }, { text: docMoc[i][2] }])
-    }
-
 
     let docDefinition = {
       info: {
@@ -547,16 +539,7 @@ function generateRotatedTextImage(text) {
         //   },
         //   pageBreak: 'after'
         // },
-        {
-          text: 'MAPPING OF CLAUSES', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
-        },
-        {
-          table: {
-            widths: [100,100,290],
-            body: docMappingOfClasses
-          },
-          pageBreak: 'after'
-        },
+
         {
           text: 'LIST OF ABBREVIATIONS', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
         },

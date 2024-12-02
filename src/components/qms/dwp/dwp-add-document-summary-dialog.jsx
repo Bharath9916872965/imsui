@@ -1,7 +1,7 @@
 import { ErrorMessage, Field, Form, Formik } from 'formik';
 import * as Yup from 'yup';
 import { useEffect, useState } from 'react';
-import { addDocSummary, getDocSummarybyId } from '../../../services/qms.service';
+import { addDwpDocSummary, getDwpDocSummarybyId } from 'services/qms.service';
 import AlertConfirmation from '../../../common/AlertConfirmation.component';
 
 
@@ -12,11 +12,14 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
         abstract: '',
         keywords: '',
         distribution: '',
+        revisionRecordId: 0,
     });
 
 
     useEffect(() => {
         const fetchData = async () => {
+            console.log('revisionElements---doc---su---', revisionElements);
+    
             try {
                 const newInitialValues = {
                     additionalInfo: '',
@@ -28,16 +31,20 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
                 if (revisionElements?.revisionRecordId) {
                     newInitialValues.revisionRecordId = revisionElements.revisionRecordId;
                 }
-
+    
                 setInitialValues(newInitialValues);
-                getDocSummary();
+    
+                await getDocSummary();
             } catch (error) {
+                console.error('Error fetching document summary:', error);
                 setError('An error occurred');
             }
-        }
-
+        };
+    
         fetchData();
+
     }, [open]);
+    
 
 
     const getDocSummary = async () => {
@@ -45,7 +52,7 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
 
 
             if(revisionElements != null) {
-                let docSummary = await getDocSummarybyId(revisionElements.revisionRecordId);
+                let docSummary = await getDwpDocSummarybyId(revisionElements.revisionRecordId);
 
                 if (docSummary && docSummary != null && docSummary != undefined && docSummary != '') {
                     setInitialValues(docSummary);
@@ -65,13 +72,16 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
 
     const submitDocSummary = async (values) => {
 
+        console.log('values---doc--', values)
         const isConfirmed = await AlertConfirmation({
             title: 'Are you sure to submit ?',
             message: '',
         });
 
         if (isConfirmed) {
-            let res = await addDocSummary(values, revisionElements.docVersionReleaseId);
+
+
+            let res = await addDwpDocSummary(values);
 
             if (res && res > 0) {
                 Swal.fire({
@@ -125,8 +135,6 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
                                     >
                                         {({ isValid, errors, touched }) => (
                                             <Form>
-
-
 
 
                                                 <div className="mb-3 text-start">
@@ -204,7 +212,7 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
                                                 </div>
 
                                                 <div className="text-center">
-                                                    <button type="submit" variant="contained" className='btn submit'  >
+                                                    <button type="submit" variant="contained" className='btn submit' >
                                                         Submit
                                                     </button>
                                                 </div>

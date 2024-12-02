@@ -13,6 +13,7 @@ import Navbar from "../../../Navbar/Navbar";
 import AlertConfirmation from "../../../../common/AlertConfirmation.component";
 import DwpAddSectionDialog from "./dwp-add-section-dialog";
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
+import DwpAddAbbreviationDialog from "./dwp-add-abbreviation-dialog";
 
 const DwpAddDocContentComponent = ({ router }) => {
 
@@ -973,16 +974,19 @@ const DwpAddDocContentComponent = ({ router }) => {
                             </button>
                         </div>
                     </div>
+                    
                     <DwpAddSectionDialog
                         open={openDialog}
                         onClose={handleCloseSectionDialog}
                         revisionElements={revisionElements}
                     />
-                    {/* <QmAddAbbreviationDialog
+
+                    <DwpAddAbbreviationDialog
                         open={openDialog2}
                         onClose={handleCloseAbbreviationDialog}
                         revisionElements={revisionElements}
-                    /> */}
+                    />
+                    
                 </div>
             </div>
 
