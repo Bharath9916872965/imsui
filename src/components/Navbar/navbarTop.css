@@ -57,7 +57,75 @@
 .nav-animate:hover {
   padding-left: 10px;
 }
+.width5{
+  width: 5%;
+}
 
+.width60{
+  width: 60%;
+}
+
+.width35{
+  width: 35%;
+}
+
+.fw-bolder{
+  font-weight: bolder;
+}
+
+.date-color{
+  color: #3426b4 !important;
+}
+
+.mg-top-10{
+  margin-top: 10px;
+}
+
+.mg-down-10{
+  margin-bottom: 10px;
+}
+.trash-btn{
+  color: red !important;
+}
+.initiated{
+  color: #a17627;
+}
+
+.forwarde{
+  color: #007bff;
+}
+.returned{
+  color: #D61C4E;
+}
+
+.reschedule{
+  color: #F96302;
+}
+.acknowledge{
+  color: green;
+}
+
+.lead-auditee{
+  color: #641cd6;
+}
+
+.float-right{
+  float: right;
+}
+.status{
+  cursor: pointer;
+  font-weight: bold;
+}
+.status:hover{
+  box-shadow: 0px 6px 10px rgba(0, 0, 0, 0.4);
+  transform: scale(1.01);
+  padding: 5px;
+}
+
+
+.mg-l-40{
+  margin-left: -43px;
+}
 .dropdown-item:hover {
   background-color: #FF3800 !important;
   transition: background-color 0.3s ease !important;

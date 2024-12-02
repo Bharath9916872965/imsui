@@ -18,10 +18,14 @@ import * as Yup from "yup";
 import SelectPicker from '../../selectpicker/selectPicker'
 import { CustomMenuItem } from "../../../services/auth.header";
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
+import { Navigate } from "react-router-dom";
+import withRouter from "../../../common/with-router";
 
 
 
-const ScheduleListComponent = () => {
+const ScheduleListComponent = ({router}) => {
+
+  const {navigate,location} = router;
 
   const [showModal, setShowModal] = useState(false);
   const [modalVisible, setModalVisible] = useState(false);
@@ -72,12 +76,12 @@ const ScheduleListComponent = () => {
 
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '12%'  },
+    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
     { name: 'Division/Group', selector: (row) => row.divisionCode, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
     { name: 'Project', selector: (row) => row.project, sortable: true, grow: 2, align: 'text-center', width: '19%'  },
     { name: 'Auditee', selector: (row) => row.auditee, sortable: true, grow: 2, align: 'text-start', width: '17%'  },
-    { name: 'Team', selector: (row) => row.team, sortable: true, grow: 2, align: 'text-center', width: '8%'  },
-    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '13%'  },
+    { name: 'Team', selector: (row) => row.team, sortable: true, grow: 2, align: 'text-center', width: '7%'  },
+    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
     { name: 'Revision', selector: (row) => row.revision, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
     { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '8%' },
   ];
@@ -155,21 +159,30 @@ const ScheduleListComponent = () => {
     }
     setAssignedAuditeeCount(list.length)
     setPendingAuditeeCount(Number(totalAuditeeCount)-Number(list.length))
-    const mappedData = list.map((item,index)=>({
+    const mappedData = list.map((item,index)=>{
+      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
+      return{
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',
         divisionCode : item.divisionName === '' && item.groupName === '' ? '-' : item.divisionName !== '' && item.groupName !== '' ? item.divisionName + '/' + item.groupName : item.divisionName !== '' ? item.divisionName : item.groupName !== '' ? item.groupName : '-',
         project      : item.projectName === ''?'-':item.projectName || '-',
         auditee      : item.auditeeEmpName || '-',
         team         : item.teamCode || '-',
-        status       : 'Schedule '+item.statusName || '-',
+        status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
         action       : <> {item.scheduleStatus === 'INI' && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editSchedule(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>}
                           {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReShchedule"><i className="material-icons">update</i></button>}</>
-              
-    }));
+      }      
+    });
     setFilScheduleList(mappedData);
    }
+
+   const openTran = (item)=>{
+    localStorage.setItem('scheduleData', JSON.stringify(item));
+    window.open('/schedule-tran', '_blank');
+   }
+
+   
 
   const setMemberTable = (list,emp) => {
         const renderListWithBreaks = (items) => items.length > 0 ? items.map((item, index) => (
@@ -547,7 +560,7 @@ const ScheduleListComponent = () => {
                                         <Autocomplete options={filTeamList} getOptionLabel={option => option.teamCode} 
                                         renderOption={(props, option) => {return (
                                             <CustomMenuItem {...props} key={option.teamId}>
-                                              <ListItemText primary={`Team ${option.teamCode}`} />
+                                              <ListItemText primary={`${option.teamCode}`} />
                                             </CustomMenuItem>
                                           );}}
                                         value = {filTeamList.find(team =>team.teamId === form.values.teamId) || null} 
@@ -587,4 +600,4 @@ const ScheduleListComponent = () => {
   );
 
 }
-export default ScheduleListComponent;
+export default withRouter(ScheduleListComponent);

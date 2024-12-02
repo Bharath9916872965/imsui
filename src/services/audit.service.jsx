@@ -271,7 +271,7 @@ export const getTotalTeamMembersList = async ()=>{
 
 export const rescheduleMailSend = async (values)=>{
     try {
-        return (await axios.post(`${API_URL}insert-audit-reschedule`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        return (await axios.post(`${API_URL}reschedule-mail-send`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in rescheduleMailSend:', error);
         throw error;
@@ -377,6 +377,15 @@ export const getScheduleRemarks = async ()=>{
         return (await axios.post(`${API_URL}schedule-remarks`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in getScheduleRemarks:', error);
+        throw error;
+    }
+}
+
+export const scheduleTran = async (scheduleId)=>{
+    try {
+        return (await axios.post(`${API_URL}schedule-tran`,scheduleId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in scheduleTran:', error);
         throw error;
     }
 }
