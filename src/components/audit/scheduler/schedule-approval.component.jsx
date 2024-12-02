@@ -25,12 +25,12 @@ const ScheduleApprovalComponent = () => {
 
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '12%'  },
+    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
     { name: 'Division/Group', selector: (row) => row.divisionCode, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
     { name: 'Project', selector: (row) => row.project, sortable: true, grow: 2, align: 'text-center', width: '19%'  },
     { name: 'Auditee', selector: (row) => row.auditee, sortable: true, grow: 2, align: 'text-start', width: '17%'  },
-    { name: 'Team', selector: (row) => row.team, sortable: true, grow: 2, align: 'text-center', width: '8%'  },
-    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '13%'  },
+    { name: 'Team', selector: (row) => row.team, sortable: true, grow: 2, align: 'text-center', width: '7%'  },
+    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
     { name: 'Revision', selector: (row) => row.revision, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
     { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '8%' },
   ];
@@ -42,7 +42,6 @@ const ScheduleApprovalComponent = () => {
       const iqaList        = await getIqaDtoList();
       setIqaFullList(iqaList);
       setScheduleList(scdList)
-      console.log('scdList------ ',scdList)
       const iqaData = iqaList.map(data => ({
                       value : data.iqaId,
                       label : data.iqaNo
@@ -66,19 +65,22 @@ const ScheduleApprovalComponent = () => {
   }, []);
 
   const setDataTable = (list)=>{
-    const mappedData = list.map((item,index)=>({
+    const mappedData = list.map((item,index)=>{
+      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
+      return{
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',
         divisionCode : item.divisionName === '' && item.groupName === '' ? '-' : item.divisionName !== '' && item.groupName !== '' ? item.divisionName + '/' + item.groupName : item.divisionName !== '' ? item.divisionName : item.groupName !== '' ? item.groupName : '-',
         project      : item.projectName === ''?'-':item.projectName || '-',
         auditee      : item.auditeeEmpName || '-',
         team         : item.teamCode || '-',
-        status       : 'Schedule '+item.statusName || '-',
+        status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
-                          {['AAA'].includes(item.scheduleStatus) && <button className=" btn btn-outline-primary btn-sm me-1" onClick={() => addCheckList(item)}  title="CheckList"><i className="material-icons">playlist_add_check</i></button>}</>       
-    }));
+                          {['AAA'].includes(item.scheduleStatus) && <button className=" btn btn-outline-primary btn-sm me-1 mg-l-40" onClick={() => addCheckList(item)}  title="CheckList"><i className="material-icons">playlist_add_check</i></button>}</>  
+      }      
+    });
     setFilScheduleList(mappedData);
    }
 
@@ -86,8 +88,12 @@ const ScheduleApprovalComponent = () => {
 
    }
 
+   const openTran = (item)=>{
+    localStorage.setItem('scheduleData', JSON.stringify(item));
+    window.open('/schedule-tran', '_blank');
+   }
+
   const scheduleApprove = async (item)=>{
-    console.log('item------- ',item)
     await AlertConfirmation({
       title: 'Are you sure Acknowledge Schedule ?' ,
       message: '',
@@ -96,7 +102,7 @@ const ScheduleApprovalComponent = () => {
         try {
          const response = await approveSchedule(item);
          if(response.status === 'S'){
-          afterSubmit();
+          afterSubmit(item);
           Swal.fire({
             icon: "success",
             title: response.message,
@@ -123,10 +129,9 @@ const ScheduleApprovalComponent = () => {
     setElement(item)
   }
 
-  const afterSubmit = async()=>{
+  const afterSubmit = async(item)=>{
     const scdList   = await getScheduleApprovalList();
-    console.log('scdList--afterSubmit------ ',scdList)
-    setDataTable(scdList.filter(data => data.iqaId === iqaId))
+    setDataTable(scdList.filter(data => data.iqaId === item.iqaId))
     setScheduleList(scdList)
   }
 
@@ -163,7 +168,7 @@ const ScheduleApprovalComponent = () => {
            element.message = message
            const response = await returnSchedule(element);
            if(response.status === 'S'){
-            afterSubmit();
+            afterSubmit(element);
             setShowModal(false);
             Swal.fire({
               icon: "success",
@@ -193,7 +198,7 @@ const ScheduleApprovalComponent = () => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="80%" className='text-center'><h3>{iqaNo} : Audit Schedule Approval</h3></Box>
+          <Box flex="80%" className='text-center'><h3>{iqaNo} : Audit Schedule List</h3></Box>
           <Box flex="20%">
             <SelectPicker options={iqaOptions} label="IQA No"
             value={iqaOptions && iqaOptions.length >0 && iqaOptions.find(option => option.value === iqaId) || null}

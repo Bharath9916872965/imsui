@@ -48,9 +48,7 @@
     margin-top: 15rem ;
   }
 
-  .trash-btn{
-    color: red !important;
-  }
+
 
   .modal-visible {
     background-color: rgba(0, 0, 0, 0.5);
@@ -62,14 +60,6 @@
 
   .scheduledate{
     margin-top: 17px !important;
-  }
-
-  .mg-top-10{
-    margin-top: 10px;
-  }
-
-  .mg-down-10{
-    margin-bottom: 10px;
   }
 
   .model-max-height{

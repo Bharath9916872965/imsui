@@ -11,6 +11,7 @@ import ScheduleListComponent from './components/audit/scheduler/schedule-list.co
 import AuditeeListComponent from './components/audit/auditee-list.component';
 import AuditTeamListComponent from './components/audit/audit-team-list.component';
 import ScheduleApprovalComponent from './components/audit/scheduler/schedule-approval.component';
+import ScheduleTransactionComponent from './components/audit/scheduler/schedule-transaction';
 
 function App() {
   return (
@@ -34,6 +35,7 @@ function App() {
         {/* Schedule */}
         <Route path="/schedule-list" element={<ScheduleListComponent />} />
         <Route path="/schedule-approval" element={<ScheduleApprovalComponent />} />
+        <Route path="/schedule-tran" element={<ScheduleTransactionComponent />} />
         
       </Routes>
 {/* <Login/> */}
