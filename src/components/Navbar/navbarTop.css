@@ -18,16 +18,20 @@
 
 .i-name {
   color: red;
+  transition: color 1.5s ease;
 }
 .nav-item:hover .i-name {
   color: white;
+  transition: color 0.3s ease;
 }
 
 .ms-name {
   color: white;
+  transition: color 1.5s ease;
 }
 .nav-item:hover .ms-name {
   color: red;
+  transition: color 1.5s ease;
 }
 
 /*  */
@@ -122,6 +126,18 @@
 .mg-l-40{
   margin-left: -43px;
 }
+.dropdown-item:hover {
+  background-color: #FF3800 !important;
+  transition: background-color 0.3s ease !important;
+  color: white !important;
+}
+
+
+.dropdown {
+  margin-right: 10px;
+}
+
+
 
 
 

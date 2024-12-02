@@ -2,6 +2,7 @@ import axios from 'axios';
 import { authHeader } from './auth.header';
 import config from "../environment/config";
 const API_URL = config.API_URL;
+const resetPsdLink = config.RESET_PASSWORD_LINK;
 
 export const getHeaderModuleList = async (role) => {
     try {
@@ -20,3 +21,8 @@ export const getHeaderModuleDetailList = async (role) => {
         throw error;
     }
 };
+
+export const changePassword = async () => {
+    window.open(resetPsdLink, '_blank'); 
+  }
+  

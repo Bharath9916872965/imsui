@@ -1,24 +1,21 @@
 import { useCallback, useEffect, useState } from "react";
-import { getQmVersionRecordDtoList } from "../../../services/qms.service";
+import { getDwpVersionRecordDtoList, getQmVersionRecordDtoList } from "../../../services/qms.service";
 import Datatable from "../../datatable/Datatable";
 import withRouter from '../../../common/with-router';
-import { IconButton } from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
-import "./qm-revisionrecords.component.css"
-import QmDocPrint from "../../prints/qms/qm-doc-print";
+import "./dwp-revisionrecords.component.css"
 import { format } from "date-fns";
-import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
-import QmAddMappingOfClassesDialog from "./qm-add-mapping-of-classes-dialog";
+import DwpDocPrint from "components/prints/qms/dwp-doc-print";
+// import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
 
 
-const QmRevisionRecordsComponent = ({ router }) => {
+const DwpRevisionRecordsComponent = ({ router }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [versionRecordList, setVersionRecordList] = useState([]);
   const [versionRecordPrintList, setVersionRecordPrintList] = useState([]);
   const [openDialog2, setOpenDialog2] = useState(false);
-  const [openMocDialog, setOpenMocDialog] = useState(false);
   const [singleDoc, setSingleDoc] = useState(null);
 
 
@@ -27,12 +24,12 @@ const QmRevisionRecordsComponent = ({ router }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
-        const VersionRecorList = await getQmVersionRecordDtoList();
-        const mappedData = VersionRecorList.map((item, index) => ({
+        const versionRecorList = await getDwpVersionRecordDtoList(0);
+        const mappedData = versionRecorList.map((item, index) => ({
           sn: index + 1,
           description: item.description || '-' || '-',
           // from: 'V' + item[5] + '-R' + item[6] || '-',
-          from: index + 1 < VersionRecorList.length ? 'I' + VersionRecorList[index + 1].issueNo + '-R' + VersionRecorList[index + 1].revisionNo : '--',
+          from: index + 1 < versionRecorList.length ? 'I' + versionRecorList[index + 1].issueNo + '-R' + versionRecorList[index + 1].revisionNo : '--',
           to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
           issueDate: item.dateOfRevision,
           issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
@@ -48,7 +45,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
                               }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
                   {getDocPDF('', item)}
                   <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true) }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
-                  <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button>
+                  {/* <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button> */}
                 </>
               )}
             </div>
@@ -56,7 +53,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
         }));
 
         setVersionRecordPrintList(mappedData);
-        setVersionRecordList(VersionRecorList);
+        setVersionRecordList(versionRecorList);
         setIsLoading(false);
 
       } catch (error) {
@@ -68,11 +65,11 @@ const QmRevisionRecordsComponent = ({ router }) => {
   }, []);
 
   const getDocPDF = (action, revisionElements) => {
-    return <QmDocPrint action={action} revisionElements={revisionElements} />
+    return <DwpDocPrint action={action} revisionElements={revisionElements} />
   }
 
   const redirecttoQmDocument = useCallback((element) => {
-    navigate('/qm-add-content', { state: { revisionElements: element } })
+    navigate('/dwp-add-content', { state: { revisionElements: element } })
   }, [navigate]);
 
   const handleCloseDocSummaryDialog = () => {
@@ -80,16 +77,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
     setSingleDoc(null);
   };
 
-  const handleCloseMocDialog = () => {
-    setOpenMocDialog(false)
-    setSingleDoc(null);
-  };
 
-  const addMappingOfClasses = (item) => {
-    setOpenMocDialog(true)
-    setSingleDoc(item)
-    // return <QmAddMappingOfClassesDialog open={openMovDialog} onClose={handleCloseMocDialog} revisionRecordId={revisionRecordId}/>;
-  };
 
 
   const columns = [
@@ -107,7 +95,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
     <div className="card">
       <Navbar />
       <div className="card-body">
-        <h3>QM - Revision Record </h3>
+        <h3>DWP - Revision Record </h3>
         <div id="card-body customized-card">
           {isLoading ? (
             <h3>Loading...</h3>
@@ -118,20 +106,12 @@ const QmRevisionRecordsComponent = ({ router }) => {
           )}
         </div>
       </div>
-      <AddDocumentSummaryDialog
+      {/* <AddDocumentSummaryDialog
         open={openDialog2}
         onClose={handleCloseDocSummaryDialog}
         revisionElements={singleDoc}
-      // onConfirm={handleDocSummaryConfirm}
-      />
-
-      {openMocDialog && (
-        <QmAddMappingOfClassesDialog
-          open={openMocDialog}
-          onClose={handleCloseMocDialog}
-          revisionRecordId={singleDoc.revisionRecordId}
-        />
-      )}
+      /> */}
+      
 
     </div>
 
@@ -139,4 +119,4 @@ const QmRevisionRecordsComponent = ({ router }) => {
 
 }
 
-export default withRouter(QmRevisionRecordsComponent);
+export default withRouter(DwpRevisionRecordsComponent);

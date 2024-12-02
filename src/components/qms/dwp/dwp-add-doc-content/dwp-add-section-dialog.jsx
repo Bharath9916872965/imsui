@@ -1,11 +1,11 @@
 import { useEffect, useState } from 'react';
-import { AddNewSection, getUnAddedChapters, UnAddListToAddList } from '../../../../services/qms.service';
+import { addNewDwpSection, dwpUnAddListToAddList, getDwpUnAddedChapters, UnAddListToAddList } from '../../../../services/qms.service';
 // import QaQtDocSections from '../Models/QaQtDocSections';
 
-import './qm-add-doc-content.component.css';
+import './dwp-add-doc-content.component.css';
 import AlertConfirmation from '../../../../common/AlertConfirmation.component';
 
-const QmAddSectionDialog = ({ open, onClose }) => {
+const DwpAddSectionDialog = ({ open, onClose, revisionElements }) => {
     const [error, setError] = useState(null);
     const [unAddedChapterList, setUnAddedChapterList] = useState([]);
     const [sectionIds, setSectionIds] = useState([]);
@@ -28,7 +28,7 @@ const QmAddSectionDialog = ({ open, onClose }) => {
 
     const getUnAddedChapterlist = async () => {
         try {
-            let unAddedChapterList = await getUnAddedChapters();
+            let unAddedChapterList = await getDwpUnAddedChapters(revisionElements.divisionId);
             setUnAddedChapterList(unAddedChapterList);
         } catch (error) {
             setError('An error occurred');
@@ -51,7 +51,7 @@ const QmAddSectionDialog = ({ open, onClose }) => {
         });
 
         if (isConfirmed) {
-            let res = await AddNewSection(newSectionName);
+            let res = await addNewDwpSection(revisionElements.divisionId, newSectionName);
             if (res && res > 0) {
                 getUnAddedChapterlist();
                 Swal.fire({
@@ -79,7 +79,7 @@ const QmAddSectionDialog = ({ open, onClose }) => {
         });
 
         if (isConfirmed) {
-            let res = await UnAddListToAddList(sectionIds);
+            let res = await dwpUnAddListToAddList(sectionIds);
             if (res && res > 0) {
                 getUnAddedChapterlist();
                 Swal.fire({
@@ -197,4 +197,4 @@ const QmAddSectionDialog = ({ open, onClose }) => {
     );
 };
 
-export default QmAddSectionDialog;
+export default DwpAddSectionDialog;

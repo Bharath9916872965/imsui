@@ -41,10 +41,7 @@ const QmAddDocContentComponent = ({ router }) => {
   const [AddNewChapterFormSecondLvl, setAddNewChapterFormSecondLvl] = useState({
       SubChapterName: ''
   });
-  const [dialogMessage, setDialogMessage] = useState('');
 
-  const [snackbarMessage, setSnackbarMessage] = useState('');
-  const [snackbarSeverity, setSnackbarSeverity] = useState('success');
 
   const [level, setLevel] = useState(0);
   const [refreshChapterId, setRefreshChapterId] = useState(0);
@@ -69,7 +66,6 @@ const QmAddDocContentComponent = ({ router }) => {
   const [isLandscape, setIsLandscape] = useState(false);
 
   useEffect(() => {
-    console.log('versionElements----in add-content---',revisionElements)
 
       window.$('#summernote').summernote({
           airMode: false,
@@ -330,12 +326,9 @@ const QmAddDocContentComponent = ({ router }) => {
   };
 
   const deleteChapterById = async (reloadchpter, chapterId, level) => {
-      // console.log('Deleting chapter', chapterId);
       setDeleteChapterId(chapterId)
       setDeleteRefreshChapterId(reloadchpter)
       setDeleteLevel(level)
-
-
         
         const isConfirmed = await AlertConfirmation({
             title: 'Are you sure to delete ?',
@@ -347,13 +340,13 @@ const QmAddDocContentComponent = ({ router }) => {
         let res = await deleteChapterByChapterIdId(chapterId);
   
         if (res && res > 0) {
-            if (deleteLevel > 0) {
-                if (deleteLevel === 1) {
+            if (level > 0) {
+                if (level === 1) {
                     setChapterIdFirstLvl(null);
-                } else if (deleteLevel === 2) {
+                } else if (level === 2) {
                     setChapterIdSecondLvl(null);
                 }
-                getSubChapters(deleteRefreshChapterId, deleteLevel);
+                getSubChapters(reloadchpter, level);
             } else {
                 getAllChapters();
             }
@@ -469,6 +462,7 @@ const QmAddDocContentComponent = ({ router }) => {
       // console.log('--editor value---',e.target.value)
       // setSnackbarOpen(false);
   };
+  
 
   const handleOpenUnaddedSections = () => {
       setOpenDialog(true)
@@ -519,7 +513,7 @@ const QmAddDocContentComponent = ({ router }) => {
                       <div className=" text-md-end mt-2 mt-md-0">
                          <div className="doc-name">
                               {/* <button className="doc-name"> */}
-                                  QUALITY MANUAL
+                                  Quality Manual(QM)
                               {/* </button> */}
                           </div>
                       </div>
@@ -1017,11 +1011,6 @@ const QmAddDocContentComponent = ({ router }) => {
                             </button>
                       </div>
                   </div>
-                  {/* <Snackbar open={snackbarOpen} autoHideDuration={5000} onClose={handleSnackbarClose} anchorOrigin={{ vertical: 'top', horizontal: 'center' }} sx={{ marginTop: '50px' }}> 
-                      <Alert onClose={handleSnackbarClose} severity={snackbarSeverity} sx={{ width: '100%' }}>
-                          {snackbarMessage}
-                      </Alert>
-                  </Snackbar> */}
 
                   <QmAddSectionDialog
                       open={openDialog}
