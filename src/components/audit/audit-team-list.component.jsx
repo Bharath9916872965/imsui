@@ -247,7 +247,7 @@ const AuditTeamListComponent = () => {
         <div className="card-body text-center">
           <div className="row">
             <div className="col-md-9">
-              <h3>{iqaNo} : Auditee Team List</h3>
+              <h3>{iqaNo} : Auditor Team List</h3>
             </div>
             <div className="col-md-2">
               <SelectPicker options={iqaOptions} label="IQA No"
