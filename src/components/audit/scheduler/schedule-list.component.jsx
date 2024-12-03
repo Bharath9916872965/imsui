@@ -110,7 +110,6 @@ const ScheduleListComponent = ({router}) => {
       setTotalAuditeeCount(auditList.length)
       setIqaFullList(iqaList);
       setScheduleList(scdList)
-      console.log('scdList------ ',scdList)
       const iqaData = iqaList.map(data => ({
                       value : data.iqaId,
                       label : data.iqaNo
@@ -129,11 +128,6 @@ const ScheduleListComponent = ({router}) => {
       }
       setIqaOptions(iqaData)
       setTeamList(team)
-      // if(scdList.length >0){
-      //   setDataTable(scdList)
-      // }else{
-      //   setScheduleList([])
-      // }
 
       setInitialValues(prevValues =>({
         ...prevValues,
@@ -479,7 +473,7 @@ const ScheduleListComponent = ({router}) => {
             <Datatable columns={columns} data={filScheduleList} />
           </div>
           <div>
-            {!forwardFlag && pendingAuditeeCount !== 0 &&  <button className="btn add" onClick={scheduleAdd}> Add </button>}
+            {!forwardFlag && pendingAuditeeCount !== 0 &&  <button className="btn add btn-name" onClick={scheduleAdd}> Add </button>}
             {forwardFlag && <button className="btn back" onClick={() => scheduleForward()}>Forward</button>}
           </div>
 
