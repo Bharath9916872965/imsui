@@ -94,23 +94,22 @@ const AuditeeListComponent = () => {
         setTableData(auditeeList);
     }, [auditeeList]);
 
-    const resetInitialValues = () => {
-        setInitialValues({
-            empId: "",
-            headType: "",
-            divisionId: "",
-            groupId: "",
-            projectId: "",
-        });
-    };
+
 
     const toggleModal = (action) => {
+
+        if (action === 'Add') {
+            setInitialValues({
+                empId: "",
+                headType: "",
+                divisionId: "",
+                groupId: "",
+                projectId: "",
+            });
+        }
         setShowModal(!showModal);
         if (!showModal) {
-            setTimeout(() => setModalVisible(true), 10);
-            if (action === 'add') {
-                resetInitialValues(); // Reset initial values when opening the modal and action is "add"
-            }
+            setModalVisible(true)
         } else {
             setModalVisible(false);
         }
@@ -170,8 +169,8 @@ const AuditeeListComponent = () => {
 
     const handleSubmit = async (values) => {
         const isEditMode = Boolean(values.auditeeId);
-        const successMessage = isEditMode ? "updated Successfully!" : " Added Successfully ";
-        const unsuccessMessage = isEditMode ? "update Unsuccessful!" : " Add Unsuccessful ";
+        const successMessage = isEditMode ? "Updated Successfully!" : " Added Successfully ";
+        const unsuccessMessage = isEditMode ? "Update Unsuccessful!" : " Add Unsuccessful ";
         const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
         const confirm = await AlertConfirmation({
             title: Title,
@@ -275,7 +274,7 @@ const AuditeeListComponent = () => {
                         <Datatable columns={columns} data={tblauditeeList} />
                     </div>
                     <div>
-                        <button className="btn add" onClick={() => toggleModal('Add')}>
+                        <button className="btn add btn-name" onClick={() => toggleModal('Add')}>
                             Add
                         </button>
                     </div>
@@ -290,7 +289,7 @@ const AuditeeListComponent = () => {
                             <div className={`modal fade show modal-show-custom  ${modalVisible ? 'modal-visible' : ''}`} style={{ display: 'block' }} aria-modal="true" role="dialog">
                                 <div className="modal-dialog modal-lg modal-lg-custom">
                                     <div className="modal-content modal-content-custom">
-                                        <div className="modal-header d-flex justify-content-between bg-primary text-white modal-header-custom">
+                                        <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white modal-header-custom">
                                             <h5 className="modal-title">Auditee {actionFrom}</h5>
                                             <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => toggleModal("")} aria-label="Close">
                                                 <span aria-hidden="true">&times;</span>

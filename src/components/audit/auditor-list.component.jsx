@@ -127,7 +127,7 @@ const AuditorListComponent = () => {
             {<Datatable columns={columns} data={tblauditorData} />}
           </div>
           <div>
-            <button className="btn add" onClick={() => setShowModal(true)}>
+            <button className="btn add btn-name" onClick={() => setShowModal(true)}>
               Add
             </button>
           </div>

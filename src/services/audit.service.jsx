@@ -35,6 +35,16 @@ export class AuditRescheduleDto{
     }
 }
 
+export class CheckListMaster{
+    constructor(mocId,description,sectionNo,level,clauseNo){
+        this.mocId       = mocId;
+        this.description = description;
+        this.sectionNo   = sectionNo;
+        this.level       = level;
+        this.clauseNo    = clauseNo;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -390,3 +400,47 @@ export const scheduleTran = async (scheduleId)=>{
     }
 }
 
+export const getMocTotalList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-moc-total-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getMocTotalList:', error);
+        throw error;
+    }
+}
+
+export const updateChapterDescById = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}update-chapter-desc`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateChapterDescById:', error);
+        throw error;
+    }
+}
+
+export const deleteChapterDescById = async (mocId)=>{
+    try {
+        return (await axios.post(`${API_URL}delete-chapter-desc`,mocId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in deleteChapterDescById:', error);
+        throw error;
+    }
+}
+
+// export const getSubMocs = async (values)=>{
+//     try {
+//         return (await axios.post(`${API_URL}get-sub-mocs`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+//     } catch (error) {
+//         console.error('Error occurred in getSubMocs:', error);
+//         throw error;
+//     }
+// }
+
+export const addNewChapter = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}add-new-chapter`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addNewChapter:', error);
+        throw error;
+    }
+}

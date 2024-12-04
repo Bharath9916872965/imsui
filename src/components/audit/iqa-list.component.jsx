@@ -21,6 +21,7 @@ const IqaListComponent = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [nextIqaNo, setNextIqaNo] = useState(null);
     const [actionFrom, setActionFrom] = useState("Add");
+    const [isAddMode,setIsAddMode] = useState(false)
 
     const [initialValues, setInitialValues] = useState({
         iqaNo: (iqaList.length + 1) + "",
@@ -67,9 +68,21 @@ const IqaListComponent = () => {
     };
 
     const toggleModal = (action) => {
+        if(action === 'Add'){
+            setIsAddMode(true);
+            setInitialValues(prevValues =>({
+                prevValues,
+                fromDate: "",
+                toDate: "",
+                scope: "",
+                description: "",
+        }));
+        }else{
+            setIsAddMode(false)
+        }
         setShowModal(!showModal);
         if (!showModal) {
-            setTimeout(() => setModalVisible(true), 10);
+             setModalVisible(true)
         } else {
             setModalVisible(false);
         }
@@ -111,44 +124,61 @@ const IqaListComponent = () => {
     };
 
     const handleSubmit = async (values) => {
-        const isEditMode = Boolean(values.iqaId);
-        const successMessage = isEditMode ? " updated Successfully!" : " Added Successfully!";
-        const unsuccessMessage = isEditMode ? " update Unsuccessful!" : " Add Unsuccessful!";
-        const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
+        let iqaCheck = false;
+        const successMessage = isAddMode ?  " Added Successfully!" :" Updated Successfully!";
+        const unsuccessMessage = isAddMode ? " Add Unsuccessful!" : " Update Unsuccessful!";
+        const Title = isAddMode ?  "Are you sure to Add ?": "Are you sure to Update ?";
 
-        const confirm = await AlertConfirmation({
-            title: Title,
-            message: '',
-        });
+        if(isAddMode){
+            if(Number(values.iqaNo) <= 0){
+                Swal.fire({
+                    icon: "error",
+                    title: 'Enter a Positive IQA Number',
+                    showConfirmButton: false,
+                    timer: 2500
+                });
+            }else{
+                iqaCheck = true;
+            }
+        }else{
+            iqaCheck = true;
+        }
 
-        // if (!confirm.isConfirmed) return;
-        if (confirm) {
-            try {
-                const result = await insertIqa(values);
-                if (result === 200) {
-                    await iqalist();
-                    const latestIqaNo = values.iqaNo || "";
-
-                    setShowModal(false);
-                    setInitialValues('');
-                    Swal.fire({
-                        icon: "success",
-                        title: `${latestIqaNo}`,
-                        text: successMessage,
-                        showConfirmButton: false,
-                        timer: 2500
-                    });
-                } else {
-                    Swal.fire({
-                        icon: "error",
-                        title: unsuccessMessage,
-                        showConfirmButton: false,
-                        timer: 2500
-                    });
+        if(iqaCheck){
+            const confirm = await AlertConfirmation({
+                title: Title,
+                message: '',
+            });
+    
+            // if (!confirm.isConfirmed) return;
+            if (confirm) {
+                try {
+                    const result = await insertIqa(values);
+                    if (result === 200) {
+                        await iqalist();
+                        const latestIqaNo = values.iqaNo || "";
+    
+                        setShowModal(false);
+                        setInitialValues('');
+                        Swal.fire({
+                            icon: "success",
+                            title: `${latestIqaNo}`,
+                            text: successMessage,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    } else {
+                        Swal.fire({
+                            icon: "error",
+                            title: unsuccessMessage,
+                            showConfirmButton: false,
+                            timer: 2500
+                        });
+                    }
+                } catch (error) {
+                    console.error('Error Adding Iqa:', error);
+                    Swal.fire('Error!', 'There was an issue inserting IQA the auditor.', 'error');
                 }
-            } catch (error) {
-                console.error('Error Adding Iqa:', error);
-                Swal.fire('Error!', 'There was an issue inserting IQA the auditor.', 'error');
             }
         }
     };
@@ -178,7 +208,7 @@ const IqaListComponent = () => {
                             <Datatable columns={columns} data={mappedData} />
                         </div>
                         <div>
-                            <button className="btn add" onClick={() => toggleModal('Add')}>
+                            <button className="btn add btn-name" onClick={() => toggleModal('Add')}>
                                 Add
                             </button>
                         </div>
@@ -221,7 +251,7 @@ const IqaListComponent = () => {
                                                                             error={Boolean(touched.iqaNo && errors.iqaNo)}
                                                                             helperText={touched.iqaNo && errors.iqaNo}
                                                                             InputProps={{
-                                                                                inputProps: { maxLength: 100 },
+                                                                                inputProps: { maxLength: 49 },
                                                                                 autoComplete: "off",
                                                                             }}
                                                                             style={{ marginTop: "0rem" }}
@@ -305,7 +335,7 @@ const IqaListComponent = () => {
                                                                                 helperText={form.touched.scope && form.errors.scope}
                                                                                 fullWidth
                                                                                 InputProps={{
-                                                                                    inputProps: { maxLength: 100 },
+                                                                                    inputProps: { maxLength: 990 },
                                                                                     autoComplete: "off"
                                                                                 }}
                                                                             />
@@ -328,7 +358,7 @@ const IqaListComponent = () => {
                                                                                 helperText={form.touched.description && form.errors.description}
                                                                                 fullWidth
                                                                                 InputProps={{
-                                                                                    inputProps: { maxLength: 100 },
+                                                                                    inputProps: { maxLength: 990 },
                                                                                     autoComplete: "off"
                                                                                 }}
                                                                             />

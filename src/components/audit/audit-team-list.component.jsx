@@ -143,8 +143,8 @@ const AuditTeamListComponent = () => {
       return Swal.fire("Warning", "Please Select Team Members !", "warning");
     }
     const isEditMode = Boolean(values.teamId);
-    const successMessage = isEditMode ? " updated Successfully!" : " Added Successfully!";
-    const unsuccessMessage = isEditMode ? " update Unsuccessful!" : " Add Unsuccessful!";
+    const successMessage = isEditMode ? " Updated Successfully!" : " Added Successfully!";
+    const unsuccessMessage = isEditMode ? " Update Unsuccessful!" : " Add Unsuccessful!";
     const Title = isEditMode ? "Are you sure to Update ?" : "Are you sure to Add ?";
 
     const confirm = await AlertConfirmation({
@@ -247,7 +247,7 @@ const AuditTeamListComponent = () => {
         <div className="card-body text-center">
           <div className="row">
             <div className="col-md-9">
-              <h3>{iqaNo} : Auditee Team List</h3>
+              <h3>{iqaNo} : Auditor Team List</h3>
             </div>
             <div className="col-md-2">
               <SelectPicker options={iqaOptions} label="IQA No"
@@ -255,7 +255,7 @@ const AuditTeamListComponent = () => {
                 handleChange={(newValue) => { onIqaChange(newValue?.value) }} />
             </div>
             <div className="col-md-1">
-            <button className="btn add" onClick={() => addTeam('Add')}>
+            <button className="btn add btn-name" onClick={() => addTeam('Add')}>
               Add
             </button>
             </div>
