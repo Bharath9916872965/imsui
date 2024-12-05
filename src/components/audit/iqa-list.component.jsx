@@ -21,7 +21,7 @@ const IqaListComponent = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [nextIqaNo, setNextIqaNo] = useState(null);
     const [actionFrom, setActionFrom] = useState("Add");
-    const [isAddMode,setIsAddMode] = useState(false)
+    const [isAddMode,setIsAddMode] = useState(false);
 
     const [initialValues, setInitialValues] = useState({
         iqaNo: (iqaList.length + 1) + "",
@@ -68,6 +68,7 @@ const IqaListComponent = () => {
     };
 
     const toggleModal = (action) => {
+        setActionFrom(action);
         if(action === 'Add'){
             setIsAddMode(true);
             setInitialValues(prevValues =>({
@@ -128,6 +129,8 @@ const IqaListComponent = () => {
         const successMessage = isAddMode ?  " Added Successfully!" :" Updated Successfully!";
         const unsuccessMessage = isAddMode ? " Add Unsuccessful!" : " Update Unsuccessful!";
         const Title = isAddMode ?  "Are you sure to Add ?": "Are you sure to Update ?";
+
+        console.log('values.iqaNo',values.iqaNo);
 
         if(isAddMode){
             if(Number(values.iqaNo) <= 0){
@@ -231,7 +234,7 @@ const IqaListComponent = () => {
                                             </div>
 
                                             <div className="modal-body">
-                                                <Formik initialValues={initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
+                                                <Formik initialValues= {isAddMode ? { iqaNo: iqaList.length === 0 ? "" : nextIqaNo } : initialValues } validationSchema={validationSchema} onSubmit={handleSubmit}>
                                                     {({ errors, touched, handleChange, handleBlur, values }) => (
                                                         <Form>
                                                             <div className="row">
@@ -368,7 +371,7 @@ const IqaListComponent = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="d-flex justify-content-center mt-3">
-                                                                <button type="submit" className="btn btn-success">Submit</button>
+                                                            {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                                                             </div>
                                                         </Form>
                                                     )}

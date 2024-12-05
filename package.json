@@ -2,7 +2,7 @@
   "name": "imsui",
   "version": "0.1.0",
   "private": true,
-  "homepage": "http://192.168.1.62/ims",
+  "homepage": "http://192.168.1.62",
   "dependencies": {
     "@date-io/dayjs": "^3.0.0",
     "@emotion/react": "^11.13.3",
