@@ -427,6 +427,15 @@ export const deleteChapterDescById = async (mocId)=>{
     }
 }
 
+export const deleteSubChapterDescById = async (mocId)=>{
+    try {
+        return (await axios.post(`${API_URL}delete-sub-chapter-desc`,mocId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in deleteSubChapterDescById:', error);
+        throw error;
+    }
+}
+
 // export const getSubMocs = async (values)=>{
 //     try {
 //         return (await axios.post(`${API_URL}get-sub-mocs`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
@@ -441,6 +450,24 @@ export const addNewChapter = async (values)=>{
         return (await axios.post(`${API_URL}add-new-chapter`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in addNewChapter:', error);
+        throw error;
+    }
+}
+
+export const addChapterToMasters = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}add-chapter-to-master`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addChapterToMasters:', error);
+        throw error;
+    }
+}
+
+export const updateCheckListChapters = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}update-check-list-chapters`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateCheckListChapters:', error);
         throw error;
     }
 }

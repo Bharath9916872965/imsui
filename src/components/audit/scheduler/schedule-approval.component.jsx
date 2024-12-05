@@ -8,11 +8,13 @@ import { format } from "date-fns";
 import SelectPicker from '../../selectpicker/selectPicker';
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 import ReturnDialog from "../../Login/returnDialog.component";
+import withRouter from "common/with-router";
 
 
 
-const ScheduleApprovalComponent = () => {
+const ScheduleApprovalComponent = ({router}) => {
 
+  const {navigate,location} = router;
   const [scheduleList,setScheduleList] = useState([]);
   const [filScheduleList,setFilScheduleList] = useState([]);
   const [iqaFullList,setIqaFullList] = useState([]);
@@ -78,13 +80,15 @@ const ScheduleApprovalComponent = () => {
         revision     : 'R'+item.revision || '-',
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
-                          {['AAA'].includes(item.scheduleStatus) && <button className=" btn btn-outline-primary btn-sm me-1 mg-l-40" onClick={() => addCheckList(item)}  title="CheckList"><i className="material-icons">playlist_add_check</i></button>}</>  
+                          {['AAA'].includes(item.scheduleStatus) && <button title='Add CheckList' className=" btn btn-outline-primary btn-sm me-1 mg-l-40" onClick={() => addCheckList(item)}  ><i className="material-icons">playlist_add_check</i></button>}</>  
       }      
     });
     setFilScheduleList(mappedData);
    }
 
    const addCheckList = (item)=>{
+
+    navigate('/audit-check-list',{state:{element:item}})
 
    }
 
@@ -215,4 +219,4 @@ const ScheduleApprovalComponent = () => {
   );
 
 }
-export default ScheduleApprovalComponent;
+export default withRouter(ScheduleApprovalComponent);

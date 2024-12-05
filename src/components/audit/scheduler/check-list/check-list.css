@@ -1,0 +1,155 @@
+.custom-header {
+    position: relative;
+    color: #273746;
+    padding: 3px 10px;
+    border: 0.5px solid #a18dce;
+    border-left: 3px solid #0fba34;
+    border-bottom: 3px solid #a18dce;
+    border-radius: 3px;
+    margin-top: 5px;
+    padding: 8px;
+    font-size: 16px;
+    overflow: hidden;
+
+}
+.main-header{
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+.main-header:hover{
+    margin-left: 7%;
+    margin-right: 7%;
+}
+
+.sub-header{
+    margin-left: 3%;
+    margin-right: 3%;
+}
+
+.sub-header:hover{
+    margin-left: 3%;
+    margin-right: 3%;
+}
+
+.custom-header::after {
+    content: '';
+    position: absolute;
+    left: 0;
+    top: 0;
+    width: 3px;
+    height: 100%;
+    background-color: #FF3800;
+    opacity: 0;
+    transition: opacity 0.5s ease;
+}
+
+.custom-header:hover::after {
+    animation: slideUpDown 1s ease-out forwards;
+}
+
+.custom-header:hover {
+    border: 0.5px solid #a18dce;
+    padding-left: 10px;
+    animation: 2s;
+    border-bottom: 3px solid #a18dce;
+}
+
+@keyframes slideUpDown {
+    0% {
+        opacity: 0;
+        height: 0%;
+    }
+
+    100% {
+        opacity: 1;
+        height: 100%;
+    }
+}
+
+
+/* .angular-editor img {
+    width: 300px !important;
+    height: auto;
+} */
+
+.angular-editor-wrapper img {
+    width: 300px !important;
+    max-width: 100%;
+}
+
+.subHeadingLink {
+    /* border-bottom: 5px solid #512D6D; */
+    border: 1.5px solid #595454;
+    border-radius: 6px;
+    /* background-color: rgba(0, 0, 0, 0.03); */
+    background-color: #ebf4f5;
+    padding: .2rem 1rem;
+    margin: 0.3rem 0rem 0.3rem 0rem;
+    display: flex;
+    justify-content: space-between; 
+    align-items: center; 
+}
+.form-control {
+    display: inline-block;
+    width: auto;
+}
+
+.editor-title {
+    word-wrap: break-word;
+    word-break: break-all;
+    white-space: normal;
+    overflow-wrap: break-word;
+}
+
+
+.main-container{
+    overflow: auto !important;
+    flex-grow: 1 !important;
+    padding: 4px !important; 
+    overflow-x: hidden !important;
+}
+
+.btn-styles{
+    padding: 2px !important;
+}
+.expand-less{
+    position: relative;
+    left: 15px;
+}
+
+.card-content{
+    height: auto;
+    overflow-y: auto;
+    border: 0.3px solid #ABB2B9 !important;
+}
+
+.ex-less{
+    color: #FF0800 !important;
+}
+.font-30{
+    font-size: 30px !important;
+}
+.ex-more{
+    color: #138808 !important;
+}
+
+.cl-orange{
+    color: orange !important;
+}
+
+.cl-red{
+    color: red !important;
+}
+
+.cl-update{
+    color: #198754 !important;
+}
+
+.main-body{
+    display: flex !important;
+    flex-direction: column !important;
+    height: 100vh !important;
+    overflow-x: hidden !important;
+}
+
