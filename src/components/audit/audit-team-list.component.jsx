@@ -394,9 +394,7 @@ const AuditTeamListComponent = () => {
                             </div>
                             {/* Submit Button */}
                             <div className="col text-center subclass">
-                              <button type="submit" className="btn btn-success">
-                                Submit
-                              </button>
+                            {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                             </div>
                           </Form>
                         )}
