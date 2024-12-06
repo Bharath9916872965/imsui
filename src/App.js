@@ -18,6 +18,7 @@ import ScheduleApprovalComponent from './components/audit/scheduler/schedule-app
 import ScheduleTransactionComponent from './components/audit/scheduler/schedule-transaction';
 import CheckListMasterComponent from './components/audit/scheduler/check-list/check-list-master.jsx';
 import AuditCheckListComponent from 'components/audit/scheduler/check-list/audit-check-list.jsx';
+import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 
 function App() {
   return (
@@ -40,6 +41,7 @@ function App() {
         <Route path="/iqa-list" element={<IqaListComponent />} />
         <Route path="/auditee-list" element={<AuditeeListComponent />} />
         <Route path="/audit-team-list" element={<AuditTeamListComponent />} />
+        <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
 
         {/* Schedule */}
         <Route path="/schedule-list" element={<ScheduleListComponent />} />
