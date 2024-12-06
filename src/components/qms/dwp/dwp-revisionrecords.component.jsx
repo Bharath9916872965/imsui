@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useState } from "react";
-import { getDwpVersionRecordDtoList, getQmVersionRecordDtoList } from "../../../services/qms.service";
+import { getDwpDivisionGroupList, getDwpDivisionList, getDwpVersionRecordDtoList, getQmVersionRecordDtoList } from "services/qms.service";
 import Datatable from "../../datatable/Datatable";
 import withRouter from '../../../common/with-router';
 import Navbar from "../../Navbar/Navbar";
@@ -7,25 +7,71 @@ import "./dwp-revisionrecords.component.css"
 import { format } from "date-fns";
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 import AddDocumentSummaryDialog from "./dwp-add-document-summary-dialog";
+import SelectPicker from "components/selectpicker/selectPicker";
+import { Autocomplete, ListItemText, TextField } from "@mui/material";
+import { CustomMenuItem } from "services/auth.header";
+import { getLoginEmployeeDetails } from "services/header.service";
+import DwpDocsAddIssueDialog from "./dwp-add-issue-dialog";
 // import AddDocumentSummaryDialog from "./qm-add-document-summary-dialog";
 
 
-const DwpRevisionRecordsComponent = ({ router }) => {
+const DwpRevisionRecordsComponent = ({ router, docName }) => {
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState(null);
   const [versionRecordList, setVersionRecordList] = useState([]);
   const [versionRecordPrintList, setVersionRecordPrintList] = useState([]);
+  const [divisionList, setDivisionList] = useState([]);
+  const [divisionGroupList, setDivisionGroupList] = useState([]);
   const [openDialog2, setOpenDialog2] = useState(false);
   const [singleDoc, setSingleDoc] = useState(null);
+  const [divisionId, setDivisionId] = useState(null);
+  const [groupId, setGroupId] = useState(null);
+  const [qmsDocTypeDto, setQmsDocTypeDto] = useState(null);
+  const [groupDivisionId, setGroupDivisionId] = useState(null);
+  const [revisionListRefresh, setRevisionListRefresh] = useState(null);
+
+  const [openAddIssueDialog, setOpenAddIssueDialog] = useState(false);
 
 
   const { navigate, location } = router;
 
   useEffect(() => {
+
+    console.log('docName------', docName)
+
+
+    const fetchData = async () => {
+      const { empName, designation, empId, imsFormRoleId, formRoleName } = await getLoginEmployeeDetails();
+      setDwpDivisionList(imsFormRoleId, empId);
+      setDwpDivisionGroupList(imsFormRoleId, empId);
+    }
+
+    fetchData();
+  }, [])
+
+  useEffect(() => {
+    
     const fetchData = async () => {
       try {
-        const versionRecorList = await getDwpVersionRecordDtoList(0);
+
+        var divId = 0;
+
+        if(groupDivisionId) {
+          divId = groupDivisionId;
+        }
+
+        const qmsDocTypeDto = {
+          docType: docName,
+          groupDivisionId:divId
+        }
+    
+        setQmsDocTypeDto(qmsDocTypeDto);
+
+        // setQmsDocTypeDto(prevState => ({...prevState, groupDivisionId: dwpDivisionList[0]?.divisionId || 0 }));
+
+        console.log("divId-----", divId)
+        const versionRecorList = await getDwpVersionRecordDtoList(qmsDocTypeDto);
         const mappedData = versionRecorList.map((item, index) => ({
           sn: index + 1,
           description: item.description || '-' || '-',
@@ -63,7 +109,7 @@ const DwpRevisionRecordsComponent = ({ router }) => {
     };
 
     fetchData();
-  }, []);
+  }, [groupDivisionId, revisionListRefresh]);
 
   const getDocPDF = (action, revisionElements) => {
     return <DwpDocPrint action={action} revisionElements={revisionElements} />
@@ -73,11 +119,44 @@ const DwpRevisionRecordsComponent = ({ router }) => {
     navigate('/dwp-add-content', { state: { revisionElements: element } })
   }, [navigate]);
 
+  const setDwpDivisionList = async (imsFormRoleId, empId) => {
+    
+    const dwpDivisionList = await getDwpDivisionList(imsFormRoleId, empId);
+
+    if(dwpDivisionList && dwpDivisionList.length > 0) {
+      if(docName==='dwp'){
+        setGroupDivisionId(dwpDivisionList[0].divisionId);
+        setQmsDocTypeDto(prevState => ({...prevState, groupDivisionId: dwpDivisionList[0]?.divisionId || 0 }));
+      }
+    }
+
+    setDivisionList(dwpDivisionList);
+
+  };
+
+  const setDwpDivisionGroupList = async (imsFormRoleId, empId) => {
+
+    const dwpDivisionGroupList = await getDwpDivisionGroupList(imsFormRoleId, empId);
+    if(dwpDivisionGroupList && dwpDivisionGroupList.length > 0) {
+      if(docName==='gwp'){
+        setGroupDivisionId(dwpDivisionGroupList[0].groupId);
+        setQmsDocTypeDto(prevState => ({...prevState, groupDivisionId: dwpDivisionGroupList[0]?.groupId || 0 }));
+      }
+    }
+    setDivisionGroupList(dwpDivisionGroupList);
+
+  };
+
   const handleCloseDocSummaryDialog = () => {
     setOpenDialog2(false)
     setSingleDoc(null);
   };
 
+  const handleCloseDialog = () => {
+    setOpenAddIssueDialog(false)
+    setSingleDoc([]);
+    setRevisionListRefresh(!revisionListRefresh)
+};
 
 
 
@@ -96,7 +175,67 @@ const DwpRevisionRecordsComponent = ({ router }) => {
     <div className="card">
       <Navbar />
       <div className="card-body">
-        <h3>DWP - Revision Record </h3>
+        {/* <h3>DWP - Revision Record </h3> */}
+
+        <div className="row">
+            <div className="col-md-10">
+            <h3>{docName.toString().toUpperCase()} - Revision Record</h3>
+            </div>
+            <div className="col-md-2">
+              {/* <SelectPicker options={divisionList} label="Division Name"
+                value={divisionList && divisionList.length > 0 && divisionList.find(option => option.value === divisionId) || null}
+                handleChange={(newValue) => { setDivisionId(newValue?.value) }} /> */}
+            {docName === "dwp" && (
+              <Autocomplete
+                options={divisionList}
+                disablePortal
+                getOptionLabel={(division) => `${division.divisionCode} - ${division.divisionName}`}
+                renderOption={(props, option) => {
+                  return (
+                    <CustomMenuItem {...props} key={option.divisionId}>
+                      <ListItemText primary={`${option.divisionCode} - ${option.divisionName}`} />
+                    </CustomMenuItem>
+                  );
+                }}
+                value={divisionList.find((division) => division.divisionId === groupDivisionId) || null}
+                onChange={(event, value) => setGroupDivisionId(value ? value.divisionId : null)}
+                renderInput={(params) => <TextField {...params} label="Division Name" margin="normal" InputProps={{
+                  ...params.InputProps,
+                  sx: { height: 40 },
+                }} />}
+              />
+            )}
+
+            {docName === "gwp" && (
+              <Autocomplete
+                options={divisionGroupList}
+                disablePortal
+                getOptionLabel={(divisionGroup) => `${divisionGroup.groupCode} - ${divisionGroup.groupName}`}
+                renderOption={(props, option) => {
+                  return (
+                    <CustomMenuItem {...props} key={option.groupId}>
+                      <ListItemText primary={`${option.groupCode} - ${option.groupName}`} />
+                    </CustomMenuItem>
+                  );
+                }}
+                value={divisionGroupList.find((divisionGroup) => divisionGroup.groupId === groupDivisionId) || null}
+                onChange={(event, value) => setGroupDivisionId(value ? value.groupId : null)}
+                renderInput={(params) => (
+                  <TextField
+                    {...params}
+                    label="Group"
+                    size="small"
+                    fullWidth
+                    variant="outlined"
+                    margin="normal"
+                  />
+                )}
+              />
+            )}
+
+            </div>
+          </div>
+          <br />
         <div id="card-body customized-card">
           {isLoading ? (
             <h3>Loading...</h3>
@@ -106,7 +245,32 @@ const DwpRevisionRecordsComponent = ({ router }) => {
             <Datatable columns={columns} data={versionRecordPrintList} />
           )}
         </div>
+
+        <br />
+
+        <div className="text-center">
+          {(versionRecordPrintList.length === 0 && ((docName === 'dwp' && divisionList.length > 0) || (docName === 'gwp' && divisionGroupList.length > 0)) ) && (
+            <button
+              type="button"
+              className="btn add"
+              onClick={() => {setOpenAddIssueDialog(true)}}
+            >
+              Add Issue (V1-R0)
+            </button>
+          )}
+        </div>
+
       </div>
+
+      <DwpDocsAddIssueDialog
+        open={openAddIssueDialog}
+        onClose={handleCloseDialog}
+        revisionElements={singleDoc}
+        docType={docName}
+        groupDivisionId={groupDivisionId}
+      //  onConfirm={handleIssueConfirm}
+      />
+
       <AddDocumentSummaryDialog
         open={openDialog2}
         onClose={handleCloseDocSummaryDialog}

@@ -28,6 +28,7 @@ export const login = async (username, password) => {
           token: response.data.access_token,
           username: username
         }));
+        localStorage.setItem('password',password)
   
         await customAuditStampingLogin(username);
    

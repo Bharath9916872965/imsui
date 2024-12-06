@@ -46,7 +46,7 @@
   transition: ease background-color 250ms;
   background-color: #1976d2 !important;
   border-color: #1976d2 !important;
-  color: white;
+  color: white !important;
 
 }
 
@@ -81,7 +81,7 @@
 
 
 .delete {
-  color: white;
+  color: white !important;
   padding: 9px 13px 9px 13px;
   border-radius: 5px;
   outline: 0;
@@ -104,7 +104,7 @@
 
 
 .print {
-  color: white;
+  color: white !important;
   padding: 9px 13px 9px 13px;
   border-radius: 5px;
   outline: 0;
@@ -142,7 +142,7 @@
 }
 
 .reset {
-  color: black;
+  color: black !important;
   padding: 9px 13px 9px 13px;
   border-radius: 5px;
   outline: 0;
