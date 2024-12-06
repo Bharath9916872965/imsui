@@ -143,33 +143,21 @@ const DwpDocsAddIssueDialog = ({ open, onClose, revisionElements, docType, group
 
                                                 <div className="form-group text-start">
                                                     <div className="row" >
-                                                        <div className="col-md-4">
+                                                        <div className="col-md-3">
                                                             <label htmlFor="isNewIssue" className="form-label">Is New Issue ?</label>
                                                             <div className="input-group">
+
                                                                 <div className="d-inline-block me-1">Off</div>
-                                                                {/* <input
-                                                        type="checkbox"
-                                                        className="form-check-input"
-                                                        id="isNewIssue"
-                                                        checked={values.isNewIssue}
-                                                        disabled={!revisionElements || revisionElements.length === 0}
-                                                        onChange={(event) => {
-                                                            setFieldValue("isNewIssue", event.target.checked);
-                                                            onchangeIsNewIssue(event);
-                                                        }}
-                                                    /> */}
-                                                                {/* <input
+                                                                <div class="form-check form-switch">
+                                                                    <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" 
                                                                     className="form-check-input"
-                                                                    type="checkbox"
-                                                                    id="isPagebreakAfter"
                                                                     checked={values.isNewIssue}
                                                                     disabled={!revisionElements || revisionElements.length === 0}
                                                                     onChange={(event) => {
                                                                         setFieldValue("isNewIssue", event.target.checked);
                                                                         onchangeIsNewIssue(event);
-                                                                    }}
-                                                                /> */}
-                                                                 <input class="form-check-input" type="checkbox" id="flexSwitchCheckChecked" checked></input>
+                                                                    }}/>
+                                                                </div>
                                                                 <div className="d-inline-block me-1">On</div>
 
                                                             </div>
