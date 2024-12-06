@@ -84,7 +84,7 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
                 onClose(false)
             } else {
                 Swal.fire({
-                    icon: "success",
+                    icon: "error",
                     title: "Document Summary Submit Unsuccessful!",
                     showConfirmButton: false,
                     timer: 1500

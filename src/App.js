@@ -16,11 +16,13 @@ import DwpRevisionrecordsComponent from 'components/qms/dwp/dwp-revisionrecords.
 import DwpAddDocContentComponent from './components/qms/dwp/dwp-add-doc-content/dwp-add-doc-content.component';
 import ScheduleApprovalComponent from './components/audit/scheduler/schedule-approval.component';
 import ScheduleTransactionComponent from './components/audit/scheduler/schedule-transaction';
+import UseIdleTimer from 'common/idle-logout';
 import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 
 function App() {
   return (
     <div className="App">
+      <UseIdleTimer/>
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
@@ -30,7 +32,8 @@ function App() {
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
         <Route path="/qm-add-content" element={<QmAddDocContentComponent />} />
-        <Route path="/dwp" element={<DwpRevisionrecordsComponent />} />
+        <Route path="/dwp" element={<DwpRevisionrecordsComponent docName='dwp' />} />
+        <Route path="/gwp" element={<DwpRevisionrecordsComponent docName='gwp' />} />
         <Route path="/dwp-add-content" element={<DwpAddDocContentComponent />} />
 
 

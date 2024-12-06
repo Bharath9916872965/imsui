@@ -58,7 +58,7 @@ export const updateChapterNameById = async (chapterId, chapterName) => {
 
 export const updateChapterContent = async (chapterId, chaperContent) => {
     try {
-        return (await axios.post(`${API_URL}update-qm-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}update-qm-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updateChapterContent', error);
         throw error;
@@ -241,18 +241,19 @@ export const getMocListById = async (revisionRecordId) => {
     }
 }
 
-export const getDwpVersionRecordDtoList = async (divisionId) => {
+export const getDwpVersionRecordDtoList = async (qmsDocTypeDto) => {
     try {
-        return (await axios.post(`${API_URL}get-dwp-version-record-list`, divisionId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}get-dwp-version-record-list`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getDwpVersionRecordDtoList() ', error);
         throw error;
     }
 }
 
-export const getDwpAllChapters = async (divisionId) => {
+export const getDwpAllChapters = async (qmsDocTypeDto) => {
     try {
-        return (await axios.post(`${API_URL}get-all-dwp-chapters`, divisionId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        console.log('qmsDocTypeDto-----', qmsDocTypeDto)
+        return (await axios.post(`${API_URL}get-all-dwp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getDwpAllChapters', error);
         throw error;
@@ -317,16 +318,16 @@ export const getDwpChapterById = async (chapterId) => {
 
 export const updateDwpChapterContent = async (chapterId, chaperContent) => {
     try {
-        return (await axios.post(`${API_URL}update-dwp-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}update-dwp-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in updateDwpChapterContent', error);
         throw error;
     }
 }
 
-export const getDwpUnAddedChapters = async (divisionId) => {
+export const getDwpUnAddedChapters = async (qmsDocTypeDto) => {
     try {
-        return (await axios.post(`${API_URL}un-added-dwp-section-list`, divisionId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}un-added-dwp-section-list`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getUnAddedChapters', error);
         throw error;
@@ -334,9 +335,9 @@ export const getDwpUnAddedChapters = async (divisionId) => {
 }
 
 
-export const addNewDwpSection = async (divisionId, sectionName) => {
+export const addNewDwpSection = async (dwpSectionDto) => {
     try {
-        return (await axios.post(`${API_URL}add-new-dwp-section/${divisionId}`, sectionName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}add-new-dwp-section`, dwpSectionDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in addNewDwpSection', error);
         throw error;
@@ -387,6 +388,39 @@ export const getDwpDocSummarybyId = async (documentId) => {
         console.error('Error occurred in getDocSummarybyId', error);
         throw error;
     
+    }
+}
+
+
+export const getDwpDivisionList = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-dwp-division-list/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpDivisionList', error);
+        throw error; 
+    }
+    
+};
+
+
+export const getDwpDivisionGroupList = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-dwp-division-grouplist/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpDivisionList', error);
+        throw error; 
+    }
+    
+};
+
+export const addNewDwpIssue = async (qmsIssueDto) => {
+    try {
+        return (await axios.post(`${API_URL}add-dwp-new-issue`, qmsIssueDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addNewDwpIssue', error);
+        throw error;
     }
 }
 

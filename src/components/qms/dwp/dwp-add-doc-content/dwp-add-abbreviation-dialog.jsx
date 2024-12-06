@@ -73,7 +73,7 @@ const DwpAddAbbreviationDialog = ({ open, onClose, revisionElements, onConfirm }
                 onClose(false)
             } else {
                 Swal.fire({
-                    icon: "success",
+                    icon: "error",
                     title: "Abbreviation Submit Unsuccessful!",
                     showConfirmButton: false,
                     timer: 1500
