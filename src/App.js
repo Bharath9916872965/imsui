@@ -17,6 +17,7 @@ import DwpAddDocContentComponent from './components/qms/dwp/dwp-add-doc-content/
 import ScheduleApprovalComponent from './components/audit/scheduler/schedule-approval.component';
 import ScheduleTransactionComponent from './components/audit/scheduler/schedule-transaction';
 import UseIdleTimer from 'common/idle-logout';
+import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 
 function App() {
   return (
@@ -41,6 +42,7 @@ function App() {
         <Route path="/iqa-list" element={<IqaListComponent />} />
         <Route path="/auditee-list" element={<AuditeeListComponent />} />
         <Route path="/audit-team-list" element={<AuditTeamListComponent />} />
+        <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
 
         {/* Schedule */}
         <Route path="/schedule-list" element={<ScheduleListComponent />} />

@@ -45,6 +45,13 @@ export class CheckListMaster{
     }
 }
 
+export class IqaAuditeeDto{
+    constructor(iqaId,auditeeIds){
+        this.iqaId = iqaId;
+        this.auditeeIds = auditeeIds;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -444,3 +451,28 @@ export const addNewChapter = async (values)=>{
         throw error;
     }
 }
+
+
+export const getIqaAuditeeList = async (iqaId) => {
+    try {
+      return (await axios.post(`${API_URL}get-iqa-auditee-list`,iqaId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in getIqaAuditeeList:', error);
+      throw error;
+    }
+  };
+
+  export const insertIqaAuditee = async (iqaId,auditeeIds) => {
+    try {
+      const response = await axios.post(
+          `${API_URL}insert-iqa-auditee`,
+          new IqaAuditeeDto(iqaId,auditeeIds),
+         {headers: authHeader() }
+      );
+      return response.data;
+  
+    } catch (error) {
+      console.error('Error occurred in insertIqaAuditee:', error);
+      throw error;
+    }
+  };

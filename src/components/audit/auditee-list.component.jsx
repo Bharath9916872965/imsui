@@ -97,7 +97,7 @@ const AuditeeListComponent = () => {
 
 
     const toggleModal = (action) => {
-
+        setActionFrom(action);
         if (action === 'Add') {
             setInitialValues({
                 empId: "",
@@ -521,7 +521,7 @@ const AuditeeListComponent = () => {
                                                             </Field>
                                                         </div>
                                                         <div className="col text-center subclass">
-                                                            <button type="submit" className="btn btn-success">Submit</button>
+                                                        {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                                                         </div>
                                                     </Form>
                                                 )}
