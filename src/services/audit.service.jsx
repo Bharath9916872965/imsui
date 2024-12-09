@@ -52,6 +52,14 @@ export class IqaAuditeeDto{
     }
 }
 
+export class AuditCheckList{
+    constructor(checkListMap,scheduleId,iqaId){
+        this.checkListMap = checkListMap;
+        this.scheduleId   = scheduleId;
+        this.iqaId        = iqaId;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -133,6 +141,18 @@ export const insertIqa = async (values) => {
     
     try {
         return (await axios.post(`${API_URL}auditee-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getAuditeeDtoList', error);
+        throw error; 
+    }
+};
+
+export const getIqaAuditeelist = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}iqa-auditee-list`,{} , {
             headers: authHeader()
         })).data;
     } catch (error) {
@@ -434,6 +454,15 @@ export const deleteChapterDescById = async (mocId)=>{
     }
 }
 
+export const deleteSubChapterDescById = async (mocId)=>{
+    try {
+        return (await axios.post(`${API_URL}delete-sub-chapter-desc`,mocId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in deleteSubChapterDescById:', error);
+        throw error;
+    }
+}
+
 // export const getSubMocs = async (values)=>{
 //     try {
 //         return (await axios.post(`${API_URL}get-sub-mocs`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
@@ -452,6 +481,23 @@ export const addNewChapter = async (values)=>{
     }
 }
 
+export const addChapterToMasters = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}add-chapter-to-master`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addChapterToMasters:', error);
+        throw error;
+    }
+}
+
+export const updateCheckListChapters = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}update-check-list-chapters`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateCheckListChapters:', error);
+        throw error;
+    }
+}
 
 export const getIqaAuditeeList = async (iqaId) => {
     try {
@@ -460,7 +506,7 @@ export const getIqaAuditeeList = async (iqaId) => {
       console.error('Error occurred in getIqaAuditeeList:', error);
       throw error;
     }
-  };
+};
 
   export const insertIqaAuditee = async (iqaId,auditeeIds) => {
     try {
@@ -476,3 +522,54 @@ export const getIqaAuditeeList = async (iqaId) => {
       throw error;
     }
   };
+
+  export const getObservation = async (iqaId) => {
+    try {
+      return (await axios.post(`${API_URL}get-observation`,iqaId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in getObservation:', error);
+      throw error;
+    }
+  };
+
+ const convertMapToOrderedArray = (map) => {
+    return Array.from(map.entries()).map(([key, value]) => ({
+      mocId: key,
+      ...value,
+    }));
+  };
+
+  export const addAuditCheckList = async (values)=>{
+    try {
+        const valuesToSend = {
+            ...values,
+            checkListMap: convertMapToOrderedArray(values.checkListMap),
+        };
+        return (await axios.post(`${API_URL}add-audit-check-list`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addAuditCheckList:', error);
+        throw error;
+    }
+  }
+
+  export const getAuditCheckList = async (scheduleId) => {
+    try {
+      return (await axios.post(`${API_URL}get-audit-check-list`,scheduleId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in getAuditCheckList:', error);
+      throw error;
+    }
+  };
+
+  export const updateAuditCheckList = async (values)=>{
+    try {
+        const valuesToSend = {
+            ...values,
+            checkListMap: convertMapToOrderedArray(values.checkListMap),
+        };
+        return (await axios.post(`${API_URL}update-audit-check-list`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateAuditCheckList:', error);
+        throw error;
+    }
+  }

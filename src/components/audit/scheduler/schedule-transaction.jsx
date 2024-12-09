@@ -43,9 +43,11 @@ const ScheduleTransactionComponent = () => {
     'ARL': ' Schedule Returned By',
     'ASA': ' Schedule Acknowledged By',
     'AAL': ' Schedule Acknowledged By',
-};
+  };
 
-
+  const back = ()=>{
+    window.close();
+  }
 
 
   return (
@@ -53,7 +55,8 @@ const ScheduleTransactionComponent = () => {
       <Navbar />
       <div className="card">
          <Box display="flex" alignItems="center" gap="10px" >
-          <Box flex="100%" className='text-center'><h3>{data && data.iqaNo}: Audit Schedule Transaction</h3></Box>
+          <Box flex="87%" className='text-center'><h3>{data && data.iqaNo}: Audit Schedule Transaction</h3></Box>
+          <Box flex="13%"><button className="btn backClass" onClick={() => back()}>Back</button></Box>
          </Box>
           <Box className="col-md-11 card l-bg-blue-dark text-left-center-card mg-top-10"  >
             <Box display="flex" alignItems="center" gap="10px">

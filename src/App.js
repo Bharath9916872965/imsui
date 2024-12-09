@@ -16,6 +16,8 @@ import DwpRevisionrecordsComponent from 'components/qms/dwp/dwp-revisionrecords.
 import DwpAddDocContentComponent from './components/qms/dwp/dwp-add-doc-content/dwp-add-doc-content.component';
 import ScheduleApprovalComponent from './components/audit/scheduler/schedule-approval.component';
 import ScheduleTransactionComponent from './components/audit/scheduler/schedule-transaction';
+import CheckListMasterComponent from './components/audit/scheduler/check-list/check-list-master.jsx';
+import AuditCheckListComponent from 'components/audit/scheduler/check-list/audit-check-list.jsx';
 import UseIdleTimer from 'common/idle-logout';
 import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 
@@ -48,6 +50,8 @@ function App() {
         <Route path="/schedule-list" element={<ScheduleListComponent />} />
         <Route path="/schedule-approval" element={<ScheduleApprovalComponent />} />
         <Route path="/schedule-tran" element={<ScheduleTransactionComponent />} />
+        <Route path="/check-list-master" element={<CheckListMasterComponent />} />
+        <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
         
       </Routes>
 {/* <Login/> */}
