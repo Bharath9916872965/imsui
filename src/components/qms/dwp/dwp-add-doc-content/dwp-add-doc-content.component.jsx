@@ -40,6 +40,7 @@ const DwpAddDocContentComponent = ({ router }) => {
     const [AddNewChapterFormSecondLvl, setAddNewChapterFormSecondLvl] = useState({
         SubChapterName: ''
     });
+    const [qmsDocTypeDto, setQmsDocTypeDto] = useState(null);
 
 
     const [level, setLevel] = useState(0);
@@ -166,7 +167,13 @@ const DwpAddDocContentComponent = ({ router }) => {
     useEffect(() => {
         const fetchData = async () => {
             try {
-                getAllChapters();
+                const qmsDocTypeDto = {
+                    docType: revisionElements.docType,
+                    groupDivisionId:revisionElements.groupDivisionId
+                }
+        
+                setQmsDocTypeDto(qmsDocTypeDto);
+                getAllChapters(qmsDocTypeDto);
             } catch (error) {
                 setError('An error occurred');
                 setIsLoading(false);
@@ -196,10 +203,10 @@ const DwpAddDocContentComponent = ({ router }) => {
         margin: '0.5rem 1rem 1rem 1rem'
     };
 
-    const getAllChapters = async () => {
+    const getAllChapters = async (qmsDocTypeDto) => {
         try {
 
-            let AllChapters = await getDwpAllChapters(revisionElements.divisionId);
+            let AllChapters = await getDwpAllChapters(qmsDocTypeDto);
             AllChapters = AllChapters.filter(obj => obj.chapterParentId == 0)
             if (AllChapters && AllChapters.length > 0) {
                 setEditorTitle(AllChapters[0].chapterName);
@@ -207,6 +214,9 @@ const DwpAddDocContentComponent = ({ router }) => {
                 if (AllChapters[0].chapterContent !== null) {
                     setEditorContent(AllChapters[0].chapterContent);
                     $('#summernote').summernote('code', AllChapters[0].chapterContent);
+                } else {
+                    setEditorContent('')
+                    $('#summernote').summernote('code', '');
                 }
                 setEditorContentChapterId(AllChapters[0].chapterId)
 
@@ -288,7 +298,7 @@ const DwpAddDocContentComponent = ({ router }) => {
                     }
                     getSubChapters(refreshChapterId, level);
                 } else {
-                    getAllChapters();
+                    getAllChapters(qmsDocTypeDto);
                 }
                 Swal.fire({
                     icon: "success",
@@ -314,6 +324,9 @@ const DwpAddDocContentComponent = ({ router }) => {
         if (chapter.chapterContent != null) {
             setEditorContent(chapter.chapterContent)
             $('#summernote').summernote('code', chapter.chapterContent);
+        } else {
+            setEditorContent('')
+            $('#summernote').summernote('code', '');
         }
         setEditorContentChapterId(chapter.chapterId);
         if (chapter.isPagebreakAfter != null && chapter.isPagebreakAfter + '' === 'Y') {
@@ -354,7 +367,7 @@ const DwpAddDocContentComponent = ({ router }) => {
                     }
                     getSubChapters(reloadchpter, level);
                 } else {
-                    getAllChapters();
+                    getAllChapters(qmsDocTypeDto);
                 }
                 Swal.fire({
                     icon: "success",
@@ -399,7 +412,7 @@ const DwpAddDocContentComponent = ({ router }) => {
                         }
                         getSubChapters(chapterId, level);
                     } else {
-                        getAllChapters();
+                        getAllChapters(qmsDocTypeDto);
                     }
                     Swal.fire({
                         icon: "success",
@@ -439,7 +452,10 @@ const DwpAddDocContentComponent = ({ router }) => {
         });
 
         if (isConfirmed) {
-            const content = $('#summernote').summernote('code');
+            var content = $('#summernote').summernote('code');
+            // if(!content){
+            //     content=''
+            // }
             let res = await updateDwpChapterContent(editorContentChapterId, content);
 
             if (res && res > 0) {
@@ -451,7 +467,7 @@ const DwpAddDocContentComponent = ({ router }) => {
                 });
             } else {
                 Swal.fire({
-                    icon: "success",
+                    icon: "error",
                     title: "Update Content Unsuccessful!",
                     showConfirmButton: false,
                     timer: 1500
@@ -468,7 +484,7 @@ const DwpAddDocContentComponent = ({ router }) => {
 
     const handleCloseSectionDialog = () => {
         setOpenDialog(false)
-        getAllChapters();
+        getAllChapters(qmsDocTypeDto);
     };
 
     const handleCloseAbbreviationDialog = () => {

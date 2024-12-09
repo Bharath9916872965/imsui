@@ -204,7 +204,10 @@ const QmAddDocContentComponent = ({ router }) => {
               if(AllChapters[0].chapterContent !== null){
                   setEditorContent(AllChapters[0].chapterContent);
                   $('#summernote').summernote('code', AllChapters[0].chapterContent);
-              }
+                } else {
+                    setEditorContent('')
+                    $('#summernote').summernote('code', '');
+                }
               setEditorContentChapterId(AllChapters[0].chapterId)
 
               if (AllChapters[0].isPagebreakAfter != null && AllChapters[0].isPagebreakAfter + '' === 'Y') {
@@ -310,7 +313,10 @@ const QmAddDocContentComponent = ({ router }) => {
       if(chapter.chapterContent != null) {
           setEditorContent(chapter.chapterContent)
           $('#summernote').summernote('code',chapter.chapterContent);
-      }
+        } else {
+            setEditorContent('')
+            $('#summernote').summernote('code', '');
+        }
       setEditorContentChapterId(chapter.chapterId);
       if (chapter.isPagebreakAfter != null && chapter.isPagebreakAfter + '' === 'Y') {
           setIsPagebreakAfter(true);
@@ -448,7 +454,7 @@ const QmAddDocContentComponent = ({ router }) => {
                 });
             } else {
                 Swal.fire({
-                    icon: "success",
+                    icon: "error",
                     title: "Update Content Unsuccessful!",
                     showConfirmButton: false,
                     timer: 1500

@@ -18,7 +18,6 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
 
     useEffect(() => {
         const fetchData = async () => {
-            console.log('revisionElements---doc---su---', revisionElements);
     
             try {
                 const newInitialValues = {
@@ -72,7 +71,6 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
 
     const submitDocSummary = async (values) => {
 
-        console.log('values---doc--', values)
         const isConfirmed = await AlertConfirmation({
             title: 'Are you sure to submit ?',
             message: '',
@@ -94,7 +92,7 @@ const AddDocumentSummaryDialog = ({ open, onClose, revisionElements, onConfirm }
                 onClose(false)
             } else {
                 Swal.fire({
-                    icon: "success",
+                    icon: "error",
                     title: "Document Summary Submit Unsuccessful!",
                     showConfirmButton: false,
                     timer: 1500

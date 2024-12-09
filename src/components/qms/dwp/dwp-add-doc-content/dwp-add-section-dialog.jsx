@@ -1,24 +1,36 @@
 import { useEffect, useState } from 'react';
-import { addNewDwpSection, dwpUnAddListToAddList, getDwpUnAddedChapters, UnAddListToAddList } from '../../../../services/qms.service';
+import { addNewDwpSection, dwpUnAddListToAddList, getDwpUnAddedChapters,  } from 'services/qms.service';
 // import QaQtDocSections from '../Models/QaQtDocSections';
 
 import './dwp-add-doc-content.component.css';
-import AlertConfirmation from '../../../../common/AlertConfirmation.component';
+import AlertConfirmation from 'common/AlertConfirmation.component';
 
 const DwpAddSectionDialog = ({ open, onClose, revisionElements }) => {
     const [error, setError] = useState(null);
     const [unAddedChapterList, setUnAddedChapterList] = useState([]);
     const [sectionIds, setSectionIds] = useState([]);
     const [newSectionName, setNewSectionName] = useState('');
+    const [qmsDocTypeDto, setQmsDocTypeDto] = useState(null);
+
 
     useEffect(() => {
+
+
         const fetchData = async () => {
+
+            const qmsDocTypeDto = {
+                docType: revisionElements.docType,
+                groupDivisionId:revisionElements.groupDivisionId
+            }
+
+            setQmsDocTypeDto(qmsDocTypeDto);
+
             try {
                 setUnAddedChapterList([]);
                 setSectionIds([]);
                 setNewSectionName('');
 
-                getUnAddedChapterlist();
+                getUnAddedChapterlist(qmsDocTypeDto);
             } catch (error) {
                 setError('An error occurred');
             }
@@ -26,9 +38,9 @@ const DwpAddSectionDialog = ({ open, onClose, revisionElements }) => {
         if (open) fetchData();
     }, [open]);
 
-    const getUnAddedChapterlist = async () => {
+    const getUnAddedChapterlist = async (qmsDocTypeDto) => {
         try {
-            let unAddedChapterList = await getDwpUnAddedChapters(revisionElements.divisionId);
+            let unAddedChapterList = await getDwpUnAddedChapters(qmsDocTypeDto);
             setUnAddedChapterList(unAddedChapterList);
         } catch (error) {
             setError('An error occurred');
@@ -50,10 +62,16 @@ const DwpAddSectionDialog = ({ open, onClose, revisionElements }) => {
             message: '',
         });
 
+        var dwpSectionDto = {
+            sectionName: newSectionName,
+            docType: revisionElements.docType,
+            groupDivisionId: revisionElements.groupDivisionId,
+        }
+
         if (isConfirmed) {
-            let res = await addNewDwpSection(revisionElements.divisionId, newSectionName);
+            let res = await addNewDwpSection(dwpSectionDto);
             if (res && res > 0) {
-                getUnAddedChapterlist();
+                getUnAddedChapterlist(qmsDocTypeDto);
                 Swal.fire({
                     icon: "success",
                     title: "Added Section Successfully",
@@ -81,7 +99,7 @@ const DwpAddSectionDialog = ({ open, onClose, revisionElements }) => {
         if (isConfirmed) {
             let res = await dwpUnAddListToAddList(sectionIds);
             if (res && res > 0) {
-                getUnAddedChapterlist();
+                getUnAddedChapterlist(qmsDocTypeDto);
                 Swal.fire({
                     icon: "success",
                     title: "Submitted Section Successfully!",

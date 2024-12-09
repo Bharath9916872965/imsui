@@ -1,45 +1,448 @@
-.dashboard-container {
-    /* background: #000000 !important; */
-    background: #ffffff !important; 
-    padding-left: 0;
-    padding-right: 0;
-    min-height: 100vh; /* Fill the full viewport height */
-    display: flex;
-    flex-direction: column; /* Arrange children vertically */
-}
-
 .main-panel {
     width: 100%;
 }
 
-.rounded {
-    border-radius: 5px !important;
-}
-.bg-secondary {
-    background-color: #191C24 !important;
-}
 
-.text-primary {
-    color: #EB1616 !important;
-}
-
-.ms-3 {
-    white-space: nowrap; /* Prevents text from breaking into multiple lines */
-    overflow: hidden;    /* Hides any overflowing text */
-    text-overflow: ellipsis; /* Adds an ellipsis (...) if text overflows */
+.dashboard-container {
+    background: #f2f2f2;
+    padding: 1.5rem 1.5rem;
+    padding-top:0.5em;
+    width: 100%;
+    -webkit-box-flex: 1;
+    -ms-flex-positive: 1;
+    flex-grow: 1;
 }
 
 
-.box-label{
-    color: #0fe1fd !important;
-    font-weight: 500!important;
-    font-size:15px!important;
+
+.content-wrapper .page-header h3 span, .content-wrapper .page-header .h3 span {
+    font-size: 15px;
 }
 
-.box-data{
-    font-family: "Roboto", sans-serif!important;
-    font-weight: 700!important;
-    line-height: 1.2!important;
-    color: #fff!important;
-    font-size:18px!important;
+.dashboard-iqa-select-picker{
+  width: 100%; 
+  height: 40px; 
 }
+.dashboard-iqa-select-picker .MuiFormLabel-root {
+  color: darkblue !important; /* Apply darkblue color specifically to the label of this instance */
+}
+
+
+.dashboard-iqa-select-picker .css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root  {
+  color: darkblue!important;
+}
+
+
+/******************************************/
+.divider-div{
+  padding-left: 0em!important;
+}
+
+.col-service-card {
+  padding: 0 0em 0.5em 0em;
+  text-align: center;
+}
+
+
+/* .service-card::after {
+  content: "";
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(0deg, rgb(252, 32, 32) 20.6%, rgb(33, 37, 41) 87.7%);
+  position: absolute;
+  left: 0%;
+  top: -98%;
+  z-index: -2;
+  transition: all 0.4s cubic-bezier(0.77, -0.04, 0, 0.99);
+  transform: scale(1.05);
+  box-shadow: 0 10px 20px rgba(0,0,0,.12), 0 4px 8px rgba(0,0,0,.06);
+} */
+
+.service-card {
+  width: 100%;
+  height: 100%;
+  padding: 0.5em 0.5em;
+  border-radius: 4px;
+  box-shadow: 0 6px 10px rgba(0,0,0,.08), 0 0 6px rgba(0,0,0,.05);
+  transition: .3s transform cubic-bezier(.155,1.105,.295,1.12),.3s        box-shadow,.3s -webkit-transform cubic-                          bezier(.155,1.105,.295,1.12);
+  position: relative;
+  z-index: 2;
+  overflow: hidden;
+  background: #fff; 
+  cursor: pointer;
+  min-height: 85px;
+}
+
+
+.service-card *,
+.service-card *:before,
+.service-card *:after {
+  box-sizing: border-box;
+  transition: all 0.45s ease;
+}
+
+
+
+.service-card:before,
+.service-card:after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  content: '';
+  background-color: rgba(184, 18, 18, 0.5);  /* Use rgba to set opacity on the background color */
+  transition: all 0.45s ease;
+  z-index: -1;  /* Ensure pseudo-elements are behind the text */
+}
+
+.service-card:before {
+  transform: skew(30deg) translateX(90%);
+}
+
+.service-card:after {
+  transform: skew(-30deg) translateX(80%);
+}
+
+.service-card figcaption:before,
+.service-card figcaption:after {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: 0;
+  right: 0;
+  background-color: rgba(184, 18, 18, 0.5);  /* Use rgba for opacity control on background color */
+  box-shadow: 0 0 20px rgba(0, 0, 0, 0.7);
+  content: '';
+  z-index: -1;
+}
+
+.service-card figcaption:before {
+  transform: skew(30deg) translateX(100%);
+}
+
+.service-card figcaption:after {
+  transform: skew(-30deg) translateX(90%);
+  z-index: -1;  /* Maintain background layer behind text */
+}
+
+.service-card:hover:before {
+  transform: skew(30deg) translateX(10%);
+  transition-delay: 0.05s;
+  z-index: -1;  /* Maintain background layer behind text */
+}
+
+.service-card:hover:after {
+  transform: skew(-30deg) translateX(20%);
+  z-index: -1;  /* Maintain background layer behind text */
+}
+
+.service-card:hover figcaption:before {
+  transform: skew(30deg) translateX(10%);
+  transition-delay: 0.15s;
+}
+
+.service-card:hover figcaption:after {
+  transform: skew(-30deg) translateX(20%);
+  transition-delay: 0.1s;
+  z-index: -1;  /* Maintain background layer behind text */
+}
+
+
+
+.service-card h3 {
+  font-size: 17px;
+  text-transform: capitalize;
+  font-weight: 600;
+  color: rgb(33, 37, 41); 
+  /* color:#f0f0f0; */
+  margin-top: 1em;
+  z-index: 3;
+}
+
+.service-card p {
+  color: #575a7b;
+  font-size: 14px;
+  line-height: 1.6;
+  letter-spacing: 0.03em;
+  z-index: 3;
+  margin-bottom: 0em;
+}
+
+
+.doc-details {
+  font-size: 14px!important;
+  margin-top: -10px!important;
+  font-weight: 600;
+  color: #1a1a1a;
+  transition: color 0.3s ease; /* Add transition for smooth color change */
+}
+
+
+
+
+.service-card:hover:after {
+  top: 0%;
+}
+
+
+
+
+.service-card:hover .doc-details {
+  color: #fff!important;
+  font-weight: 700!important;
+  /* text-shadow: 0 0 20px #fff, 0 0 25px #fff, 0 0 30px rgba(255, 255, 255, 0.7); */
+}
+
+.service-card:hover h3 {
+  color: #fff!important;
+  font-weight: 700!important;
+  /* text-shadow: 0 0 20px #fff, 0 0 25px #fff, 0 0 30px rgba(255, 255, 255, 0.7); */
+}
+
+.service-card:hover p {
+  color: #f0f0f0;
+}
+/* ADVERTISERS SERVICE CARD ENDED */
+
+
+/********************simple counter start*****************************/
+.audit-graphs-card{
+background-color:transparent;
+border:none!important;
+}
+
+.dashboard-links {
+  text-decoration: none !important; /* Removes the underline */
+}
+
+/* 
+.counter-box {
+	display: block;
+	padding-top:10px;
+  padding-bottom:10px;
+  padding-right:5px;
+  padding-left:5px;
+	text-align: center;
+  border-radius:25px!important;
+  cursor:pointer;
+}
+
+.counter-box p {
+	padding: 0;
+	color: #909090;
+	font-size: 16px;
+	font-weight: 500;
+  margin-top: 10px;
+  margin-bottom: 6px;
+}
+
+.counter-box .counter-icons {
+  font-size: 35px; 
+  margin-top: 6px;
+  margin-bottom: 6px;
+  color: #d2d2d2;
+}
+
+.counter { 
+	display: block;
+	font-size: 25px;
+	font-weight: 700;
+	color: #666;
+	line-height: 12px;
+  margin-top: 8px;
+  margin-bottom: 6px;
+}
+
+.counter-box.auditor-colored {
+  background: linear-gradient(to right, #58AB2F, #9BD75B) !important;
+}
+
+.counter-box.auditor-colored p,
+.counter-box.auditor-colored .counter-icons,
+.counter-box.auditor-colored .counter {
+  color: #fff;
+}
+
+.counter-box.auditee-colored {
+  background: linear-gradient(to right, #5B86E5, #3EBEDC) !important;
+}
+
+.counter-box.auditee-colored p,
+.counter-box.auditee-colored .counter-icons,
+.counter-box.auditee-colored .counter {
+color: #fff;
+} */
+
+h1 { padding: 0 0 30px;}
+
+.counter{
+    font-family: 'Sarabun', sans-serif;
+    width: 160px;
+    padding-bottom: 7px;
+    border-radius: 12px;
+    position: relative;
+    text-align: center;
+    margin: 0 auto;
+    z-index: 1;
+}
+.counter:before,
+.counter:after{
+    content: "";
+    width: 100%;
+    height: 50px;
+    border-radius: 10px 10px;
+    position: absolute;
+    top: 0;
+    left: 0;
+    z-index: -2;
+}
+
+
+
+.counter:after{
+    top: auto;
+    bottom: 0;
+}
+
+.counter .counter-icon {
+  color: #fff;
+  font-size: 25px;
+  line-height: 30px;
+  height: 38px;
+  width: 50px;
+  border-radius: 0 0 15px 15px;
+  margin: 0 auto 20px;
+  margin-bottom: 10px;
+
+}
+
+.counter .counter-icon i {line-height:inherit;}
+.counter h3{
+    font-size: 16px;
+    font-weight: 600;
+    text-transform: capitalize;
+    margin: 0 10px 22px;
+    margin-bottom: 10px;
+
+}
+
+.counter h3:before{
+    content:"";
+    background: #fff;
+    width: calc(100% - 15px);
+    height: calc(100% - 15px);
+    border-radius: 12px;
+    transform: translateX(-50%) translateY(-50%);
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    box-shadow: 0 0 10px rgba(0,0,0,0.8); 
+    z-index: -1;
+}
+
+
+
+.counter .counter-value {
+  color: #fff;
+  font-size: 25px;
+  font-weight: 600;
+  line-height: 30px;
+  height: 30px;
+  width: 85px;
+  display: block;
+  border-radius: 10px 10px 0 0;
+  margin: 0 auto;
+}
+
+
+@media screen and (max-width:990px){
+.counter{ margin-bottom: 40px; }
+}
+
+
+.auditor:before,
+.auditor:after
+{
+  background: linear-gradient(45deg, #0eae57, #0c7475) !important;
+}
+
+.auditee:before,
+.auditee:after
+{
+  background: linear-gradient(45deg, #52E5E7, #2967c4) !important;
+}
+
+.team:before,
+.team:after
+{
+  background: linear-gradient(45deg, #e95081, #974686) !important;
+}
+
+.schedule:before,
+.schedule:after
+{
+  background: linear-gradient(45deg, rgb(184, 142, 252), rgb(104, 119, 244)) !important;
+}
+
+
+
+.auditor .counter-icon{
+  background: linear-gradient(45deg, #0eae57, #0c7475) !important;
+}
+
+.auditee .counter-icon{
+  background: linear-gradient(45deg, #52E5E7, #2967c4) !important;
+}
+
+.team .counter-icon{
+  background: linear-gradient(45deg, #e95081, #974686) !important;
+}
+
+.schedule .counter-icon{
+  background: linear-gradient(45deg, rgb(184, 142, 252), rgb(104, 119, 244)) !important;
+}
+
+
+.auditor .counter-value{
+  background: linear-gradient(45deg, #0eae57, #0c7475) !important;
+}
+
+.auditee .counter-value{
+  background: linear-gradient(45deg, #52E5E7, #2967c4) !important;
+}
+
+.team .counter-value{
+  background: linear-gradient(45deg, #e95081, #974686) !important;
+}
+
+.schedule .counter-value{
+  background: linear-gradient(45deg, rgb(184, 142, 252), rgb(104, 119, 244)) !important;
+}
+
+
+
+.auditor h3 {
+  color: #0c7475 !important;
+}
+
+.auditee h3 {
+  color: #5082ce !important;
+}
+
+.team h3 {
+  color: #e95081 !important;
+}
+
+.schedule h3 {
+  color: rgb(104, 119, 244) !important;
+}
+
+
+
+/********************simple counter end*****************************/
+.iqa-graphs-card{
+  background-color:transparent;
+  border:none!important;
+}
+

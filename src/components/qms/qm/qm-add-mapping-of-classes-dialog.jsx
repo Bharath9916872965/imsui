@@ -82,7 +82,7 @@ const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId }) => {
       if (res && res > 0) {
         Swal.fire({
           icon: "success",
-          title: "Abbreviation Submitted Successfully!",
+          title: "MOC Submitted Successfully!",
           showConfirmButton: false,
           timer: 1500
         });
@@ -91,7 +91,7 @@ const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId }) => {
       } else {
         Swal.fire({
           icon: "success",
-          title: "Abbreviation Submit Unsuccessful!",
+          title: "MOC Submit Unsuccessful!",
           showConfirmButton: false,
           timer: 1500
         });
@@ -121,10 +121,10 @@ const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId }) => {
                   <br />
                   <div>
 
-                    <hr />
+                    {/* <hr /> */}
 
                     <div>
-                      <div className="d-flex mb-3 gap-3">
+                      {/* <div className="d-flex mb-3 gap-3">
                         <div className="fw-bold">
                           <h4>Choose Mapping Of Clauses file</h4>
                         </div>
@@ -149,7 +149,7 @@ const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId }) => {
                             <i className="material-icons">file_download</i>
                           </button>
                         </div>
-                      </div>
+                      </div> */}
 
                       <div>
                         <table className="table table-striped table-hover">
