@@ -79,7 +79,6 @@ const CheckListMasterComponent = ({ router }) => {
           let allChapters = await getMocTotalList();
           setMocIds(allChapters.filter(data => data.isForCheckList === 'Y').map(data => data.mocId) || []);
           setAllChapters(allChapters);
-          console.log('allChapters------------ ',allChapters)
           allChapters=allChapters.filter(obj => obj.mocParentId !== 0 && Number(obj.clauseNo) === Number(obj.mocParentId) && obj.isActive === 1)
           setFilChapters(allChapters);
 

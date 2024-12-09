@@ -32,6 +32,16 @@
     margin-right: 3%;
 }
 
+.check-list-card{
+    margin-left: 4%;
+    margin-right: 4%;
+}
+
+.check-list-card:hover{
+    margin-left: 4%;
+    margin-right: 4%;
+}
+
 .custom-header::after {
     content: '';
     position: absolute;
@@ -152,4 +162,6 @@
     height: 100vh !important;
     overflow-x: hidden !important;
 }
-
+.MuiOutlinedInput-root{
+    background-color: #fff !important;
+}

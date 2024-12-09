@@ -110,7 +110,7 @@ const IqaAuditeeListComponent = () =>{
       };
     
       const getGroupDivisionProject = (audit) => {
-        return audit.groupName || audit.divisionName || audit.projectName || '-';
+        return audit.groupName || audit.divisionName || audit.projectShortName || '-';
       };
 
       const handleSubmit = async () => {

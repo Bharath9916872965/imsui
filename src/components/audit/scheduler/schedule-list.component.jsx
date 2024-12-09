@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from "react";
-import { addSchedule, editScheduleSubmit,getScheduleList,getTeamList,reScheduleSubmit,getIqaDtoList,getAuditeeDtoList,forwardSchedule,scheduleMailSend,
+import { addSchedule, editScheduleSubmit,getScheduleList,getTeamList,reScheduleSubmit,getIqaDtoList,getIqaAuditeelist,forwardSchedule,scheduleMailSend,
          AuditRescheduleDto,getTotalTeamMembersList,rescheduleMailSend,getScheduleRemarks } from "../../../services/audit.service";
 import Datatable from "../../datatable/Datatable";
-import { Box, Typography, Button, Switch, TextField,Autocomplete, ListItemText,TableContainer,Table,TableHead,TableRow,TableCell,TableBody,Paper } from '@mui/material';
+import { Box, Typography, Button, TextField,Autocomplete, ListItemText } from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import '../auditor-list.component.css';
 import '../../datatable/Datatable.css'
@@ -18,7 +18,6 @@ import * as Yup from "yup";
 import SelectPicker from '../../selectpicker/selectPicker'
 import { CustomMenuItem } from "../../../services/auth.header";
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
-import { Navigate } from "react-router-dom";
 import withRouter from "../../../common/with-router";
 
 
@@ -44,6 +43,7 @@ const ScheduleListComponent = ({router}) => {
   const [iqaId,setIqaId] = useState('');
   const [iqaFromDate,setIqaFromDate] = useState(dayjs(new Date()));
   const [iqaToDate,setIqaToDate] = useState(dayjs(new Date()));
+  const [fullAuditeeList,setFullAuditeeList] = useState([]);
   const [auditeeList,setAuditeeList] = useState([]);
   const [filauditeeList,setFilAuditeeList] = useState([]);
   const [forwardFlag,setForwardFlag] = useState(false);
@@ -56,6 +56,7 @@ const ScheduleListComponent = ({router}) => {
   const [pendingAuditeeCount,setPendingAuditeeCount] = useState(0);
   const [schRemarks,setSchRemarks] = useState([]);
   const [filSchRemarks,setFilSchRemarks] = useState([]);
+  const [isSubmit,setIsSubmit] = useState(false)
 
   const scheduleValidation = Yup.object().shape({
     scheduleDate: Yup.date().required('Schedule Date is required'),
@@ -101,13 +102,12 @@ const ScheduleListComponent = ({router}) => {
       const scdList        = await getScheduleList();
       const team           = await getTeamList();
       const iqaList        = await getIqaDtoList();
-      const auditList      = await getAuditeeDtoList();
+      const auditList      = await getIqaAuditeelist();
       const teamMemDetails = await getTotalTeamMembersList();
       const remarksSch     =     await getScheduleRemarks();
       setSchRemarks(remarksSch);
       setTeamMemberDetails(teamMemDetails)
-      setAuditeeList(auditList)
-      setTotalAuditeeCount(auditList.length)
+      setFullAuditeeList(auditList)
       setIqaFullList(iqaList);
       setScheduleList(scdList)
       const iqaData = iqaList.map(data => ({
@@ -118,12 +118,16 @@ const ScheduleListComponent = ({router}) => {
         const iqa = iqaList[0];
         setIqaNo(iqa.iqaNo)
         setIqaId(iqa.iqaId)
+        const filList = auditList.filter(data => data.iqaId === iqa.iqaId);
+        setAuditeeList(filList)
+        setTotalAuditeeCount(filList.length)
         setIqaFromDate(dayjs(new Date(iqa.fromDate)))
         setIqaToDate(dayjs(new Date(iqa.toDate)))
         setFilTeamList(team.filter(data => data.iqaId === iqa.iqaId));
         const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
         const auditees = scList.map(data => data.auditeeId);
         setFilAuditeeList(auditList.filter(data => !auditees.includes(data.auditeeId)))
+        setPendingAuditeeCount(filList.length - scList.length)
         setDataTable(scList);
       }
       setIqaOptions(iqaData)
@@ -152,7 +156,7 @@ const ScheduleListComponent = ({router}) => {
       setForwardFlag(false)
     }
     setAssignedAuditeeCount(list.length)
-    setPendingAuditeeCount(Number(totalAuditeeCount)-Number(list.length))
+    //setPendingAuditeeCount(Number(totalAuditeeCount)-Number(list.length))
     const mappedData = list.map((item,index)=>{
       let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
       return{
@@ -165,7 +169,7 @@ const ScheduleListComponent = ({router}) => {
         status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
         action       : <> {item.scheduleStatus === 'INI' && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editSchedule(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>}
-                          {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReShchedule"><i className="material-icons">update</i></button>}</>
+                          {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReSchedule"><i className="material-icons">update</i></button>}</>
       }      
     });
     setFilScheduleList(mappedData);
@@ -187,6 +191,9 @@ const ScheduleListComponent = ({router}) => {
         const renderField = (value, isLead, isList = false,data) => {
                             const content = isList ? renderListWithBreaks(value) : value || '-';
                             const className = data.empId === emp ?'trash-btn text-bold':isLead ? 'text-color-green text-bold': 'text-bold';
+                            if(data.empId === emp){
+                              setIsSubmit(true)
+                            }
                             return <span className={className}>{content}</span>;
                             };
 
@@ -293,13 +300,17 @@ const ScheduleListComponent = ({router}) => {
 
   const afterSubmit = async()=>{
     const scdList   = await getScheduleList();
-    const auditList = await getAuditeeDtoList();
-    setDataTable(scdList.filter(data => data.iqaId === iqaId))
+    const auditList = await getIqaAuditeelist();
+    const scList = scdList.filter(data => data.iqaId === iqaId)
+    setDataTable(scList)
     setScheduleList(scdList)
-    setAuditeeList(auditList)
-    setTotalAuditeeCount(auditList.length)
+    setFullAuditeeList(auditList)
+    const filList = auditList.filter(data => data.iqaId === iqaId);
+    setAuditeeList(filList)
+    setTotalAuditeeCount(filList.length)
     const auditees = scdList.filter(data => data.iqaId === iqaId).map(data => data.auditeeId);
     setFilAuditeeList(auditList.filter(data => !auditees.includes(data.auditeeId)))
+    setPendingAuditeeCount(filList.length - scList.length)
   }
   const handleSubmitClick = async (values) => {
 
@@ -388,7 +399,12 @@ const ScheduleListComponent = ({router}) => {
     }
     setIqaId(value);
     setFilTeamList(teamList.filter(data => data.iqaId === value))
-    setDataTable(scheduleList.filter(data => data.iqaId === value))
+    const scList = scheduleList.filter(data => data.iqaId === value)
+    setDataTable(scList)
+    const filList = fullAuditeeList.filter(data => data.iqaId === value);
+    setAuditeeList(filList)
+    setTotalAuditeeCount(filList.length)
+    setPendingAuditeeCount(filList.length - scList.length)
 
   }
 
@@ -435,6 +451,7 @@ const ScheduleListComponent = ({router}) => {
   }
 
   const changeAuditee = (auditee)=>{
+    setIsSubmit(false)
     const audit = auditeeList.filter(data => data.auditeeId === auditee);
     setMemberTable(filMembersTotalData,audit.length >0?audit[0].empId:0)
   }
@@ -532,10 +549,10 @@ const ScheduleListComponent = ({router}) => {
                                 <Box flex="40%">
                                 <Field name="auditeeId">
                                         {({ field, form })=>(
-                                            <Autocomplete options={filauditeeList} getOptionLabel={option => option.divisionName !== ""?option.auditee+' - '+option.divisionName:option.projectName !== ""?option.auditee+' - '+option.projectName:option.auditee+' - '+option.groupName} 
+                                            <Autocomplete options={filauditeeList} getOptionLabel={option => option.divisionName !== ""?option.auditee+' - '+option.divisionName:option.projectCode !== ""?option.auditee+' - '+option.projectCode:option.auditee+' - '+option.groupName} 
                                             renderOption={(props, option) => {return (
                                                 <CustomMenuItem {...props} key={option.auditeeId}>
-                                                  <ListItemText primary={option.divisionName !== ""?option.auditee+' - '+option.divisionName:option.projectName !== ""?option.auditee+' - '+option.projectName:option.auditee+' - '+option.groupName} />
+                                                  <ListItemText primary={option.divisionName !== ""?option.auditee+' - '+option.divisionName:option.projectCode !== ""?option.auditee+' - '+option.projectCode:option.auditee+' - '+option.groupName} />
                                                 </CustomMenuItem>
                                               );}}
                                             value = {filauditeeList.find(auditee =>auditee.auditeeId === form.values.auditeeId) || null} 
@@ -576,7 +593,7 @@ const ScheduleListComponent = ({router}) => {
                               </Box>
                               <Box flex="5%"> </Box>
                             </Box>}
-                            <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="submit" disabled = {!isValid || isSubmitting }>Submit</Button></Box>
+                            <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="submit" disabled = {!isValid || isSubmitting || isSubmit }>Submit</Button></Box>
                             </Typography>
                           </Form>
                         )}

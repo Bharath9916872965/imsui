@@ -42,6 +42,7 @@ const ScheduleApprovalComponent = ({router}) => {
     try {
       const scdList        = await getScheduleApprovalList();
       const iqaList        = await getIqaDtoList();
+      const iqaNum = router.location.state?.iqaNo;
       setIqaFullList(iqaList);
       setScheduleList(scdList)
       const iqaData = iqaList.map(data => ({
@@ -49,7 +50,7 @@ const ScheduleApprovalComponent = ({router}) => {
                       label : data.iqaNo
                   }));
       if(iqaList.length >0){
-        const iqa = iqaList[0];
+        const iqa = iqaNum?iqaList.filter(item => item.iqaNo === iqaNum)?.[0]:iqaList[0];
         setIqaNo(iqa.iqaNo)
         setIqaId(iqa.iqaId)
         const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
