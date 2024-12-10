@@ -60,6 +60,16 @@ export class AuditCheckList{
     }
 }
 
+export  class CheckListImgDto{
+    constructor(mocId,scheduleId,checkListAttachementName,iqaNo,iqaId){
+        this.mocId              = mocId;
+        this.scheduleId         = scheduleId;
+        this.checkListAttachementName = checkListAttachementName;
+        this.iqaNo              = iqaNo;
+        this.iqaId              = iqaId;
+    }
+}
+
 export const getAuditorDtoList = async () => {
     
     try {
@@ -573,3 +583,15 @@ export const getIqaAuditeeList = async (iqaId) => {
         throw error;
     }
   }
+
+  export const uploadCheckListImage = async (attachment,file)=>{
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('ad', JSON.stringify(attachment));
+        return (await axios.post(`${API_URL}upload-check-list-img`,formData,{headers : { 'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in uploadCheckListImage:', error);
+        throw error;
+    }
+}

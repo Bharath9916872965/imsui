@@ -193,11 +193,26 @@
   font-weight: bolder !important;
 }
 
+.bt-error-color{
+  background-color: red !important;
+  color: #fff !important;
+  font-weight: bolder !important;
+}
+
 .bt-sty{
   color: #fff !important;
   font-weight: bold !important;
 }
 
+.update-bg{
+  background-color: rgb(255, 155, 10) !important;
+}
+
+
+.upload-bt{
+  position: relative;
+  top: 20px !important;
+}
 
 
 
