@@ -50,7 +50,7 @@ import Swal from 'sweetalert2';
 const AlertConfirmation = async ({ title, message }) => {
   const result = await Swal.fire({
     title: title,
-    text: message,
+    html: `<span style="font-weight: bolder; font-size: 16px;">${message}</span>`,
     icon: 'warning',
     showCancelButton: true,
     confirmButtonColor: '#2B682A',

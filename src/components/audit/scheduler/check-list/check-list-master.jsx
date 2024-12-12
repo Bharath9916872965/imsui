@@ -75,14 +75,13 @@ const CheckListMasterComponent = ({ router }) => {
 
   const getAllChapters = async () => {
       try {
-
           let allChapters = await getMocTotalList();
           setMocIds(allChapters.filter(data => data.isForCheckList === 'Y').map(data => data.mocId) || []);
           setAllChapters(allChapters);
-          allChapters=allChapters.filter(obj => obj.mocParentId !== 0 && Number(obj.clauseNo) === Number(obj.mocParentId) && obj.isActive === 1)
+          allChapters=allChapters.filter(obj =>  Number(obj.clauseNo) === Number(obj.sectionNo) && obj.isActive === 1) 
           setFilChapters(allChapters);
 
-      } catch (error) {
+      }catch (error) {
           setError('An error occurred');
           setIsLoading(false);
           console.error(error)
@@ -97,7 +96,7 @@ const CheckListMasterComponent = ({ router }) => {
     try {
         const allChapters = await getMocTotalList();
         setAllChapters(allChapters);
-        const filterChapters = allChapters.filter(obj => obj.mocParentId !== 0 && Number(obj.clauseNo) === Number(obj.mocParentId) && obj.isActive === 1)
+        const filterChapters = allChapters.filter(obj =>  Number(obj.clauseNo) === Number(obj.sectionNo) && obj.isActive === 1) 
         setFilChapters(filterChapters);
         if(level === 1){
             const lv1 =  allChapters.filter(data => data.sectionNo === sectionNo && data.mocId !== mocId && data.mocParentId === mocId && data.isActive === 1);
@@ -393,8 +392,8 @@ const CheckListMasterComponent = ({ router }) => {
            <div id="main-wrapper">
             <div className="subHeadingLink d-flex ">
              <div align='left' className="d-flex flex-column flex-md-row gap-1"><h4>Check List Master</h4></div>
-             <div className="d-flex gap-2"><button onClick={() => updateCheckList()} className="btn btn-success">Submit</button>
-             <button className="btn btn-primary" title="Add New Chapter"  onClick={handleOpenUnaddedSections}><i className="material-icons">playlist_add</i></button></div>
+             <div className="d-flex gap-2"><button onClick={() => updateCheckList()} className="btn btn-success">Submit</button></div> 
+             {/* <button className="btn btn-primary" title="Add New Chapter"  onClick={handleOpenUnaddedSections}><i className="material-icons">playlist_add</i></button>*/}
             </div>
             
             <div id="card-body" >

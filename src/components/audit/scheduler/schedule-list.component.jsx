@@ -234,7 +234,7 @@ const ScheduleListComponent = ({router}) => {
   
     })
     if(filTeamList.length >0){
-      setTeamMembers(filTeamList[0].teamId,filauditeeList.length >0?filauditeeList[0].empId:0)
+      setTeamMembers(filTeamList[0].teamId,filList.length >0?filList[0].empId:0)
     }
   }
 
