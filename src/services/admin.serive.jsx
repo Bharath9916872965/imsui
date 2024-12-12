@@ -25,4 +25,83 @@ export const getHeaderModuleDetailList = async (role) => {
 export const changePassword = async () => {
     window.open(resetPsdLink, '_blank'); 
   }
+
+export const getUserManagerList = async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}user-manager-list`, 
+        {},
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in getUserManagerList:', error);
+      throw error;
+    }
+};
+
+export const getRolesList = async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}roles-list`, 
+        {},
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in getRolesList:', error);
+      throw error;
+    }
+  };
+
+  export const getFormModulesList = async () => {
+    try {
+      const response = await axios.post(
+        `${API_URL}form-modules-list`, 
+        {},
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in getFormModulesList:', error);
+      throw error;
+    }
+  };
+
+  export const getFormRoleAccessList = async (roleId, formModuleId) => {
+    try {
+      const payload = { roleId, formModuleId }; 
+      const response = await axios.post(
+        `${API_URL}form-role-access-list`,
+        payload, // Send as JSON object
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in getFormRoleAccessList:', error);
+      throw error;
+    }
+  };
+
+
+  export const updateFormRoleAccess = async (formRoleAccessId, isActive, formDetailsId, roleId) => {
+    try {
+      const values = {  
+        formRoleAccessId: formRoleAccessId,
+        isActive: isActive,
+        formDetailId: formDetailsId,
+        roleId: roleId
+      };
+      const response = await axios.post(
+        `${API_URL}update-form-role-access`,
+        values,
+        { headers: { 'Content-Type': 'application/json', ...authHeader() } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in updateFormRoleAccess:', error);
+      throw error;
+    }
+  };
+  
   
