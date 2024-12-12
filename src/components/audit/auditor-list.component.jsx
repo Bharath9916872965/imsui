@@ -1,13 +1,14 @@
 import React, { useEffect, useState } from "react";
-import { deleteAditor, getAuditorDtoList, getEmployee, insertAditor } from "../../services/audit.service";
+import { deleteAditor, getAuditorDtoList, getEmployee, insertAditor,checkAuditorPresent, deleteAuditor } from "../../services/audit.service";
 import Datatable from "../datatable/Datatable";
-import { Switch } from "@mui/material";
+import { Switch,Tooltip,IconButton } from "@mui/material";
 import { Field, Formik, Form } from "formik";
 import Navbar from "../Navbar/Navbar";
 import "./auditor-list.component.css";
 import Swal from "sweetalert2";
 import MultipleSelectPicker from "../selectpicker/multipleSelectPicker";
 import AlertConfirmation from "../../common/AlertConfirmation.component";
+import DeleteIcon from 'assets/images/delete.png';
 
 const AuditorListComponent = () => {
   const [showModal, setShowModal] = useState(false);
@@ -53,6 +54,7 @@ const AuditorListComponent = () => {
         employeeName: `${item.empName || "-"}, ${item.designation || "-"}`,
         divisionCode: item.divisionName || "-",
         action: (
+          <>
           <Switch
             checked={item.isActive === 1}
             onChange={() => handleToggleIsActive(item.auditorId, item.isActive)}
@@ -63,10 +65,41 @@ const AuditorListComponent = () => {
               "& .MuiSwitch-track": { backgroundColor: item.isActive === 1 ? "green" : "red" },
             }}
           />
+          <Tooltip title="Delete Auditor"><IconButton  id="iconButtons" onClick={() => auditorDelete(item)} ><img src={DeleteIcon} alt="Delete" className='fwdButton uploadStyles  mgb5' /></IconButton></Tooltip></>
         ),
       }))
     );
   };
+
+  const auditorDelete = async (item)=>{
+    const response = await checkAuditorPresent(item.auditorId);
+    if(response > 0){
+      Swal.fire({
+        icon: "error",
+        title: "Auditor can't be Deleted, Auditor already exists in a Team",
+        showConfirmButton: false,
+        timer: 3000
+      });
+    }else{
+      await AlertConfirmation({
+        title: '',
+        message:  'Do you want to Delete '+item.empName+', '+item.designation+' ?' ,
+        }).then(async (result) => {
+          if(result){
+            const delResponse = await deleteAuditor(item.auditorId);
+            if(delResponse > 0){
+             auditorlist();
+             Swal.fire({
+               icon: "success",
+               title: item.empName+', '+item.designation+" deleted Successfully!",
+               showConfirmButton: false,
+               timer: 1500
+             });
+            }
+          }
+      })
+    }
+  }
 
   const handleToggleIsActive = async (auditorId, currentStatus) => {
     try {

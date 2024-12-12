@@ -555,9 +555,37 @@ export const getIqaAuditeeList = async (iqaId) => {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
+        console.log('valuesToSend-------- ',valuesToSend)
         return (await axios.post(`${API_URL}add-audit-check-list`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        return null;
     } catch (error) {
         console.error('Error occurred in addAuditCheckList:', error);
+        throw error;
+    }
+  }
+
+  export const addAuditeeRemarks = async (values)=>{
+    try {
+        const valuesToSend = {
+            ...values,
+            checkListMap: convertMapToOrderedArray(values.checkListMap),
+        };
+        return (await axios.post(`${API_URL}add-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in addAuditeeRemarks:', error);
+        throw error;
+    }
+  }
+
+  export const updateAuditeeRemarks = async (values)=>{
+    try {
+        const valuesToSend = {
+            ...values,
+            checkListMap: convertMapToOrderedArray(values.checkListMap),
+        };
+        return (await axios.post(`${API_URL}update-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateAuditeeRemarks:', error);
         throw error;
     }
   }
@@ -595,3 +623,30 @@ export const getIqaAuditeeList = async (iqaId) => {
         throw error;
     }
 }
+
+export const getCheckListimg = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}get-check-list-img`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getCheckListimg:', error);
+        throw error;
+    }
+}
+
+export const checkAuditorPresent = async (auditorId) => {
+    try {
+      return (await axios.post(`${API_URL}check-auditor-present`,auditorId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in checkAuditorPresent:', error);
+      throw error;
+    }
+};
+
+export const deleteAuditor = async (auditorId) => {
+    try {
+      return (await axios.post(`${API_URL}delete-auditor`,auditorId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in deleteAuditor:', error);
+      throw error;
+    }
+};

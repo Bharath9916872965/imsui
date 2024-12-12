@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { getIqaDtoList,getScheduleApprovalList,approveSchedule,returnSchedule } from "../../../services/audit.service";
 import Datatable from "../../datatable/Datatable";
-import { Box} from '@mui/material';
+import { Box,Tabs, Tab,Badge} from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
 import '../auditor-list.component.css';
 import { format } from "date-fns";
@@ -17,12 +17,16 @@ const ScheduleApprovalComponent = ({router}) => {
   const {navigate,location} = router;
   const [scheduleList,setScheduleList] = useState([]);
   const [filScheduleList,setFilScheduleList] = useState([]);
+  const [auditorList,setAuditorList] = useState([]);
+  const [auditeeList,setAuditeeListt] = useState([]);
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaOptions,setIqaOptions] = useState([]);
   const [iqaNo,setIqaNo] = useState('');
   const [iqaId,setIqaId] = useState('');
   const [showModal, setShowModal] = useState(false);
-  const [element,setElement] = useState('')
+  const [element,setElement] = useState('');
+  const [isBoth,setIsBoth] = useState(false);
+  const [selectedTab, setSelectedTab] = useState(0);
 
 
   const columns = [
@@ -53,8 +57,24 @@ const ScheduleApprovalComponent = ({router}) => {
         const iqa = iqaNum?iqaList.filter(item => item.iqaNo === iqaNum)?.[0]:iqaList[0];
         setIqaNo(iqa.iqaNo)
         setIqaId(iqa.iqaId)
-        const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
-        setDataTable(scList);
+        const scList = scdList.filter(data => data.iqaId === iqa.iqaId);
+        if(scList.length >0){
+          const auditee = scList.filter(data => data.auditeeFlag === 'A');
+          const auditor = scList.filter(data => data.auditeeFlag === 'L');
+          if(auditee.length >0 && auditor.length >0){
+            setDataTable(auditee,'A')
+            setDataTable(auditor,'L')
+            setIsBoth(true)
+          }else{
+            setDataTable(scList,'F')
+            setIsBoth(false)
+          }
+        }else{
+          setFilScheduleList([]);
+          setAuditeeListt([]);
+          setAuditorList([]);
+          setIsBoth(false);
+       }
       }
       setIqaOptions(iqaData)
 
@@ -67,7 +87,7 @@ const ScheduleApprovalComponent = ({router}) => {
     fetchData();
   }, []);
 
-  const setDataTable = (list)=>{
+  const setDataTable = (list,flag)=>{
     const mappedData = list.map((item,index)=>{
       let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
       return{
@@ -84,7 +104,13 @@ const ScheduleApprovalComponent = ({router}) => {
                           {['AAA'].includes(item.scheduleStatus) && <button title='Add CheckList' className=" btn btn-outline-primary btn-sm me-1 mg-l-40" onClick={() => addCheckList(item)}  ><i className="material-icons">playlist_add_check</i></button>}</>  
       }      
     });
-    setFilScheduleList(mappedData);
+    if(flag === 'F'){
+      setFilScheduleList(mappedData);
+    }else if(flag === 'A'){
+      setAuditeeListt(mappedData);
+    }else if(flag === 'L'){
+      setAuditorList(mappedData);
+    }
    }
 
    const addCheckList = (item)=>{
@@ -136,7 +162,9 @@ const ScheduleApprovalComponent = ({router}) => {
 
   const afterSubmit = async(item)=>{
     const scdList   = await getScheduleApprovalList();
-    setDataTable(scdList.filter(data => data.iqaId === item.iqaId))
+    const scList = scdList.filter(data => data.iqaId === item.iqaId)
+    console.log('scList------- ',scList)
+    setDataTable(scList,'F')
     setScheduleList(scdList)
   }
 
@@ -146,7 +174,25 @@ const ScheduleApprovalComponent = ({router}) => {
       setIqaNo(selectedIqa.iqaNo)
     }
     setIqaId(value);
-    setDataTable(scheduleList.filter(data => data.iqaId === value))
+    const scList = scheduleList.filter(data => data.iqaId === value);
+    if(scList.length >0){
+      const auditee = scList.filter(data => data.auditeeFlag === 'A');
+      const auditor = scList.filter(data => data.auditeeFlag === 'L');
+      if(auditee.length >0 && auditor.length >0){
+        console.log('scList------- ',scList);
+        setDataTable(auditee,'A')
+        setDataTable(auditor,'L')
+        setIsBoth(true)
+      }else{
+        setDataTable(scList,'F')
+        setIsBoth(false)
+      }
+    }else{
+      setFilScheduleList([]);
+      setAuditeeListt([]);
+      setAuditorList([]);
+      setIsBoth(false);
+    }
 
   }
 
@@ -197,6 +243,10 @@ const ScheduleApprovalComponent = ({router}) => {
     }
    }
 
+   const handleTabChange = (event, newValue) => {
+    setSelectedTab(newValue);
+   }
+
   return (
     <div>
       <Navbar />
@@ -211,7 +261,16 @@ const ScheduleApprovalComponent = ({router}) => {
           </Box>
          </Box>
           <div id="card-body customized-card">
-            <Datatable columns={columns} data={filScheduleList} />
+          {isBoth?
+            <>
+            <Tabs className="max-h35" value={selectedTab} onChange={handleTabChange} aria-label="inspection tabs"  variant="fullWidth" >
+              <Tab className='mgt8' icon={<i className="material-icons">sort</i>} iconPosition="start"  label={ <span style={{ display: 'flex', alignItems: 'center' }}>Auditee Schedule List<Badge showZero badgeContent = {Number(auditeeList.length)}  color="error" className="badge-position"/></span>}  />
+              <Tab className='mgt8' icon={<i className="material-icons">sort</i>} iconPosition="start"  label={ <span style={{ display: 'flex', alignItems: 'center' }}>Auditor Schedule List<Badge showZero badgeContent = {Number(auditorList.length)}  color="error" className="badge-position"/></span>} />
+            </Tabs>
+            {selectedTab === 0 &&(<Datatable columns={columns} data={auditeeList} />)}
+            {selectedTab === 1 &&(<Datatable columns={columns} data={auditorList} />)}</>
+          :<Datatable columns={columns} data={filScheduleList} />}
+            
           </div>
         </div>
       </div>
