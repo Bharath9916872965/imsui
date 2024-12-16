@@ -65,13 +65,11 @@ const AuditStamping = () => {
         const { fromDate, toDate } = initialValues;
   
         const filteredEmployees =
-          roleId === 2 || roleId === 7
+          roleId === 1 || roleId === 2
             ? employees
             : employees.filter(emp => emp.empId === defaultEmpId);
   
         setEmployeesList(filteredEmployees);
-        console.log('getEmployeesList-------', getEmployeesList())
-        console.log('getEmployeesList-------', filteredEmployees)
   
         const auditList = await getAuditStampingList(defaultEmpId, fromDate, toDate);
         const mappedData = auditList.map((item, index) => ({
@@ -268,7 +266,6 @@ const AuditStamping = () => {
                               views={['year', 'month', 'day']}
                               onChange={(date) => {
                                 const formattedDate = date ? date.format('YYYY-MM-DD') : '';
-                                //console.log("Selected From Date:", formattedDate);
                                 form.setFieldValue('fromDate', formattedDate);
                                 handleFieldChange('fromDate', formattedDate, form.values);
                                }}
@@ -298,7 +295,6 @@ const AuditStamping = () => {
                               onChange={(date) => {
                                  const formattedDate = date ? date.format('YYYY-MM-DD') : '';
                                  form.setFieldValue('toDate', formattedDate);
-                                // console.log('toDate value:', formattedDate); 
                                 handleFieldChange('toDate', formattedDate, form.values);
                              }}
                              format="DD-MM-YYYY"

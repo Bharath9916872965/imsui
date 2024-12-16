@@ -21,6 +21,8 @@ import AuditCheckListComponent from 'components/audit/scheduler/check-list/audit
 import UseIdleTimer from 'common/idle-logout';
 import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 import KpiObjectiveMaster from 'components/KPI/masters/kpi-objective-master';
+import UserManagerComponent from 'components/admin/userManager.component';
+import FormRoleAccess from 'components/admin/formRoleAccess.component';
 
 function App() {
   return (
@@ -31,6 +33,10 @@ function App() {
         <Route path="/login" element={<Login />} />
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/audit-stamping" element={<AuditStampingComponent />} />
+
+        {/* Admin */}
+        <Route path="/user-manager-list" element={<UserManagerComponent />} />
+        <Route path="/form-role-access" element={<FormRoleAccess />} />
         
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
