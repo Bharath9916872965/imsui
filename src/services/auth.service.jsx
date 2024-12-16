@@ -28,6 +28,8 @@ export const login = async (username, password) => {
           token: response.data.access_token,
           username: username
         }));
+        const emp = await getEmpDetails(username);
+        localStorage.setItem('roleId',emp.imsFormRoleId)
         localStorage.setItem('password',password)
   
         await customAuditStampingLogin(username);

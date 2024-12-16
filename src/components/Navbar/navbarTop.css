@@ -162,6 +162,10 @@
   text-align: left !important;
 }
 
+.text-center{
+  text-align: center !important;
+}
+
 .bt-color{
   background-color: #002CCD !important;
   color: #fff !important;
@@ -194,6 +198,10 @@
   color: #fff;
   font-weight: bold;
   font-size: 14px;
+}
+
+.large-icon{
+  font-size: 30px !important;
 }
 
 .bt-success-color{
