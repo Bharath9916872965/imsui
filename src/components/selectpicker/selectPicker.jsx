@@ -4,7 +4,7 @@ import { CustomMenuItem } from '../../services/auth.header';
 
 
 
-const SelectPicker = ({ options, label, value, handleChange }) => {
+const SelectPicker = ({ options, label, value, handleChange,readOnly }) => {
   return (
     <Box>
       <Autocomplete
@@ -26,9 +26,10 @@ const SelectPicker = ({ options, label, value, handleChange }) => {
             {...params}
             label={label}
             variant="outlined"
-            size="small" // Adjust size here
+            size="small" 
           />
         )}
+        disabled={readOnly?readOnly:false}
       />
     </Box>
   );

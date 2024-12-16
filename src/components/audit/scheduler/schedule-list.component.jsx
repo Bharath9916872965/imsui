@@ -215,6 +215,8 @@ const ScheduleListComponent = ({router}) => {
   }
 
   const scheduleAdd = ()=>{
+    setIsSubmit(false)
+    setFilSchRemarks([])
     const auditees = scheduleList.filter(data => data.iqaId === iqaId).map(data => data.auditeeId);
     const filList = auditeeList.filter(data => !auditees.includes(data.auditeeId));
     setFilAuditeeList(filList)
@@ -245,6 +247,8 @@ const ScheduleListComponent = ({router}) => {
   
 
   const editSchedule =(item) =>{
+    setIsSubmit(false)
+    setFilSchRemarks([])
     const auditees = scheduleList.filter(data => data.iqaId === iqaId && data.auditeeId !== item.auditeeId).map(data => data.auditeeId);
     setFilAuditeeList(auditeeList.filter(data => !auditees.includes(data.auditeeId)))
     setTeamMembers(item.teamId)
@@ -277,6 +281,8 @@ const ScheduleListComponent = ({router}) => {
   }
 
   const reSchedule = (item)=>{
+    setIsSubmit(false)
+    setFilSchRemarks([])
     setFilSchRemarks(schRemarks.filter(data =>data.scheduleId === item.scheduleId))
     const auditees = scheduleList.filter(data => data.iqaId === iqaId && data.auditeeId !== item.auditeeId).map(data => data.auditeeId);
     setFilAuditeeList(auditeeList.filter(data => !auditees.includes(data.auditeeId)))
@@ -322,7 +328,7 @@ const ScheduleListComponent = ({router}) => {
         try {
           if(isReschedule){
             const result = await reScheduleSubmit(new AuditRescheduleDto(values,element));
-            if (result === 'audit Rescheduled Successfully') {
+            if (result === 'Audit Rescheduled Successfully') {
               afterSubmit();
               setShowModal(false);
               Swal.fire({
@@ -343,7 +349,7 @@ const ScheduleListComponent = ({router}) => {
           }else{
             if(isAddMode){
               const result = await addSchedule(values);
-              if (result === 'audit schedule Added Successfully') {
+              if (result === 'Audit schedule Added Successfully') {
                 afterSubmit();
                 setShowModal(false);
                 Swal.fire({
@@ -362,7 +368,7 @@ const ScheduleListComponent = ({router}) => {
               }
             }else{
               const result = await editScheduleSubmit(values);
-              if (result === 'audit schedule Edited Successfully') {
+              if (result === 'Audit schedule Edited Successfully') {
                 afterSubmit();
                 setShowModal(false);
                 Swal.fire({
@@ -390,6 +396,7 @@ const ScheduleListComponent = ({router}) => {
   };
 
   const onIqaChange = (value)=>{
+    setIsSubmit(false)
     const selectedIqa = iqaFullList.find(data => data.iqaId === value);
     if(selectedIqa){
       setIqaNo(selectedIqa.iqaNo)
@@ -405,6 +412,7 @@ const ScheduleListComponent = ({router}) => {
     setAuditeeList(filList)
     setTotalAuditeeCount(filList.length)
     setPendingAuditeeCount(filList.length - scList.length)
+    setFilSchRemarks([])
 
   }
 
@@ -464,6 +472,7 @@ const ScheduleListComponent = ({router}) => {
  }
 
  const changeTeam = (teamId,auditee)=>{
+  setIsSubmit(false)
   const audit = auditeeList.filter(data => data.auditeeId === auditee);
   setTeamMembers(teamId,(audit.length >0?audit[0].empId:0))
  }
@@ -520,7 +529,8 @@ const ScheduleListComponent = ({router}) => {
                         <tbody>
                           <tr key={index}>
                               <td className='width5'>{index + 1 }</td>
-                              <td className='width35 text-start'>{item.empName}<Box className='date-color'>{format(new Date(item.transactionDate),'MMM d, y h:mm a')}</Box></td>
+                              <td className='width35 text-start'>{item.empName}</td>
+                              {/* <td className='width35 text-start'>{item.empName}<Box className='date-color'>{format(new Date(item.transactionDate),'MMM d, y h:mm a')}</Box></td> */}
                               <td className='width60 text-start'>{item.remarks}</td>
                           </tr>
                         </tbody>

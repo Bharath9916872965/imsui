@@ -46,6 +46,7 @@ const AddChecklistSectionDialog = ({ open, onClose,onConfirm,list }) => {
         if (isConfirmed) {
             const response = await addNewChapter(new CheckListMaster(0,inputValue,Number(maxSectionNo)+1,0,''));
             if (response && response  === 'Successfully') {
+                setInputValue('')
                 afterSubmit();
                 Swal.fire({
                     icon: "success",
