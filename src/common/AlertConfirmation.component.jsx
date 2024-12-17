@@ -57,7 +57,7 @@ const AlertConfirmation = async ({ title, message }) => {
     cancelButtonColor: '#C14141',
     confirmButtonText: 'YES',
     cancelButtonText: 'NO',
-    // reverseButtons: true,
+    reverseButtons: true,
     customClass: {
       container: 'my-swal-container',
       popup: 'my-swal-popup',

@@ -73,11 +73,13 @@ const IqaAuditeeListComponent = () =>{
     
 
       const onIqaChange = async (value) => {
+       if(value){
         const selectedIqa = iqaFullList.find(data => data.iqaId === value);
         setIqaId(value);
         setIqaNo(selectedIqa?.iqaNo || '');
         const updatedAuditeeList = await getIqaAuditeeList(value);
         changedata(value,selauditeeData);
+       }
       };
 
       const chunkArray = (array, chunkSize) => {

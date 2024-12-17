@@ -1,0 +1,23 @@
+ .full-width {
+    margin-top: 1rem;
+  }
+
+  .edit-button {
+    position: absolute;
+    bottom: 10px; /* Adjust to fit your design */
+    right: 10px;  /* Adjust to fit your design */
+    border: none;
+    border-radius: 5px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  
+  .edit-button:hover {
+    background-color: #0056b3;
+  }
+
+  .modal-dialog.modal-xl-custom {
+    max-width: 90%;
+    margin-top: 9%;
+  }
+

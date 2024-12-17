@@ -20,6 +20,7 @@ import CheckListMasterComponent from './components/audit/scheduler/check-list/ch
 import AuditCheckListComponent from 'components/audit/scheduler/check-list/audit-check-list.jsx';
 import UseIdleTimer from 'common/idle-logout';
 import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
+import KpiObjectiveMaster from 'components/KPI/masters/kpi-objective-master';
 import UserManagerComponent from 'components/admin/userManager.component';
 import FormRoleAccess from 'components/admin/formRoleAccess.component';
 import RiskRegisterComponent from 'components/riskregister/risk-register.component';
@@ -60,6 +61,9 @@ function App() {
         <Route path="/schedule-tran" element={<ScheduleTransactionComponent />} />
         <Route path="/check-list-master" element={<CheckListMasterComponent />} />
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
+
+        {/* Schedule */}
+        <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
         
 
          {/* Risk Register */}

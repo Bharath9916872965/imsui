@@ -650,3 +650,12 @@ export const deleteAuditor = async (auditorId) => {
       throw error;
     }
 };
+
+export const auditorForward = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}auditor-forward`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in auditorForward:', error);
+        throw error;
+    }
+}

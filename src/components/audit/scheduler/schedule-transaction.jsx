@@ -43,6 +43,8 @@ const ScheduleTransactionComponent = () => {
     'ARL': ' Schedule Returned By',
     'ASA': ' Schedule Acknowledged By',
     'AAL': ' Schedule Acknowledged By',
+    'AES': ' Schedule CheckList Submitted By',
+    'ARS': ' Schedule CheckList Submitted By',
   };
 
   const back = ()=>{
