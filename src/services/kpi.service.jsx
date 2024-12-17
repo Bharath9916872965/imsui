@@ -50,3 +50,12 @@ export const getKpiRatingList = async ()=>{
         throw error;
     }
 }
+
+export const getDwpRevisonList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-dwp-revision-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpRevisonList:', error);
+        throw error;
+    }
+}

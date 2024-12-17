@@ -93,6 +93,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
                   {getDocPDF('', item)}
                   <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true); }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
                   {/* <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button> */}
+                  <button className="icon-button kpi-icon-button me-1" onClick={() => addKpi(item)} title="Add KPI"> <i className="material-icons"  >fact_check</i></button>
                 </>
               )}
             </div>
@@ -113,6 +114,10 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
 
   const getDocPDF = (action, revisionElements) => {
     return <DwpDocPrint action={action} revisionElements={revisionElements} />
+  }
+
+  const addKpi = (item)=>{
+    navigate('/kpi-objective', { state: { dwpGwp: item } })
   }
 
   const redirecttoQmDocument = useCallback((element) => {
