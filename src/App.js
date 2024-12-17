@@ -22,6 +22,8 @@ import UseIdleTimer from 'common/idle-logout';
 import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component';
 import UserManagerComponent from 'components/admin/userManager.component';
 import FormRoleAccess from 'components/admin/formRoleAccess.component';
+import RiskRegisterComponent from 'components/riskregister/risk-register.component';
+import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 
 function App() {
   return (
@@ -59,6 +61,12 @@ function App() {
         <Route path="/check-list-master" element={<CheckListMasterComponent />} />
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
         
+
+         {/* Risk Register */}
+         <Route path="/risk-register" element={<RiskRegisterComponent />} />
+         <Route path="/mitigation-risk-register" element={<MitigationRiskRegisterComponent />} />
+
+         
       </Routes>
 {/* <Login/> */}
     </div>
