@@ -19,6 +19,7 @@ import SelectPicker from "components/selectpicker/selectPicker";
 import { CustomMenuItem } from "../../../services/auth.header";
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 import withRouter from "../../../common/with-router";
+import auditCheckListPdf from "components/prints/qms/auditCheck-list-print"
 
 
 
@@ -169,7 +170,9 @@ const ScheduleListComponent = ({router}) => {
         status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
         action       : <> {item.scheduleStatus === 'INI' && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editSchedule(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>}
-                          {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReSchedule"><i className="material-icons">update</i></button>}</>
+                          {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReSchedule"><i className="material-icons">update</i></button>}
+                          <button className=" btn-primary"  onClick={auditCheckListPdf} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+</>
       }      
     });
     setFilScheduleList(mappedData);
