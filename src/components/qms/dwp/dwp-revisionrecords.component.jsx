@@ -92,6 +92,8 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
                               }} title="Document Summary"> <i className="material-icons" >summarize</i></button> */}
                   {getDocPDF('', item)}
                   <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true); }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
+                 {docName && docName==='dwp' ? (<button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => redirecttoRiskRegisterComponent(item)}  title="Risk"> <i className="material-icons"  >app_registration</i></button> ) : " "}
+                  
                   {/* <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button> */}
                 </>
               )}
@@ -117,6 +119,10 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
 
   const redirecttoQmDocument = useCallback((element) => {
     navigate('/dwp-add-content', { state: { revisionElements: element } })
+  }, [navigate]);
+
+  const redirecttoRiskRegisterComponent = useCallback((element) => {
+    navigate('/risk-register', { state: { revisionElements: element } })
   }, [navigate]);
 
   const setDwpDivisionList = async (imsFormRoleId, empId) => {
