@@ -106,6 +106,8 @@ const ScheduleListComponent = ({router}) => {
       const auditList      = await getIqaAuditeelist();
       const teamMemDetails = await getTotalTeamMembersList();
       const remarksSch     = await getScheduleRemarks();
+    
+      
       setSchRemarks(remarksSch);
       setTeamMemberDetails(teamMemDetails)
       setFullAuditeeList(auditList)
@@ -171,8 +173,9 @@ const ScheduleListComponent = ({router}) => {
         revision     : 'R'+item.revision || '-',
         action       : <> {item.scheduleStatus === 'INI' && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editSchedule(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>}
                           {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReSchedule"><i className="material-icons">update</i></button>}
-                          <button className=" btn-primary"  onClick={auditCheckListPdf} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+                          
 </>
+
       }      
     });
     setFilScheduleList(mappedData);
@@ -486,11 +489,14 @@ const ScheduleListComponent = ({router}) => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="55%" className='text-center'><h3>{iqaNo} : Audit Schedule</h3></Box>
-          <Box flex="35%">
+          <Box flex="45%" className='text-center'><h3>{iqaNo} : Audit Schedule</h3></Box>
+          <Box flex="45%">
             <span className="text-heading">Auditees : </span><button className="button-count total-auditee-count">{totalAuditeeCount}</button>
             <span className="text-heading">&nbsp;  Auditee Assigned : </span><button className="button-count assigned-count">{assignedAuditeeCount}</button>
             <span className="text-heading">&nbsp;  Auditee Pending : </span><button className="button-count pending-count">{pendingAuditeeCount}</button>
+            <span className="text-heading">&nbsp;  Check List Print : </span>
+        
+            <button className=" btn-primary"  onClick={() =>auditCheckListPdf(iqaNo)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
           </Box>
           <Box flex="10%">
             <SelectPicker options={iqaOptions} label="IQA No"

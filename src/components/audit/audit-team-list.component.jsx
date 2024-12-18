@@ -240,6 +240,7 @@ const AuditTeamListComponent = () => {
     setActionFrom('Edit');
   }
 
+  
   return (
     <div>
       <Navbar />
@@ -299,7 +300,7 @@ const AuditTeamListComponent = () => {
                     </div>
                     <div className="modal-body">
                       <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema} onSubmit={handleSubmit}>
-                        {({ values, errors, touched, setFieldValue }) => (
+                      {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
                           <Form>
                             {/* Row 1 */}
                             <div className="row">

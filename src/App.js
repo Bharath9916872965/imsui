@@ -23,6 +23,8 @@ import IqaAuditeeListComponent from 'components/audit/iqa-auditee-list.component
 import KpiObjectiveMaster from 'components/KPI/masters/kpi-objective-master';
 import UserManagerComponent from 'components/admin/userManager.component';
 import FormRoleAccess from 'components/admin/formRoleAccess.component';
+import RiskRegisterComponent from 'components/riskregister/risk-register.component';
+import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 
 function App() {
   return (
@@ -63,6 +65,12 @@ function App() {
         {/* Schedule */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
         
+
+         {/* Risk Register */}
+         <Route path="/risk-register" element={<RiskRegisterComponent />} />
+         <Route path="/mitigation-risk-register" element={<MitigationRiskRegisterComponent />} />
+
+         
       </Routes>
 {/* <Login/> */}
     </div>

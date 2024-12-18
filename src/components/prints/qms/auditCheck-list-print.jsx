@@ -1,7 +1,14 @@
 import pdfMake from 'pdfmake/build/pdfmake';
+import React, { useEffect, useState } from 'react';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 
-const auditCheckListPdf = async () => {
+const AuditCheckListPdf = async (iqaNo) => {
+  
+
+  
+
+
+  
   try {
     // Fetch logo details
     const [labDetails, logoimage, drdoLogo] = await Promise.all([
@@ -58,7 +65,7 @@ const auditCheckListPdf = async () => {
               ],
             ],
           },
-          margin: [0, 10, 0, 15], // Reduced vertical margin for closer spacing
+          margin: [0, 20, 0, 15], // Reduced vertical margin for closer spacing
         };
         
   
@@ -398,7 +405,7 @@ const auditCheckListPdf = async () => {
            
           ],
         },
-        margin: [0, 2, 0, 60], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 80], // Reduced vertical margin for closer spacing
       };
 
       const tenthTable = {
@@ -439,7 +446,7 @@ const auditCheckListPdf = async () => {
            
           ],
         },
-        margin: [0, 2, 0, 5], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const elevenTable = {
         style: 'tableExample',
@@ -459,7 +466,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 5], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
 
       const twelveTable = {
@@ -480,7 +487,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 5], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const thirteenTable = {
         style: 'tableExample',
@@ -500,7 +507,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 5], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const fourteenTable = {
         style: 'tableExample',
@@ -531,7 +538,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 2], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const fifteenTable = {
         style: 'tableExample',
@@ -551,7 +558,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 2], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const sixteenTable = {
         style: 'tableExample',
@@ -581,7 +588,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 2], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const seventeenTable = {
         style: 'tableExample',
@@ -601,7 +608,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, 2], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, 3], // Reduced vertical margin for closer spacing
       };
       const eighteenTable = {
         style: 'tableExample',
@@ -621,7 +628,7 @@ const auditCheckListPdf = async () => {
 
           ],
         },
-        margin: [0, 2, 0, ,2], // Reduced vertical margin for closer spacing
+        margin: [0, 2, 0, ,0], // Reduced vertical margin for closer spacing
       };
       // Push all the table data into MyContent
       const MyContent = [];
@@ -647,6 +654,36 @@ const auditCheckListPdf = async () => {
       MyContent.push(eighteenTable);
       
      ;
+     function generateRotatedTextImage(text) {
+      const canvas = document.createElement('canvas');
+      const ctx = canvas.getContext('2d');
+      
+      // Define dimensions of the canvas (adjust as necessary)
+      const textFontSize = 20; // Text font size in px
+      const canvasWidth = 80; // Width before rotation
+      const canvasHeight = 150; // Height before rotation
+  
+      canvas.width = canvasWidth;
+      canvas.height = canvasHeight;
+  
+      // Set font and styling
+      ctx.font = `bold ${textFontSize}px Roboto`; 
+
+      ctx.fillStyle = 'black'; // Text color
+  
+      // Translate and rotate canvas context
+      ctx.translate(canvasWidth / 2, canvasHeight / 2); // Move to center
+      ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+  
+      // Draw the text in the rotated context
+      ctx.textAlign = 'center';
+      ctx.textBaseline = 'middle';
+      ctx.fillText(text, 0, 0); // Draw at rotated position
+  
+      // Convert the canvas to a base64 image
+      return canvas.toDataURL();
+  }
+  const rotatedImage = generateRotatedTextImage('ISO-9001:2015');
     // Define the document content
     const docDefinition = {
       info: {
@@ -654,7 +691,7 @@ const auditCheckListPdf = async () => {
       },
       pageSize: 'A4',
       pageOrientation: 'portrait',
-      pageMargins: [60, 160, 80, 150], // Increased top margin for header
+      pageMargins: [60, 170, 80, 150], // Increased top margin for header
       content: [
         {
           text: 'ISO-9001:2015- Audit Check List',
@@ -663,7 +700,7 @@ const auditCheckListPdf = async () => {
           decoration: 'underline',  // Underline the heading
           bold: true,               // Make the heading bold
           fontSize: 15,             // Set the font size
-          margin: [0, 0, 0, 1],    // Margin below the heading
+          margin: [0, 30, 0, 1],    // Margin below the heading
         },
         firstTable,
         secondTable,
@@ -706,63 +743,65 @@ const auditCheckListPdf = async () => {
               [
                 {
                   image: logoImageSrc,
-                  width: 45,
-                  height: 45,
+                  width: 55,
+                  height: 55,
                   rowSpan: 4, // Applying rowspan to this cell
-                  margin: [0, 5, 0, 5],
+                  margin: [0, 0, 0, 0],
                 },
                 {
                   stack: [
                     {
-                      text: 'ISO-9001:2015 Internal Quality Audit -33',
+                      text: 'ISO-9001:2015 Internal Quality Audit ' + (iqaNo ? iqaNo.split('-')[1] : ''),
                       style: 'superheader',
-                      fontSize: 12,
+                      fontSize: 14,
                       alignment: 'center',
-                    },
+                    }
+                    ,
                     {
                       text: 'INTERNAL AUDIT REPORT (IAR)',
                       style: 'superheader',
                       alignment: 'center',
-                      fontSize: 10,
+                      fontSize: 12,
                       margin: [5, 5, 5, 0],
                     },
                   ],
                   rowSpan: 4, // Applying rowspan to this cell as well
-                  margin: [0, 5, 0, 5],
+                  //margin: [0, 5, 0, 5],
                 },
-                { text: 'FROM NO', style: 'superheader', fontSize: 6, margin: [2, 0, 0, 0] },
-                { text: 'IQA-FM-01 R0', style: 'superheader', fontSize: 6, margin: [2, 0, 0, 0] },
+                { text: 'FROM NO', style: 'superheader', fontSize: 9, margin: [2, 0, 0, 0] },
+                { text: '', style: 'superheader', fontSize: 9, margin: [2, 0, 0, 0] },
                 {
-                  text: 'ISO-9001:2015',
-                  style: 'superheader',
-                  fontSize: 6,
-                  alignment: 'center',
-                  rowSpan: 4, // Applying rowspan to this cell as well
-                  margin: [0, 5, 0, 5],
-                },
+                  image: rotatedImage, // Use the rotated image
+                  width: 30,
+                  height: 60,
+                  margin: [-8, 0, 0, 0],
+                  rowSpan: 4
+                }
+                
+                ,
               ],
               // Row 3
               [
                 {},
                 {},
-                { text: 'REFERENCE', style: 'superheader', fontSize: 6, margin: [0, 0, 0, 0] },
-                { text: '', style: 'superheader', fontSize: 6, margin: [2, 0, 0, 0] },
+                { text: 'REFERENCE', style: 'superheader', fontSize: 9, margin: [0, 0, 0, 0] , fontWeight: 'bold'},
+                { text: '', style: 'superheader', fontSize: 9, margin: [2, 0, 0, 0] },
                 {},
               ],
               // Row 4
               [
                 {},
                 {},
-                { text: 'REV NO', style: 'superheader', fontSize: 6, margin: [0, 0, 0, 0] },
-                { text: '', style: 'superheader', fontSize: 6, margin: [2, 0, 0, 0] },
+                { text: 'REV NO', style: 'superheader', fontSize: 9, margin: [0, 0, 0, 0], fontWeight: 'bold' },
+                { text: '', style: 'superheader', fontSize: 9, margin: [2, 0, 0, 0] },
                 {},
               ],
               // Row 5
               [
                 {},
                 {},
-                { text: 'PAGE NO', style: 'superheader', fontSize: 6, margin: [0, 0, 0, 0] },
-                { text: `Page ${currentPage} of ${pageCount}`, style: 'superheader', fontSize: 6, margin: [2, 0, 0, 0] },
+                { text: 'PAGE NO', style: 'superheader', fontSize: 9, margin: [0, 0, 0, 0] },
+                { text: `Page ${currentPage} of ${pageCount}`, style: 'superheader', fontSize: 9, margin: [2, 0, 0, 0] },
                 {},
               ],
               // Additional table row
@@ -781,7 +820,7 @@ const auditCheckListPdf = async () => {
                         { text: '3.  Auditee Name:', style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
                         { text: '', style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
                         { text: '4. IQA Report No:', style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
-                        { text: '', style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
+                        { text: iqaNo , style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
                       ],
                       [
                         { text: '5.  Audit scope', style: 'superheader', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
@@ -798,7 +837,7 @@ const auditCheckListPdf = async () => {
             ],
           },
          // margin: [60, 20, 60, 90], // Adjusted header margin
-          margin: [60, 20, 30, 20], //[R,t,R,,B ]
+          margin: [60, 50, 30, 10], //[R,t,R,,B ]
         };
       },
       
@@ -834,7 +873,7 @@ const auditCheckListPdf = async () => {
                 ],
               ],
             },
-            margin: [60, 20, 0, 10], // FOR FOOTER PADDING
+            margin: [60, 60, 0, 10], // FOR FOOTER PADDING
           },
           {
            
@@ -865,4 +904,4 @@ const auditCheckListPdf = async () => {
   }
 };
 
-export default auditCheckListPdf;
+export default AuditCheckListPdf;

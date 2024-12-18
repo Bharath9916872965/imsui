@@ -27,6 +27,11 @@ const QmRevisionRecordsComponent = ({ router }) => {
   useEffect(() => {
     const fetchData = async () => {
       try {
+        const role = localStorage.getItem('roleId')
+        const roleName = localStorage.getItem('roleName')
+        const empId = localStorage.getItem('empId')
+        console.log('roleName',roleName);
+        
         const VersionRecorList = await getQmVersionRecordDtoList();
         const mappedData = VersionRecorList.map((item, index) => ({
           sn: index + 1,
@@ -49,6 +54,12 @@ const QmRevisionRecordsComponent = ({ router }) => {
                   {getDocPDF('', item)}
                   <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true) }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
                   <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button>
+                  {/* {roleName && roleName.trim() === 'MR Rep' ? (
+                  <button className="icon-button me-1" style={{color: 'green'}} title="Forward">
+                   <i className="material-icons">fast_forward</i>
+                    </button>
+                  ) : " "} */}
+
                 </>
               )}
             </div>
