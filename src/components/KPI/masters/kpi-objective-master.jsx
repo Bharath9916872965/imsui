@@ -288,21 +288,47 @@ const KpiObjectiveMaster = ({router}) => {
                    {({ values, errors, touched, setFieldValue, setFieldTouched, isValid, dirty }) => (
                     <Form>
                      <DialogContent>
-                      <Box display="flex" alignItems="flex-start" flexWrap="wrap" gap="10px">
-                       <Box flex="5%"></Box>
-                       <Box flex="32%">
+                      <Box display="flex" alignItems="flex-center" flexWrap="wrap" gap="10px">
+                       <Box flex="7%"></Box>
+                       <Box flex="44%">
                        <Field name="objective" id="standard-basic" as={TextField} label="Objectives" variant="outlined" fullWidth size="small" margin="normal" multiline minRows={2} maxRows={5}
                         error={Boolean(touched.objective && errors.objective)} helperText={touched.objective && errors.objective} required></Field>
                        </Box>
-                       <Box flex="32%">
+                       <Box flex="44%">
                        <Field name="metrics" id="standard-basic" as={TextField} label="Metrics" variant="outlined" fullWidth size="small" margin="normal" multiline minRows={2} maxRows={5}
                         error={Boolean(touched.metrics && errors.metrics)} helperText={touched.metrics && errors.metrics} required></Field>
                        </Box>
-                       <Box flex="10%"> 
+                       {/* <Box flex="10%"> 
                        <Field name="target" id="standard-basic" as={TextField} label="Target/Norms" variant="outlined" fullWidth size="small" margin="normal" required
                         error={Boolean(touched.target && errors.target)} helperText={touched.target && errors.target}></Field>
                        </Box>
                        <Box flex="16%">
+                        <Field name="kpiUnitId">
+                          {({ field, form })=>(
+                              <Autocomplete options={kpiUnitList} getOptionLabel={option => option.kpiUnitName} 
+                              renderOption={(props, option) => {return (
+                                  <CustomMenuItem {...props} key={option.kpiUnitId}>
+                                    <ListItemText primary={`${option.kpiUnitName}`} />
+                                  </CustomMenuItem>
+                                );}}
+                              value = {kpiUnitList.find(team =>team.kpiUnitId === form.values.kpiUnitId) || null} 
+                                ListboxProps={{sx:{maxHeight :200,overflowY:'auto'}}}
+                              onChange={(event, newValue) => { setFieldValue("kpiUnitId", newValue ? newValue.kpiUnitId : '');}}
+                              renderInput={(params) => (<TextField {...params} label="Unit"   size="small"  margin="normal" variant="outlined"
+                                      error={touched.kpiUnitId && Boolean(errors.kpiUnitId)} required
+                                      helperText={touched.kpiUnitId && errors.kpiUnitId} />)} />
+                          )}
+                        </Field> 
+                       </Box> */}
+                       <Box flex="5%"></Box>
+                      </Box>
+                      <Box display="flex" alignItems="flex-center" flexWrap="wrap" gap="10px">
+                       <Box flex="7%"></Box>
+                       <Box flex="44%"> 
+                       <Field name="target" id="standard-basic" as={TextField} label="Target/Norms" variant="outlined" fullWidth size="small" margin="normal" required
+                        error={Boolean(touched.target && errors.target)} helperText={touched.target && errors.target}></Field>
+                       </Box>
+                       <Box flex="44%">
                         <Field name="kpiUnitId">
                           {({ field, form })=>(
                               <Autocomplete options={kpiUnitList} getOptionLabel={option => option.kpiUnitName} 
@@ -325,22 +351,22 @@ const KpiObjectiveMaster = ({router}) => {
                       <Grid item xs={12} className="mg-top-20">
                         {values.ratings.map((tar, index) => (
                           <Box display="flex" alignItems="center" gap="10px" className='mg-top-10'>
-                            <Box flex="6%"></Box>
-                            <Box flex="9.5%"><span className="fn-bold">Rating - {index+1}</span>
-                              {/* <TextField label="Rating" value={tar.rating} fullWidth size="small" required
+                            <Box flex="8%"><span className="fn-bold">Rating - {index+1}</span></Box>
+                           {/*  <Box flex="9.5%"><span className="fn-bold"></span>
+                              <TextField label="Rating" value={tar.rating} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].rating`, e.target.value)}
                                 onBlur={() => setFieldTouched(`ratings[${index}].rating`, true)}
                                 error={touched.ratings?.[index]?.rating && Boolean(errors.ratings?.[index]?.rating)}
-                                helperText={touched.ratings?.[index]?.rating && errors.ratings?.[index]?.rating} /> */}
-                            </Box>
-                            <Box flex="28%">
+                                helperText={touched.ratings?.[index]?.rating && errors.ratings?.[index]?.rating} /> 
+                            </Box>*/}
+                            <Box flex="45%">
                               <TextField label="Start Value" value={tar.startValue} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].startValue`, e.target.value)}
                                 onBlur={() => setFieldTouched(`ratings[${index}].startValue`, true)}
                                 error={touched.ratings?.[index]?.startValue && Boolean(errors.ratings?.[index]?.startValue)}
                                 helperText={touched.ratings?.[index]?.startValue && errors.ratings?.[index]?.startValue} />
                             </Box>
-                            <Box flex="28%">
+                            <Box flex="47%">
                               <TextField label="End Value" value={tar.endValue} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].endValue`, e.target.value)}
                                 onBlur={() => setFieldTouched(`ratings[${index}].endValue`, true)}
@@ -351,7 +377,7 @@ const KpiObjectiveMaster = ({router}) => {
                             {index === 0 ? (<IconButton onClick={() => setFieldValue('ratings', [...values.ratings, { startValue: '', endValue: '', rating: ''}])} color="primary" > <i className="material-icons large-icon"  >add</i></IconButton>) :
                             (<IconButton onClick={() => {const updatedRatings = values.ratings.filter((_, idx) => index !== idx); setFieldValue('ratings', updatedRatings);}} color="danger" ><i className="material-icons large-icon returned"  >remove</i></IconButton>)}
                             </Box> */}
-                            <Box flex="28.5%"></Box>
+                            {/* <Box flex="2%"></Box> */}
                           </Box>
                         ))}
                       </Grid>
