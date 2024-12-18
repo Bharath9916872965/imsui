@@ -310,6 +310,16 @@
     background-color: green;
     font-weight: bold;
   }
+
+  .aditee-sub{
+    background-color : #b91cd6 !important;
+    font-weight: bold;
+  }
+  
+  .aditor-sub{
+    background-color : #641cd6 !important;
+    font-weight: bold;
+  }
   
   .lead-auditee-bg{
     background-color: rgb(15 189 15);

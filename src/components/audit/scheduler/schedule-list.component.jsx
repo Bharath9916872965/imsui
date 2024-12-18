@@ -15,7 +15,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import { LocalizationProvider } from '@mui/x-date-pickers/LocalizationProvider';
 import { DateTimePicker } from '@mui/x-date-pickers/DateTimePicker';
 import * as Yup from "yup";
-import SelectPicker from '../../selectpicker/selectPicker'
+import SelectPicker from "components/selectpicker/selectPicker";
 import { CustomMenuItem } from "../../../services/auth.header";
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 import withRouter from "../../../common/with-router";
@@ -105,7 +105,7 @@ const ScheduleListComponent = ({router}) => {
       const iqaList        = await getIqaDtoList();
       const auditList      = await getIqaAuditeelist();
       const teamMemDetails = await getTotalTeamMembersList();
-      const remarksSch     =     await getScheduleRemarks();
+      const remarksSch     = await getScheduleRemarks();
     
       
       setSchRemarks(remarksSch);

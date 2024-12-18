@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getKpiUnitList,insertKpi,getKpiMasterList,getKpiRatingList,updateKpi } from "services/kpi.service";
+import { getKpiUnitList,insertKpi,getKpiMasterList,getKpiRatingList,updateKpi,getDwpRevisonList } from "services/kpi.service";
 import Datatable from "../../datatable/Datatable";
 import { Box, Button, TextField,Autocomplete, ListItemText,Grid,DialogContent } from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
@@ -9,6 +9,7 @@ import * as Yup from "yup";
 import AlertConfirmation from "common/AlertConfirmation.component";
 import { CustomMenuItem } from "services/auth.header";
 import withRouter from "common/with-router";
+import SelectPicker from "components/selectpicker/selectPicker";
 
 const validationSchema = Yup.object({
   objective : Yup.string().required("Objective is required").min(3,'Objective must be at least 3 characters').max(990,'Objective must not exceed 990 characters')
@@ -41,6 +42,11 @@ const KpiObjectiveMaster = ({router}) => {
   const [isReady, setIsReady] = useState(false);
   const [isAddMode,setIsAddMode] = useState(true);
   const [kpiUnitList,setKpiUnitList] = useState([])
+  const [dwpRevisionList,setDwpRevisionList] = useState([])
+  const [isMr,setIsMr] = useState(true);
+  const [revisionOptions,setRevisionOptions] = useState([]);
+  const [revisionId,setRevisionId] = useState('A');
+  const [dwpData,setDwpData] = useState('')
 
     const [initialValues,setInitialValues] = useState({
       kpiId     : 0,
@@ -48,16 +54,18 @@ const KpiObjectiveMaster = ({router}) => {
       metrics   : '',
       target    : '',
       kpiUnitId : 1,
+      revisionRecordId : '0',
       ratings   : [{ startValue : '', endValue : '',rating : '' }],
     });
 
 
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-    { name: 'Objectives', selector: (row) => row.objectives, sortable: true, grow: 2, align: 'text-left', width: '35%'  },
-    { name: 'Metrics', selector: (row) => row.metrics, sortable: true, grow: 2, align: 'text-left', width: '35%'  },
+    { name: 'Division/Group/LAB', selector: (row) => row.division, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
+    { name: 'Objectives', selector: (row) => row.objectives, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
+    { name: 'Metrics', selector: (row) => row.metrics, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
     { name: 'Target/Norms', selector: (row) => row.target, sortable: true, grow: 2, align: 'text-center', width: '12%'  },
-    { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '15%' },
+    { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '10%' },
   ];
 
 
@@ -67,11 +75,33 @@ const KpiObjectiveMaster = ({router}) => {
       const kpiMasterList  = await getKpiMasterList();
       const unitList = await getKpiUnitList();
       const ratingList = await getKpiRatingList();
-  
+      const dwpList = await getDwpRevisonList();
+
+      setIsMr(true)
+      const dwpData = router.location.state?.dwpGwp;
+      const revisionData = dwpList.map(data => ({
+        value : String(data.revisionRecordId),
+        label : data.docType === 'dwp'?'DWP - '+data.divisionMasterDto.divisionCode:'GWP - '+data.divisionGroupDto.groupCode
+      }));
+      const iniLsit = [{value : 'A', label : 'ALL'},{value : '0', label : 'COMMON LAB KPI'}]
+
+      setRevisionOptions([...iniLsit,...revisionData])
+      setDwpRevisionList(dwpList);
       setKpiRatingList(ratingList)
       setKpiUnitList(unitList)
       setKpiMasterList(kpiMasterList)
-      setDataTable(kpiMasterList)
+      if(dwpData){
+        setRevisionId(String(dwpData.revisionRecordId))
+        setDwpData(dwpData)
+        setIsMr(false);
+        setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
+      }else{
+        if(revisionId === 'A'){
+          setDataTable(kpiMasterList)
+        }else{
+          setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(revisionId)))
+        }
+      }
       setIsReady(true);
 
     } catch (error) {
@@ -99,6 +129,7 @@ const KpiObjectiveMaster = ({router}) => {
             const kpiUnit = item.kpiUnitName === 'PERCENTAGES'?'%':' '+item.kpiUnitName;
           return{
             sn          : index+1,
+            division    : item.groupDivisionCode || '-',
             objectives  : item.kpiObjectives || '-',
             metrics     : item.kpiMerics || '-',
             target      : item.kpiTarget+kpiUnit || '-',
@@ -118,6 +149,7 @@ const KpiObjectiveMaster = ({router}) => {
       metrics   : '',
       target    : '',
       kpiUnitId : 1,
+      revisionRecordId : '0',
       ratings   : Array.from({length : 5},(_,index) => ({startValue : '', endValue : '',rating : index+1  }))
    
     });
@@ -134,6 +166,7 @@ const KpiObjectiveMaster = ({router}) => {
       metrics   : item.kpiMerics,
       target    : item.kpiTarget,
       kpiUnitId : item.kpiUnitId,
+      revisionRecordId : item.revisionRecordId,
       ratings   : kpiRatingList.filter(data => Number(data.kpiId) === Number(item.kpiId)).map(item => ({ startValue: item.startValue,endValue: item.endValue, rating: item.kpiRating.toString(),}))
    
     });
@@ -155,6 +188,7 @@ const KpiObjectiveMaster = ({router}) => {
       try {
         setIsReady(false);
           if(isAddMode){
+            values.revisionRecordId = revisionId === 'A'?'0':revisionId;
             const result =await insertKpi(values);
             if (result.status === 'S') {
               fetchData();
@@ -199,10 +233,24 @@ const KpiObjectiveMaster = ({router}) => {
       }
     }
   });
-};
+  };
 
+  const onRevisionChange = (value)=>{
+    setRevisionId(value);
+    if(value === 'A'){
+      setDataTable(kpiMasterList)
+    }else{
+      setDataTable(kpiMasterList.filter(data => data.revisionRecordId === value))
+    }
+  }
 
-  
+  const back = ()=>{
+    if(dwpData.docType === 'dwp'){
+      navigate('/dwp')
+    }else{
+      navigate('/gwp')
+    }
+  }
   
   return (
     <div>
@@ -210,7 +258,13 @@ const KpiObjectiveMaster = ({router}) => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="100%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="75%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="20%">
+            <SelectPicker options={revisionOptions} label="Division/Group" readOnly = {!isMr} 
+            value={revisionOptions && revisionOptions.length >0 && revisionOptions.find(option => option.value === revisionId) || null}
+             handleChange={(newValue) => {onRevisionChange( newValue?.value) }}/>
+          </Box>
+          {!isMr && <Box flex="5%" ><button className="btn backClass" onClick={() => back()}>Back</button></Box>}
          </Box>
           <div id="card-body customized-card">
             <Datatable columns={columns} data={filKpiMasterList} />
@@ -231,7 +285,7 @@ const KpiObjectiveMaster = ({router}) => {
 
                   <div className="modal-body model-max-height">
                   <Formik initialValues={initialValues} enableReinitialize={true} validationSchema={validationSchema} onSubmit={async (values) => { await handleSubmitClick(values);}}>
-                   {({ values, errors, touched, setFieldValue, isValid, dirty }) => (
+                   {({ values, errors, touched, setFieldValue, setFieldTouched, isValid, dirty }) => (
                     <Form>
                      <DialogContent>
                       <Box display="flex" alignItems="flex-start" flexWrap="wrap" gap="10px">
@@ -272,21 +326,24 @@ const KpiObjectiveMaster = ({router}) => {
                         {values.ratings.map((tar, index) => (
                           <Box display="flex" alignItems="center" gap="10px" className='mg-top-10'>
                             <Box flex="6%"></Box>
-                            <Box flex="9.5%">
-                              <TextField label="Rating" value={tar.rating} fullWidth size="small" required
+                            <Box flex="9.5%"><span className="fn-bold">Rating - {index+1}</span>
+                              {/* <TextField label="Rating" value={tar.rating} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].rating`, e.target.value)}
+                                onBlur={() => setFieldTouched(`ratings[${index}].rating`, true)}
                                 error={touched.ratings?.[index]?.rating && Boolean(errors.ratings?.[index]?.rating)}
-                                helperText={touched.ratings?.[index]?.rating && errors.ratings?.[index]?.rating} />
+                                helperText={touched.ratings?.[index]?.rating && errors.ratings?.[index]?.rating} /> */}
                             </Box>
                             <Box flex="28%">
                               <TextField label="Start Value" value={tar.startValue} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].startValue`, e.target.value)}
+                                onBlur={() => setFieldTouched(`ratings[${index}].startValue`, true)}
                                 error={touched.ratings?.[index]?.startValue && Boolean(errors.ratings?.[index]?.startValue)}
                                 helperText={touched.ratings?.[index]?.startValue && errors.ratings?.[index]?.startValue} />
                             </Box>
                             <Box flex="28%">
                               <TextField label="End Value" value={tar.endValue} fullWidth size="small" required
                                 onChange={(e) => setFieldValue(`ratings[${index}].endValue`, e.target.value)}
+                                onBlur={() => setFieldTouched(`ratings[${index}].endValue`, true)}
                                 error={touched.ratings?.[index]?.endValue && Boolean(errors.ratings?.[index]?.endValue)}
                                 helperText={touched.ratings?.[index]?.endValue && errors.ratings?.[index]?.endValue} />
                             </Box>

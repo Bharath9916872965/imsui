@@ -20,9 +20,7 @@ const ScheduleTransactionComponent = () => {
       const data = JSON.parse(localStorage.getItem('scheduleData'));
       if(data){
         setData(data)
-        console.log('data------ ',data)
        const trans = await scheduleTran(data.scheduleId)
-       console.log('trans------- ',trans)
        setTransaction(trans)
       }
 
@@ -72,7 +70,7 @@ const ScheduleTransactionComponent = () => {
           <div id="card-body customized-card">
           <Box className="col-md-11  text-left-center-card mg-top-10"  >
             {transaction && transaction.length >0 && transaction.map(item =>{
-                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':'acknowledge-bg')}`;
+                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':['AES'].includes(item.auditStatus)?'aditee-sub':['ARS'].includes(item.auditStatus)?'aditor-sub':'acknowledge-bg')}`;
               return(
                 <>
                   <div className="timeline-row">

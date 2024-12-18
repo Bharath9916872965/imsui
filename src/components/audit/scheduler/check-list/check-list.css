@@ -165,3 +165,7 @@
 .MuiOutlinedInput-root{
     background-color: #fff !important;
 }
+
+.fn-bold{
+    font-weight: bolder;
+}
