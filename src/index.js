@@ -7,6 +7,7 @@ import { BrowserRouter } from "react-router-dom";
 import "bootstrap/dist/css/bootstrap.min.css"
 import "bootstrap/dist/js/bootstrap.min.js"
 import Swal from 'sweetalert2';
+import 'font-awesome/css/font-awesome.min.css';
 
 window.Swal = Swal;
 
