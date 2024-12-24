@@ -424,3 +424,94 @@ export const addNewDwpIssue = async (qmsIssueDto) => {
     }
 }
 
+
+export const getSelectedEmpData = async (empId) => {
+    try {
+        return (await axios.post(`${API_URL}get-employee-byid`, empId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getSelectedEmpData', error);
+        throw error;
+    
+    }
+}
+
+export const forwardQm = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}forward-qm`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in forwardQm', error);
+        throw error;
+    }
+}
+
+
+export const amendQm = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}add-new-qm-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in amendQm', error);
+        throw error;
+    }
+}
+
+export const revokeSubmit = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}revoke-qm-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in revokeSubmit', error);
+        throw error;
+    }
+}
+
+
+export const revisionTran = async (revisionRecordId)=>{
+    try {
+        return (await axios.post(`${API_URL}revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in revisionTran:', error);
+        throw error;
+    }
+}
+
+export const forwardDwpGwp = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}forward-dwp-gwp`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in forwardDwpGwp', error);
+        throw error;
+    }
+}
+
+export const dwprevokeSubmit = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}revoke-dwp-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in dwprevokeSubmit', error);
+        throw error;
+    }
+}
+
+export const getMRRepList = async() =>{
+        try {
+            return (await axios.post(`${API_URL}get-mr-rep-list`,{} , {
+                headers: authHeader()
+            })).data;
+        } catch (error) {
+            console.error('Error occurred in getMRRepList', error);
+            throw error;
+        }
+}
+
+export const getMRList = async() =>{
+    try {
+        return (await axios.post(`${API_URL}get-mr-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getMRList', error);
+        throw error;
+    }
+}
+
+
+

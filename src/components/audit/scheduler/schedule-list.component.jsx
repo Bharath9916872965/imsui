@@ -174,7 +174,7 @@ const ScheduleListComponent = ({router}) => {
         project      : item.projectName === ''?'-':item.projectName || '-',
         auditee      : item.auditeeEmpName || '-',
         team         : item.teamCode || '-',
-        status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
+        status       : <Box className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
         action       : <> {item.scheduleStatus === 'INI' && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editSchedule(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button>}
                           {item.scheduleStatus !== 'INI' && <button className=" btn btn-outline-info btn-sm me-1" onClick={() => reSchedule(item)}  title="ReSchedule"><i className="material-icons">update</i></button>}

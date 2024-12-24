@@ -297,6 +297,25 @@
     background-color: #007bff;
     font-weight: bold;
   }
+
+  .reforwarde-bg{
+    background-color: #007bff;
+    font-weight: bold;
+  }
+
+  .reviewed-bg{
+    background-color:#919bff;
+    font-weight: bold;
+  }
+  .approved-bg{
+    background-color: #30c67c;
+    font-weight: bold;
+  }
+
+  .revoked-bg{
+    background-color: #f8a902;
+    font-weight: bold;
+  }
   .returned-bg{
     background-color: #D61C4E;
     font-weight: bold;

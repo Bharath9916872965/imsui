@@ -25,6 +25,8 @@ import UserManagerComponent from 'components/admin/userManager.component';
 import FormRoleAccess from 'components/admin/formRoleAccess.component';
 import RiskRegisterComponent from 'components/riskregister/risk-register.component';
 import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
+import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transaction';
+import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
 
 function App() {
   return (
@@ -46,6 +48,7 @@ function App() {
         <Route path="/dwp" element={<DwpRevisionrecordsComponent docName='dwp' />} />
         <Route path="/gwp" element={<DwpRevisionrecordsComponent docName='gwp' />} />
         <Route path="/dwp-add-content" element={<DwpAddDocContentComponent />} />
+        <Route path="/revision-tran" element={<RevisionTransactionComponent />} />
 
 
         {/* Audit */}
@@ -64,6 +67,8 @@ function App() {
 
         {/* Schedule */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
+        <Route path="/kpi-list" element={<KpiObjectiveAction />} />
+
         
 
          {/* Risk Register */}
