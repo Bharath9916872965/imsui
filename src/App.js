@@ -26,6 +26,7 @@ import FormRoleAccess from 'components/admin/formRoleAccess.component';
 import RiskRegisterComponent from 'components/riskregister/risk-register.component';
 import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transaction';
+import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
 
 function App() {
   return (
@@ -66,6 +67,8 @@ function App() {
 
         {/* Schedule */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
+        <Route path="/kpi-list" element={<KpiObjectiveAction />} />
+
         
 
          {/* Risk Register */}

@@ -9,6 +9,7 @@ import SelectPicker from '../../selectpicker/selectPicker';
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 import ReturnDialog from "../../Login/returnDialog.component";
 import withRouter from "common/with-router";
+import auditCheckListWithDataPdf from "components/prints/qms/auditCheck-withData-print"
 
 
 
@@ -23,6 +24,7 @@ const ScheduleApprovalComponent = ({router}) => {
   const [iqaOptions,setIqaOptions] = useState([]);
   const [iqaNo,setIqaNo] = useState('');
   const [iqaId,setIqaId] = useState('');
+  const [scope,setscope] = useState('');
   const [showModal, setShowModal] = useState(false);
   const [element,setElement] = useState('');
   const [isBoth,setIsBoth] = useState(false);
@@ -49,6 +51,7 @@ const ScheduleApprovalComponent = ({router}) => {
       const iqaNum = router.location.state?.iqaNo;
       setIqaFullList(iqaList);
       setScheduleList(scdList)
+    
       const iqaData = iqaList.map(data => ({
                       value : data.iqaId,
                       label : data.iqaNo
@@ -57,6 +60,7 @@ const ScheduleApprovalComponent = ({router}) => {
         const iqa = iqaNum?iqaList.filter(item => item.iqaNo === iqaNum)?.[0]:iqaList[0];
         setIqaNo(iqa.iqaNo)
         setIqaId(iqa.iqaId)
+        setscope(iqa.scope)
         const scList = scdList.filter(data => data.iqaId === iqa.iqaId);
         if(scList.length >0){
           const auditee = scList.filter(data => data.auditeeFlag === 'A');
@@ -102,9 +106,12 @@ const ScheduleApprovalComponent = ({router}) => {
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
                           {['AAA','AES','ARS'].includes(item.scheduleStatus) && <button title='Add CheckList' className={(item.fwdFlag === 1 && !['ARS'].includes(item.scheduleStatus)) ? " btn btn-outline-primary btn-sm me-1":" btn btn-outline-primary btn-sm me-1 mg-l-40"} onClick={() => addCheckList(item)}  ><i className="material-icons">playlist_add_check</i></button>}
-                          {item.fwdFlag === 1 && !['ARS'].includes(item.scheduleStatus)  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}</>  
+                          {item.fwdFlag === 1 && !['ARS'].includes(item.scheduleStatus)  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['ARS'].includes(item.scheduleStatus) &&<button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
+                          </>  
       }      
     });
+
     if(flag === 'F'){
       setFilScheduleList(mappedData);
     }else if(flag === 'A'){
