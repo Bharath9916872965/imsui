@@ -112,6 +112,7 @@ const AuditorListComponent = () => {
   };
 
   const handleSubmit = async (values) => {
+    console.log('values',values); 
     if (values.empId.length === 0) {
       return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
     }
@@ -120,6 +121,7 @@ const AuditorListComponent = () => {
       message: '',
     });
 
+   
     // if (!confirm.isConfirmed) return;
     if (confirm) {
       try {

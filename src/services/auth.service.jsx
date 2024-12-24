@@ -34,6 +34,7 @@ export const login = async (username, password) => {
         localStorage.setItem('labCode',emp.labCode)
         localStorage.setItem('empId',emp.empId)
         localStorage.setItem('password',password)
+        localStorage.setItem('divId',emp.divisionId)
   
         await customAuditStampingLogin(username);
    
