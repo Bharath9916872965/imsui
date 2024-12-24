@@ -7,11 +7,11 @@ import { Autocomplete, Box, Button, Grid, IconButton, ListItemText, TextField, T
 import { CustomMenuItem } from 'services/auth.header';
 import Datatable from 'components/datatable/Datatable';
 import { FaEdit } from 'react-icons/fa';
+import UserManagerActionsComponent from './userManagerActions.component';
 
 
 
-const UserManager = ({ router }) => {
-  
+const UserManager = (props) => {
     const [roleList, setRoleList] = useState([]);
     const [userManagerList, setUserManagerList] = useState([]);
     const [filteredUserManagerList, setFilteredUserManagerList] = useState([]);
@@ -19,10 +19,15 @@ const UserManager = ({ router }) => {
     const [error, setError] = useState(null);
     const [imsFormRoleId, setImsFormRoleId] = useState('0');
     const [stateLoginId, setStateLoginId] = useState(null);
-
+    const [status, setStatus] = useState('');
 
   
     useEffect(() => {
+
+      if (props.status) {
+        setStatus(props?.status);
+      }
+
       const fetchUserManagerList = async () => {
         try {
           const userManagerList = await getUserManagerList();
@@ -41,11 +46,9 @@ const UserManager = ({ router }) => {
       fetchUserManagerList();
     }, []);
   
-    const handleUserManagerAdd = (e) => {
-      e.preventDefault();
-    };
-  
+
     const handleUserManagerEdit = useCallback((loginId) => {
+      setStatus('edit');
       setStateLoginId(loginId);
     }, []);
   
@@ -70,7 +73,7 @@ const UserManager = ({ router }) => {
       { name: 'Employee', selector: (row) => row.employee, sortable: true, grow: 4 },
       { name: 'Role Name', selector: (row) => row.rolename, sortable: true, grow: 2 , align: 'text-center'},
       { name: 'Division', selector: (row) => row.division, sortable: true, grow: 2 , align: 'text-center'},
-    //   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
+      { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
     ];
   
     const mappedData = filteredUserManagerList.map((item, index) => ({
@@ -79,19 +82,19 @@ const UserManager = ({ router }) => {
       employee: item.empName+', '+item.empDesig || '-',
       rolename: item.formRoleName || '-',
       division: item.empDivCode || '-',
-    //   action: (
-    //     <React.Fragment>
-    //                 <Tooltip title="Edit User">
-    //                     <IconButton className='p-0'
-    //                       color="primary"
-    //                       onClick={() => handleUserManagerEdit(item.loginId)}
-    //                       aria-label="edit"
-    //                     >
-    //                        <FaEdit></FaEdit>
-    //                     </IconButton>
-    //                  </Tooltip>
-    //       </React.Fragment>
-    //   ),
+      action: (
+        <React.Fragment>
+                    <Tooltip title="Edit User">
+                        <IconButton className='p-0'
+                          color="primary"
+                          onClick={() => handleUserManagerEdit(item.loginId)}
+                          aria-label="edit"
+                        >
+                           <FaEdit></FaEdit>
+                        </IconButton>
+                     </Tooltip>
+          </React.Fragment>
+      ),
       loginId: item.loginId,
     }));
   
@@ -104,7 +107,15 @@ const UserManager = ({ router }) => {
       }))
     ];
   
-
+  switch (status) {
+    case 'edit':
+        return (
+            <UserManagerActionsComponent
+                mode="edit"
+                loginId={stateLoginId}
+            />
+        );
+  default:
     return (
       <Box  id="qms-wrapper">
         <Helmet>
@@ -172,5 +183,5 @@ const UserManager = ({ router }) => {
       </Box>
     );
   }
-  
+}
   export default withRouter(UserManager);

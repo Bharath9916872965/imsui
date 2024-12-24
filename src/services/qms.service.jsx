@@ -424,3 +424,122 @@ export const addNewDwpIssue = async (qmsIssueDto) => {
     }
 }
 
+export const qspDocumentList = async () => {
+    try {
+        return (await axios.post(`${API_URL}get-qsp-version-record-list`, {},{ headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in qspDocumentList', error);
+        throw error;
+    }
+}
+
+export const updateQspNotReqAbbreviationIds = async (abbreviationIds, revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}update-qsp-notreq-abbreviation/${revisionRecordId}`, abbreviationIds, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateQspNotReqAbbreviationIds', error);
+        throw error;
+    }
+}
+
+export const getQspRevistionRecordById = async (revisionRecordId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qsp-revision-record`, revisionRecordId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQspRevistionRecordById', error);
+        throw error;
+    }
+}
+
+export const updateQspPagebreakAndLandscape = async (chapterPagebreakOrLandscape) => {
+    try {
+        return (await axios.post(`${API_URL}update-qsp-pagebreak-landscape`, chapterPagebreakOrLandscape, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateQspPagebreakAndLandscape', error);
+        throw error;
+    }
+}
+
+export const getQspAllChapters = async (qmsDocTypeDto) => {
+    try {
+        return (await axios.post(`${API_URL}get-all-qsp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQspAllChapters', error);
+        throw error;
+    }
+}
+
+export const getQspSubChaptersById = async (chapterId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qsp-subchapters`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQspSubChaptersById', error);
+        throw error;
+    }
+}
+
+export const deleteQspChapterByChapterId = async (chapterId) => {
+    try {
+        return (await axios.post(`${API_URL}delete-qsp-chapteId`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in deleteQspChapterByChapterId', error);
+        throw error;
+    }
+}
+
+export const updateQspChapterNameById = async (chapterId, chapterName) => {
+    try {
+        return (await axios.post(`${API_URL}update-qsp-chaptername/${chapterId}`, chapterName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateQspChapterNameById', error);
+        throw error;
+    }
+}
+
+export const getQspChapterById = async (chapterId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qsp-chapter`, chapterId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQspChapterById', error);
+        throw error;
+    }
+}
+
+export const addQspChapterNameById = async (chapterId, chapterName) => {
+    try {
+        return (await axios.post(`${API_URL}add-qsp-new-subchapter/${chapterId}`, chapterName, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addQspChapterNameById', error);
+        throw error;
+    }
+}
+
+export const updateQspChapterContent = async (chapterId, chaperContent) => {
+    try {
+        return (await axios.post(`${API_URL}update-qsp-chaptercontent/${chapterId}`, chaperContent, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateQspChapterContent', error);
+        throw error;
+    }
+}
+
+export const getQspDocSummarybyId = async (documentId) => {
+    try {
+        return (await axios.post(`${API_URL}get-qsp-docsummary-byid`, documentId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getQspDocSummarybyId', error);
+        throw error;
+    
+    }
+}
+
+export const addQspDocSummary = async (DocSummary) => {
+    try {
+        return (await axios.post(`${API_URL}add-qsp-docsummary`, DocSummary, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addQspDocSummary', error);
+        throw error;
+    }
+}
+
+

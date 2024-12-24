@@ -1,10 +1,11 @@
 import React, { useEffect, useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
-import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDetails, getLogoImage, getQmAbbreviationsById, getAbbreviationsByIdNotReq, getQmRevistionRecordById, getDrdoLogo, getMocListById } from '../../../services/qms.service';
 import htmlToPdfmake from 'html-to-pdfmake';
+import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage, getQspAllChapters, getQspDocSummarybyId, getQspRevistionRecordById, qspDocumentList } from 'services/qms.service';
+import { format } from 'date-fns';
 
-const QmDocPrint = ({ action, revisionElements, buttonType }) => {
+
+const QspDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
   const [triggerEffect, setTriggerEffect] = useState(false);
   const [today, setToday] = useState(new Date());
@@ -15,28 +16,33 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   const [AllChaptersList, setAllChaptersList] = useState([]);
   const [DocumentSummaryDto, setDocumentSummaryDto] = useState(null);
   const [docAbbreviationsResponse, setDocAbbreviationsResponse] = useState([]);
-  const [docMoc, setDocMoc] = useState([]);
   const [ApprovedVersionReleaseList, setApprovedVersionReleaseList] = useState([]);
   const [isReady, setIsReady] = useState(false);
 
 
 
+
   useEffect(() => {
+
+    const qmsDocTypeDto = {
+      docType: revisionElements.docName,
+    //   groupDivisionId:revisionElements.groupDivisionId
+    }
 
     const fetchData = async () => {
       try {
-        const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
-
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getMocListById(revisionElements.revisionRecordId), getQmAllChapters(), getDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, docMoc, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+        const revision = await getQspRevistionRecordById(revisionElements.revisionRecordId);
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQspAllChapters(qmsDocTypeDto), getQspDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),qspDocumentList()]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, qspRevisionRecordDetails]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
           setDocAbbreviationsResponse(docAbbreviationsResponse);
-          setDocMoc(docMoc);
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);
           setIsReady(true);
+          const filteredDetails = qspRevisionRecordDetails.filter(a => a.docName === qmsDocTypeDto.docType);
+          setApprovedVersionReleaseList(filteredDetails);
         });
       } catch (error) {
         console.error('Error in useEffect : ' , error);
@@ -51,8 +57,6 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     //   handlePdfGeneration();
     // }
   }, [triggerEffect]);
-
-
 
   const changeTriggerEffect = () => {
     setTriggerEffect(true);
@@ -83,6 +87,7 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
     const textElements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, td, th, table, v, figure, hr, ul, li');
     textElements.forEach(element => {
       if (element.style) {
+       
         element.style.fontFamily = '';
         element.style.margin = '';
         element.style.marginTop = '';
@@ -99,8 +104,8 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
         element.style.paddingLeft = '';
         element.style.fontSize = '';
         element.style.cssText='';
-        element.id = '';
-
+        element.id='';
+       
         const elementColor = element.style.color;
         if (elementColor && elementColor.startsWith("var")) {
             element.style.color = 'black';
@@ -115,11 +120,12 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
         if (elementFontWeight && elementFontWeight.startsWith("var")) {
             element.style.fontWeight = '';  
         }
-
       }
+
+      
     });
   
- const tables = container.querySelectorAll('table');
+    const tables = container.querySelectorAll('table');
     tables.forEach(table => {
       if (table.style) {
         table.style="";
@@ -192,6 +198,42 @@ function generateRotatedTextImage(text) {
   const handlePdfGeneration = () => {
     // setRefresh(true);
     const todayMonth = today.toLocaleString('en-US', { month: 'short' }).substring(0, 3);
+
+    let dateTimeString1 = revisionElements.dateOfRevision.toString();
+
+    const date = new Date(dateTimeString1);
+
+    const monthName = date.toLocaleString('default', { month: 'long' }); // "May"
+    const year = date.getFullYear();
+    const shortMonthName = date.toLocaleString('default', { month: 'short' });
+
+
+    let datePart1 = monthName + ' ' + ' ' + year;
+    let shortMonthYear = shortMonthName + ' ' + ' ' + year;
+
+    var documentName = revisionElements.docName ? revisionElements.docName.toString().toUpperCase() : '';
+    var documentNumber = ''
+    var documentTitle = ''
+
+    if(documentName === 'QSP1') {
+      documentTitle = 'Control of Documents and Records'
+    }else if(documentName === 'QSP2') {
+      documentTitle = 'Internal Quality Audit'
+    }else if(documentName === 'QSP3') {
+        documentTitle = 'Management Review'
+    }else if(documentName === 'QSP4') {
+        documentTitle = 'Non conformity & Corrective Action'
+    }else if(documentName === 'QSP5') {
+        documentTitle = 'Quality Objectives and Continual Improvement'
+    }else if(documentName === 'QSP6') {
+        documentTitle = 'Analysis of Data & Preventive Action'
+    }else if(documentName === 'QSP7') {
+        documentTitle = 'Customer Feedback Analysis'
+    }else if(documentName === 'QSP8') {
+        documentTitle = 'Risk management'
+    }
+
+
     var allValues = [];
 
 
@@ -204,7 +246,7 @@ function generateRotatedTextImage(text) {
       // copyArray.unshift((i + 1) + '.');
       copyArray = { ...copyArray, chapterNumber: (i + 1) + '.' };
       // copyArray.chapterContent = setImagesWidth(copyArray.chapterContent, 450);
-      allValues.push({ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'mainChaper', tocItem: true, pageBreak: 'before', pageOrientation: 'portrait' }, { stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(copyArray.chapterContent, 600)) : ''], style: 'chaperContent' });
+      allValues.push({ text: [copyArray.chapterNumber, ' ', copyArray.chapterName], style: 'mainChaper', tocItem: true, pageOrientation: 'portrait' }, { stack: [(copyArray.chapterContent !== null && copyArray.chapterContent !== 'null') ? htmlToPdfmake(setImagesWidth(copyArray.chapterContent, 600)) : ''], style: 'chaperContent' });
 
       let firstLvlList = AllChaptersList.filter(chapter => {
         return chapter.chapterParentId === mainList[i].chapterId
@@ -307,25 +349,23 @@ function generateRotatedTextImage(text) {
     DocVersionRelease.push(header2);
     for (let i = 0; i < ApprovedVersionReleaseList.length; i++) {
 
-      let datePart = '--'
+      // let datePart = '--'
+      // if (ApprovedVersionReleaseList[i][13] !== null && ApprovedVersionReleaseList[i][13] !== '' && ApprovedVersionReleaseList[i][13] !== undefined) {
+      //   let dateTimeString = ApprovedVersionReleaseList[i][13].toString();
+      //   let parts = dateTimeString.split(' ');
 
-      if (ApprovedVersionReleaseList[i][13] !== null && ApprovedVersionReleaseList[i][13] !== '' && ApprovedVersionReleaseList[i][13] !== undefined) {
-        let dateTimeString = ApprovedVersionReleaseList[i][13].toString();
-        let parts = dateTimeString.split(' ');
-
-        datePart = parts[0] + ' ' + parts[1] + ' ' + parts[2];
-      }
-
+      //   datePart = parts[0] + ' ' + parts[1] + ' ' + parts[2];
+      // }
 
 
       var value = [
 
         { text: i, style: 'tdData', alignment: 'center' },
-        { text: ApprovedVersionReleaseList[i][3], style: 'tdData' },
-        { text: i > 0 ? 'V' + ApprovedVersionReleaseList[i - 1][5] + '-R' + ApprovedVersionReleaseList[i - 1][6] : '--', style: 'tdData', alignment: 'center', },
-        { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
-        { text: datePart, alignment: 'center', style: 'tdData' },
-        { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
+        { text: ApprovedVersionReleaseList[i].description, style: 'tdData' },
+        { text: i > 0 ? 'V' + ApprovedVersionReleaseList[i - 1].issueNo + '-R' + ApprovedVersionReleaseList[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
+        { text: 'V' + ApprovedVersionReleaseList[i].issueNo + '-R' + ApprovedVersionReleaseList[i].revisionNo, style: 'tdData', alignment: 'center', },
+        { text: format(new Date(ApprovedVersionReleaseList[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
+        { text: 'V' + ApprovedVersionReleaseList[i].issueNo + '-R' + ApprovedVersionReleaseList[i].revisionNo, style: 'tdData', alignment: 'center', },
       ];
 
       DocVersionRelease.push(value);
@@ -334,27 +374,21 @@ function generateRotatedTextImage(text) {
     // ----------revision table start----------------
 
     // ----------Document summary table start----------------
-    let dateTimeString1 = revisionElements.dateOfRevision.toString();
 
+    const latestRow = [...ApprovedVersionReleaseList].sort(
+      (a, b) => b.revisionRecordId - a.revisionRecordId
+    )[0];
 
-    // let parts1 = dateTimeString1.split(' ');
-
-    // let datePart1 = parts1[0] + ' ' + ' ' + parts1[2];
-    const date = new Date(dateTimeString1);
-
-    const monthName = date.toLocaleString('default', { month: 'long' }); // "May"
-    const year = date.getFullYear();
-
-    let datePart1 = monthName + ' ' + ' ' + year;
+    documentNumber = labDetails.labCode + '/QMS/QSP/' + 'I' + latestRow.issueNo + '-R' + latestRow.revisionNo;
 
     var docSummary = [];
 
-    docSummary.push([{stack :[{text: [{text  : ' 1. Title : ' , style  : ' tableLabel'}, {text  : ' ISO 9001 :2001, Quality Manual of '+labDetails.labCode}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text  : ' 2. Type of report : ' , style  : ' tableLabel'}, {text  : ' QMS'}]}]}, {stack :[{text: [{text  : ' 3. Classification : ' , style  : ' tableLabel'}, {text  : ' RESTRICTED'}]}]}])
-    docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
-    docSummary.push([{stack :[{text: [{text  : ' 6. Month and Year : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: [{text  : ' 7. Number of Pages: ', style  : ' tableLabel'}, {text  : ' 70'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 1. Title : ' , style  : ' tableLabel'}, {text  : documentTitle + ' ' + labDetails.labCode}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 2. Type of report : ' , style  : ' tableLabel'}, {text  : ' Process Document'}]}]}, {stack :[{text: [{text  : ' 3. Classification : ' , style  : ' tableLabel'}, {text  : ' RESTRICTED'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : documentNumber}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
+    docSummary.push([{stack :[{text: [{text  : ' 6. Month and Year : ' , style  : ' tableLabel'}, {text : datePart1}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 8. Additional Information : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.additionalInfo !== null && DocumentSummaryDto.additionalInfo !== undefined ? DocumentSummaryDto.additionalInfo: ''}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text  : ' 9. Project  Number & Project Name: ', style  : ' tableLabel'}, {text : 'Quality Management System of '+labDetails.labCode}]}], colSpan :2}, {}])
+    docSummary.push([{stack :[{text: [{text  : ' 9. Project  Number & Project Name: ', style  : ' tableLabel'}, {text : 'ISO Monitoring System of '+labDetails.labCode}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 10. Abstract : ' , style  : ' tableLabel'}, {text :  DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.abstract !== null && DocumentSummaryDto.abstract !== undefined ? DocumentSummaryDto.abstract: ''}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 11. Keywords : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.keywords !== null && DocumentSummaryDto.keywords !== undefined ? DocumentSummaryDto.keywords: ''}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 12. Organization and address : ' , style  : ' tableLabel'}, {text : labDetails.labName + ' (' + labDetails.labCode + '), '+'Government of India, Ministry of Defence ' + 'Defence Research Development Organization '+labDetails[4] + ', ' + labDetails[5] + ' PIN-' + labDetails[6]}]}], colSpan :2}, {}])
@@ -377,16 +411,10 @@ function generateRotatedTextImage(text) {
     // ----------Document Abbreviation table end----------------
 
 
-    let docMappingOfClasses = [];
-    docMappingOfClasses.push([{ text: 'QM Section No. ', style: 'tableLabel', alignment: 'center' }, { text: 'ISO 9001:2015 Clause. No.', style: 'tableLabel', alignment: 'center' }, { text: 'Description', style: 'tableLabel', alignment: 'center' }])
-    for (let i = 0; i < docMoc.length; i++) {
-      docMappingOfClasses.push([{ text: docMoc[i][0] }, { text: docMoc[i][1] }, { text: docMoc[i][2] }])
-    }
-
 
     let docDefinition = {
       info: {
-        title: "Quality Manual Print",
+        title: documentName+" Print",
       },
       pageSize: 'A4',
       pageOrientation: 'portrait',
@@ -431,7 +459,7 @@ function generateRotatedTextImage(text) {
             stack: [{
               columns: [
 
-                { text: labDetails.labCode+'/QMS/QM/'+'I' + revisionElements.issueNo + '-R' + revisionElements.revisionNo, fontSize : 9 },
+                { text: documentNumber, fontSize : 9 },
                 { text: 'RESTRICTED', style: 'footerNote', },
                 {
                   text: "Page " + currentPage.toString() + ' of ' + pageCount, margin: [45, 0, 0, 0], fontSize : 9
@@ -507,7 +535,7 @@ function generateRotatedTextImage(text) {
           ]
         },
         {
-          text: 'Quality Manual (QM)', style: 'DocumentName', alignment: 'center',
+          text: documentTitle, style: 'DocumentName', alignment: 'center',
         },
         // {
         //   text: '(Quality Assurance, Qualification & Acceptance Test Conditions/Plan, Reliability and Test Report Formats)', style: 'DocumentSubName', alignment: 'center',
@@ -563,16 +591,7 @@ function generateRotatedTextImage(text) {
         //   },
         //   pageBreak: 'after'
         // },
-        {
-          text: 'MAPPING OF CLAUSES', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
-        },
-        {
-          table: {
-            widths: [100,100,290],
-            body: docMappingOfClasses
-          },
-          pageBreak: 'after'
-        },
+
         {
           text: 'LIST OF ABBREVIATIONS', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10]
         },
@@ -588,7 +607,7 @@ function generateRotatedTextImage(text) {
             title: { text: 'TABLE OF CONTENTS', style: 'header', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10] },
             numberStyle: { bold: true },
           },
-          // pageBreak: 'after'
+          pageBreak: 'after'
 
         },
         allValues,
@@ -734,4 +753,4 @@ function generateRotatedTextImage(text) {
   
 }
 
-export default QmDocPrint;
+export default QspDocPrint;
