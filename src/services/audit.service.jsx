@@ -555,9 +555,7 @@ export const getIqaAuditeeList = async (iqaId) => {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
-        console.log('valuesToSend-------- ',valuesToSend)
         return (await axios.post(`${API_URL}add-audit-check-list`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
-        return null;
     } catch (error) {
         console.error('Error occurred in addAuditCheckList:', error);
         throw error;

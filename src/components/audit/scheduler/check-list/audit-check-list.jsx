@@ -70,16 +70,13 @@ const AuditCheckListComponent = ({router}) => {
        const obsList   = await getObservation();
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
-       //checking Auditee Remarks Add
-      //  if(((chapters.filter(item => item.isForCheckList === 'Y').length-1) === chList.length) || ((chapters.filter(item => item.isForCheckList === 'Y').length) === chList.length)){
-      //   setIsAuditeeAdd(true)
-      //  }
+       
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
       }
        setimgView(imgSource);
        setCheckList(chList)
-       setButtoncolors(chList,Number(role) === 7)
+       setButtoncolors(chList,Number(role) === 7,['1','2','3','4'].includes(String(role)))
        let filChapters = [];
        
        if(chList.length === 0 || eleData.scheduleStatus !== 'ARS'){
@@ -125,10 +122,10 @@ const AuditCheckListComponent = ({router}) => {
     fetchData();
   }, []);
 
-  const setButtoncolors = (list,isAditor)=>{
+  const setButtoncolors = (list,isAditor,isAdmin)=>{
     let newSuccessBtns = [];
     let newUnsuccessBtns = [];
-    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && (!isAditor || data.auditorRemarks !== '')).map(item => item.sectionNo))];
+    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && ((!isAditor && !isAdmin) || data.auditorRemarks !== '')).map(item => item.sectionNo))];
     secs.forEach(item =>{
       if(setColor(list,item)){
         newUnsuccessBtns.push(String(item))
@@ -157,7 +154,7 @@ const AuditCheckListComponent = ({router}) => {
 
   const afterSubmit = async ()=>{
     const chList   = await getAuditCheckList(element.scheduleId);
-    setButtoncolors(chList,isAditor)
+    setButtoncolors(chList,isAditor,isAdmin)
     setCheckList(chList);
     if(isAddMode){
       const nextSection = getNextValue(sectionOpenRef.current);
@@ -424,7 +421,7 @@ const AuditCheckListComponent = ({router}) => {
     setIsValidationActive(true)
     auditorRemarksValid = false
     const mergedMap = new Map();
-    if(isAditor){
+    if(isAditor || isAdmin){
       observations.forEach((value,key)=>{
         if(value !== 0 && value !== 5 && value !== 1){
           if(auditorRemarks.get(key)?.trim() === 'NA' || auditorRemarks.get(key)?.trim() === ''){
@@ -468,7 +465,7 @@ const AuditCheckListComponent = ({router}) => {
       });
     }
 
-    if(auditeeRemarksValidation.length !== selectionCount && !isAditor){
+    if(auditeeRemarksValidation.length !== selectionCount && !isAditor && !isAdmin){
       Swal.fire({
         icon: "error",
         title: 'Please Add Auditee Remarks',
@@ -646,7 +643,7 @@ const AuditCheckListComponent = ({router}) => {
                   {filMainClause.length > 0 &&filMainClause.map(item =>{
                     const fx = 90/filMainClause.length -1;
                     return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+item.description}</span>}>
-                      <button className={(isAditor || element.scheduleStatus === 'ARS' ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
+                      <button className={(isAditor || element.scheduleStatus === 'ARS' || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
                       (auditeeSuccessBtns.includes(item.sectionNo)?'btn btn-sm bg-auditee-success':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')} 
                       onClick={()=>openTable(Number(item.sectionNo))}>{item.sectionNo}</button></Tooltip></Box>)
                   })}

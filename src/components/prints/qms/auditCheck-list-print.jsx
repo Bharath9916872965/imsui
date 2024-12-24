@@ -3,12 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 
 const AuditCheckListPdf = async (iqaNo) => {
-  
-
-  
-
-
-  
+   
   try {
     // Fetch logo details
     const [labDetails, logoimage, drdoLogo] = await Promise.all([
@@ -700,7 +695,7 @@ const AuditCheckListPdf = async (iqaNo) => {
           decoration: 'underline',  // Underline the heading
           bold: true,               // Make the heading bold
           fontSize: 15,             // Set the font size
-          margin: [0, 30, 0, 1],    // Margin below the heading
+          margin: [0, 20, 0, 1],    // Margin below the heading
         },
         firstTable,
         secondTable,
@@ -837,7 +832,7 @@ const AuditCheckListPdf = async (iqaNo) => {
             ],
           },
          // margin: [60, 20, 60, 90], // Adjusted header margin
-          margin: [60, 50, 30, 10], //[R,t,R,,B ]
+          margin: [60, 20, 30, 10], //[R,t,R,,B ]
         };
       },
       
@@ -873,7 +868,7 @@ const AuditCheckListPdf = async (iqaNo) => {
                 ],
               ],
             },
-            margin: [60, 60, 0, 10], // FOR FOOTER PADDING
+            margin: [60, 40, 0, 10], // FOR FOOTER PADDING
           },
           {
            
