@@ -3,7 +3,7 @@ import Navbar from "../Navbar/Navbar";
 import Swal from 'sweetalert2';
 import { getAuditeeDtoList, getIqaAuditeeList, getIqaDtoList, insertIqaAuditee } from "services/audit.service";
 import SelectPicker from "components/selectpicker/selectPicker";
-import AlertConfirmation from "common/AlertConfirmation.component";
+import AlertConfirmation from "common/AlertConfirmation.component"
 
 
 
