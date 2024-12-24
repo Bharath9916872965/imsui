@@ -16,6 +16,7 @@
     "bootstrap": "^5.3.3",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
+    "font-awesome": "^4.7.0",
     "formik": "^2.4.6",
     "html-to-pdfmake": "^2.5.14",
     "jquery": "^3.7.1",

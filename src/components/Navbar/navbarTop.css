@@ -105,16 +105,27 @@
   color: red !important;
 }
 .initiated{
-  color: #a17627;
+  color: #a17627; 
 }
 
 .forwarde{
   color: #007bff;
 }
+.reforwarded{
+  color: #007bff;
+}
+.reviewed{
+  color:#919bff;
+}
+.approved{
+  color: #30c67c;
+}
 .returned{
   color: #D61C4E;
 }
-
+.revoked{
+  color: #f8a902;
+}
 .reschedule{
   color: #F96302;
 }
