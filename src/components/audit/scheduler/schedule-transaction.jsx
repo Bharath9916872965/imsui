@@ -43,6 +43,8 @@ const ScheduleTransactionComponent = () => {
     'AAL': ' Schedule Acknowledged By',
     'AES': ' Schedule CheckList Submitted By',
     'ARS': ' Schedule CheckList Submitted By',
+    'ABA': ' Schedule CheckList Accepted By',
+    'RBA': ' Schedule CheckList Rejected By',
   };
 
   const back = ()=>{
@@ -70,7 +72,7 @@ const ScheduleTransactionComponent = () => {
           <div id="card-body customized-card">
           <Box className="col-md-11  text-left-center-card mg-top-10"  >
             {transaction && transaction.length >0 && transaction.map(item =>{
-                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':['AES'].includes(item.auditStatus)?'aditee-sub':['ARS'].includes(item.auditStatus)?'aditor-sub':'acknowledge-bg')}`;
+                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL','RBA'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':['AES'].includes(item.auditStatus)?'aditee-sub':['ARS'].includes(item.auditStatus)?'aditor-sub':'acknowledge-bg')}`;
               return(
                 <>
                   <div className="timeline-row">

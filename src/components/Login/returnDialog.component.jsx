@@ -2,7 +2,7 @@ import React, { useState } from 'react';
 import { Box,TextField,Button } from '@mui/material';
 import './Login.css';
 
-const ReturnDialog = ({ open, onClose, onConfirm }) => {
+const ReturnDialog = ({ open, onClose, onConfirm,heading }) => {
   const [inputValue, setInputValue] = useState('');
   const handleClose = () => {
     if (onClose) onClose();
@@ -22,7 +22,7 @@ const ReturnDialog = ({ open, onClose, onConfirm }) => {
         <div className="modal-dialog modal-lg modal-lg-custom">
           <div className="modal-content" >
             <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-              <h5 className="modal-title">Please, Add Your Send Back Message Here.</h5>
+              <h5 className="modal-title">{heading}</h5>
               <button type="button" className="btn btn-danger" onClick={handleClose} aria-label="Close">
                 <span aria-hidden="true">&times;</span>
               </button>
