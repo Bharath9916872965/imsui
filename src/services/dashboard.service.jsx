@@ -74,3 +74,43 @@ export const getActiveSchedules = async () => {
     }
     
 }
+
+
+export const getTotalChecklistObsCountByIqa = async () => {
+    try {
+        return (await axios.post(`${API_URL}get-total-obs-count-by-iqa`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getTotalChecklistObsCountByIqa', error);
+        throw error;
+    }
+}
+
+
+export const getCheckListByObservation = async () => {
+    try {
+        return (await axios.post(`${API_URL}get-checklist-by-observation`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getCheckListByObservation', error);
+        throw error;
+    }
+}
+
+
+
+export const getAllVersionRecordDtoList = async (qmsDocTypeDto) => {
+    try {
+        return (await axios.post(`${API_URL}get-all-version-record-list`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getAllVersionRecordDtoList() ', error);
+        throw error;
+    }
+}
+
+
+
+
+
