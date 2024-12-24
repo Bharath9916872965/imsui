@@ -10,7 +10,7 @@ import SelectPicker from '../selectpicker/selectPicker';
 import MultipleSelectPicker from "../selectpicker/multipleSelectPicker";
 import AlertConfirmation from "../../common/AlertConfirmation.component";
 import { CustomMenuItem } from "../../services/auth.header";
-
+import internalAuditorTeamsPrint from "components/prints/qms/internalAduitor-teams-print";
 const AuditTeamListComponent = () => {
 
   const [showModal, setShowModal] = useState(false);
@@ -59,9 +59,6 @@ const AuditTeamListComponent = () => {
     });
     return acc;
   }, {});
-
-
-
   const auditTeamList = async () => {
     try {
       const [AuditTeamDtoList, IqaList] = await Promise.all([getAuditeeTeamDtoList(), getIqaDtoList()]);
@@ -156,6 +153,7 @@ const AuditTeamListComponent = () => {
     if (confirm) {
       try {
         const response = await insertAuditTeam(values);
+   
         if (response === 200) {
           await latestData();
           setShowModal(false);
@@ -247,9 +245,14 @@ const AuditTeamListComponent = () => {
       <div className="card">
         <div className="card-body text-center">
           <div className="row">
-            <div className="col-md-9">
+            <div className="col-md-7">
               <h3>{iqaNo} : Auditor Team List</h3>
             </div>
+
+            <div className="col-md-2">
+              
+            <button className=" btn-primary"  onClick={() =>internalAuditorTeamsPrint(filAuditTeamDtoList,teamMembersGrouped,iqaNo)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+        </div>
             <div className="col-md-2">
               <SelectPicker options={iqaOptions} label="IQA No"
                 value={iqaOptions && iqaOptions.length > 0 && iqaOptions.find(option => option.value === iqaId) || null}
@@ -262,6 +265,7 @@ const AuditTeamListComponent = () => {
             </div>
           </div><br />
           <div className="team-list">
+
             {filAuditTeamDtoList.map((team, index) => (
               <div key={index} className="team-card">
                 <h3>{team.teamCode}</h3>
