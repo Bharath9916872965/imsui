@@ -178,6 +178,10 @@
 .mg-l-10{
   margin-left: 10px;
 }
+
+.mg-l-5{
+  margin-left: 5px;
+}
 .dropdown-item:hover {
   background-color: #FF3800 !important;
   transition: background-color 0.3s ease !important;
