@@ -61,29 +61,55 @@
   width: 5%;
 }
 
-.width60{
-  width: 60%;
+.width7{
+  width: 7%;
 }
 
-.width45{
-  width: 45%;
+.width10{
+  width: 10%;
 }
-
 .width15{
   width: 15%;
-}
-
-.width25{
-  width: 25%;
 }
 
 .width20{
   width: 20%;
 }
 
+.width22{
+  width: 22%;
+}
+
+.width25{
+  width: 25%;
+}
 
 .width35{
   width: 35%;
+}
+
+.width45{
+  width: 45%;
+}
+
+.width47{
+  width: 47%;
+}
+
+.width50{
+  width: 50%;
+}
+
+.width60{
+  width: 60%;
+}
+
+.width70{
+  width: 70%;
+}
+
+.width80{
+  width: 80%;
 }
 
 .fw-bolder{
@@ -105,7 +131,7 @@
   color: red !important;
 }
 .initiated{
-  color: #a17627;
+  color: #a17627 !important;
 }
 
 .forwarde{
@@ -116,10 +142,15 @@
 }
 
 .reschedule{
-  color: #F96302;
+  color: #F96302 !important;
 }
+
+.rating-4{
+  color : rgb(15 189 15) !important;
+}
+
 .acknowledge{
-  color: green;
+  color: green !important;
 }
 
 .lead-auditee{
@@ -142,6 +173,10 @@
 
 .mg-l-40{
   margin-left: -43px;
+}
+
+.mg-l-10{
+  margin-left: 10px;
 }
 .dropdown-item:hover {
   background-color: #FF3800 !important;
@@ -247,6 +282,12 @@
   position: relative;
   left: 10px;
   bottom: 10px;
+}
+
+.noteColor{
+  color: #0444c3 !important;
+  text-align: left;
+  font-weight: bold;
 }
 
 
