@@ -23,7 +23,6 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
 
   useEffect(() => {
 
-    console.log('pdf----revisionElements----', revisionElements)
     const qmsDocTypeDto = {
       docType: revisionElements.docType,
       groupDivisionId:revisionElements.groupDivisionId
@@ -88,6 +87,7 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
     const textElements = container.querySelectorAll('p, h1, h2, h3, h4, h5, h6, span, div, td, th, table, v, figure, hr, ul, li');
     textElements.forEach(element => {
       if (element.style) {
+       
         element.style.fontFamily = '';
         element.style.margin = '';
         element.style.marginTop = '';
@@ -103,22 +103,41 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
         element.style.paddingBottom = '';
         element.style.paddingLeft = '';
         element.style.fontSize = '';
-        element.id = '';
+        element.style.cssText='';
+        element.id='';
+       
+        const elementColor = element.style.color;
+        if (elementColor && elementColor.startsWith("var")) {
+            element.style.color = 'black';
+        }
+
+        const elementbackgroundColor = element.style.backgroundColor;
+        if (elementbackgroundColor && elementbackgroundColor.startsWith("var")) {
+            element.style.backgroundColor = 'white';
+        }
+
+        const elementFontWeight = element.style.fontWeight; 
+        if (elementFontWeight && elementFontWeight.startsWith("var")) {
+            element.style.fontWeight = '';  
+        }
       }
+
+      
     });
   
     const tables = container.querySelectorAll('table');
     tables.forEach(table => {
       if (table.style) {
+        table.style="";
         table.style.borderCollapse = 'collapse';
         table.style.width = '100%';
       }
   
-      const cells = table.querySelectorAll('th, td');
+      const cells = table.querySelectorAll('tr ,th, td');
       cells.forEach(cell => {
         if (cell.style) {
+          cell.style="";
           cell.style.border = '1px solid black';
-  
           if (cell.tagName.toLowerCase() === 'th') {
             cell.style.textAlign = 'center';
           }
