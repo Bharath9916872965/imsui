@@ -206,11 +206,11 @@ const AuditTeamListComponent = () => {
     const leadDetails = editTeamMembers.filter(data => data.isLead === 1);
     const memberDetails = editTeamMembers.filter(data => data.isLead === 0);
     const filteredAuditorList = fullAuditorList.filter(
-      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.auditorId !== leadDetails[0].auditorId && auditor.iqaId === iqaId )
+      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.auditorId !== leadDetails[0].auditorId && auditor.iqaId === iqaId)
     );
 
     const filteredTeamMemberList = fullAuditorList.filter(
-      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.iqaId === iqaId && !memberDetails.some(member => member.auditorId === aud.auditorId ))
+      (aud) => !teamMemberDtoList.some((auditor) => auditor.auditorId === aud.auditorId && auditor.iqaId === iqaId && !memberDetails.some(member => member.auditorId === aud.auditorId))
     );
 
     setTeamLeadFilOptions(
@@ -240,7 +240,7 @@ const AuditTeamListComponent = () => {
     setActionFrom('Edit');
   }
 
-  
+
   return (
     <div>
       <Navbar />
@@ -256,9 +256,9 @@ const AuditTeamListComponent = () => {
                 handleChange={(newValue) => { onIqaChange(newValue?.value) }} />
             </div>
             <div className="col-md-1">
-            <button className="btn add btn-name" onClick={() => addTeam('Add')}>
-              Add
-            </button>
+              <button className="btn add btn-name" onClick={() => addTeam('Add')}>
+                Add
+              </button>
             </div>
           </div><br />
           <div className="team-list">
@@ -300,7 +300,7 @@ const AuditTeamListComponent = () => {
                     </div>
                     <div className="modal-body">
                       <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema} onSubmit={handleSubmit}>
-                      {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
+                        {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
                           <Form>
                             {/* Row 1 */}
                             <div className="row">
@@ -395,7 +395,7 @@ const AuditTeamListComponent = () => {
                             </div>
                             {/* Submit Button */}
                             <div className="col text-center subclass">
-                            {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
+                              {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                             </div>
                           </Form>
                         )}
