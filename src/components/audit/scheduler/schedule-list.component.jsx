@@ -19,8 +19,8 @@ import SelectPicker from "components/selectpicker/selectPicker";
 import { CustomMenuItem } from "../../../services/auth.header";
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 import withRouter from "../../../common/with-router";
-import auditCheckListPdf from "components/prints/qms/auditCheck-list-print"
-
+import auditCheckListPdf from "components/prints/qms/auditCheck-list-print";
+import AuditSchedulePrint from "components/prints/qms/auditSchedule-print";
 
 
 const ScheduleListComponent = ({router}) => {
@@ -107,6 +107,11 @@ const ScheduleListComponent = ({router}) => {
       const teamMemDetails = await getTotalTeamMembersList();
       const remarksSch     = await getScheduleRemarks();
     
+      console.log('remarksSch',remarksSch);
+    console.log('teamMemDetails',teamMemDetails);
+    console.log('auditList',auditList);
+    console.log('team',team);
+    console.log('scdList',scdList);
       
       setSchRemarks(remarksSch);
       setTeamMemberDetails(teamMemDetails)
@@ -178,8 +183,10 @@ const ScheduleListComponent = ({router}) => {
 
       }      
     });
+
     setFilScheduleList(mappedData);
    }
+  
 
    const openTran = (item)=>{
     localStorage.setItem('scheduleData', JSON.stringify(item));
@@ -495,8 +502,9 @@ const ScheduleListComponent = ({router}) => {
             <span className="text-heading">&nbsp;  Auditee Assigned : </span><button className="button-count assigned-count">{assignedAuditeeCount}</button>
             <span className="text-heading">&nbsp;  Auditee Pending : </span><button className="button-count pending-count">{pendingAuditeeCount}</button>
             <span className="text-heading">&nbsp;  Check List Print : </span>
-        
-            <button className=" btn-primary"  onClick={() =>auditCheckListPdf(iqaNo)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+        <button className=" btn-primary"  onClick={() =>auditCheckListPdf(iqaNo)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+            <span className="text-heading">&nbsp; Print : </span>
+            <button className=" btn-primary"  onClick={() =>AuditSchedulePrint(filScheduleList,iqaNo)} title="Print" aria-label="Print AuditSchedule" > <i className="material-icons">print</i> </button>
           </Box>
           <Box flex="10%">
             <SelectPicker options={iqaOptions} label="IQA No"

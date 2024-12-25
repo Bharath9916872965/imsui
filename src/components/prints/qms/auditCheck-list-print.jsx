@@ -3,12 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 
 const AuditCheckListPdf = async (iqaNo) => {
-  
-
-  
-
-
-  
+   
   try {
     // Fetch logo details
     const [labDetails, logoimage, drdoLogo] = await Promise.all([
