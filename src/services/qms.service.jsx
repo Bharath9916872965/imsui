@@ -514,4 +514,51 @@ export const getMRList = async() =>{
 }
 
 
+export const amendDwpGwp = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}add-new-dwp-gwp-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in amendDwpGwp', error);
+        throw error;
+    }
+}
 
+
+export const dwprevisionTran = async (revisionRecordId)=>{
+    try {
+        return (await axios.post(`${API_URL}dwp-revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in dwprevisionTran:', error);
+        throw error;
+    }
+}
+
+
+export const getDivisionEmployee = async() =>{
+    try {
+        return (await axios.post(`${API_URL}get-division-employee-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getDivisionEmployee', error);
+        throw error;
+    }
+}
+
+export const UpdateQMDescription = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}update-qm-description`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in UpdateDescription', error);
+        throw error;
+    }
+}
+
+export const UpdateDwpGwpDescription = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}update-dwp-gwp-description`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in UpdateDwpGwpDescription', error);
+        throw error;
+    }
+}
