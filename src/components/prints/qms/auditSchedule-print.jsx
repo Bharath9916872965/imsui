@@ -1,9 +1,19 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import React from 'react';
-
-const AuditSchedulePrint = async (data,iqaNo) => {
+import dayjs from 'dayjs';
+import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
+const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
 
   try {
+
+    const labDetails = await getLabDetails();
+    const logoImg = await getLogoImage();
+    const drdoLogo = await getDrdoLogo();
+
+
+
+    const formattedFromDate = dayjs(iqaFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
+    const formattedToDate = dayjs(iqaToDate).format('DD-MMM YYYY'); 
     const getFormattedDate = () => {
       const date = new Date();
       const weekday = date.toLocaleString('en-IN', { weekday: 'short' });
@@ -38,30 +48,35 @@ const AuditSchedulePrint = async (data,iqaNo) => {
     }
     
     data.forEach((item, index) => {
-      let formattedDate = '-';
-      if (item.date) {
-        const parsedDate = parseDate(item.date);
-        if (!isNaN(parsedDate)) {
-          formattedDate = new Intl.DateTimeFormat('en-GB', {
-            day: '2-digit',
-            month: 'short',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false,
-          }).format(parsedDate);
+      if (item && Object.keys(item).length > 0) { // Ensure item is not null or empty
+        let formattedDate = '-';
+        if (item.date) {
+          const parsedDate = parseDate(item.date);
+          if (!isNaN(parsedDate)) {
+            formattedDate = new Intl.DateTimeFormat('en-GB', {
+              day: '2-digit',
+              month: 'short',
+              year: 'numeric',
+              hour: '2-digit',
+              minute: '2-digit',
+              hour12: false,
+            }).format(parsedDate);
+          }
         }
+    
+        tableBody.push([
+          { text: index + 1, style: 'normal', alignment: 'center', margin: [2, 2, 2, 2] },
+          { text: formattedDate || '-', style: 'normal', alignment: 'center', margin: [2, 2, 2, 2] },
+          { text: item.divisionCode || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
+          { text: item.project || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
+          { text: item.auditee || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
+          { text: item.team || '-', style: 'normal', alignment: 'left', margin: [2, 2, 5, 2] },
+        ]);
       }
     
-      tableBody.push([
-        { text: index + 1, style: 'normal', alignment: 'center' },
-        { text: formattedDate, style: 'normal', alignment: 'center' },
-        { text: item.divisionCode || '-', style: 'normal', alignment: 'left' },
-        { text: item.project || '-', style: 'normal', alignment: 'left' },
-        { text: item.auditee || '-', style: 'normal', alignment: 'left' },
-        { text: item.team || '-', style: 'normal', alignment: 'center' },
-      ]);
+
     });
+    
     
     
 
@@ -84,32 +99,62 @@ const AuditSchedulePrint = async (data,iqaNo) => {
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [40, 80, 40, 60],
-      header: () => [
-        {
-          style: 'headertable',
-          table: {
-            widths: ['100%'],
-            body: [
-              [
+      pageMargins: [40, 120, 40, 80],
+ header: (currentPage) => {
+        return {
+          stack: [
+            {
+              columns: [
+                {
+                  image:
+                    logoImg
+                      ? `data:image/png;base64,${logoImg}`
+                      : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC',
+                  width: 30,
+                  height: 30,
+                  alignment: 'left',
+                  margin: [35, 15, 0, 10],
+                },
                 {
                   stack: [
-                    { 
-                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}AUDIT SCHEDULE`, 
-                      style: 'superheader', 
-                      fontSize: 15, 
-                      alignment: 'center' 
+                    {
+                      text: `Electronics and Radar Development Establishment, CV Raman Nagar, Bangalore-560093`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 4],
+                    },
+                    {
+                      text: `Audit Summary`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}AUDIT SCHEDULE (${formattedFromDate} - ${formattedToDate})`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
                     },
                   ],
-                  
+                  margin: [0, 20, 20, 10],
+                },
+                {
+                  image:
+                    drdoLogo
+                      ? `data:image/png;base64,${drdoLogo}`
+                      : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC',
+                  width: 30,
+                  height: 30,
+                  alignment: 'right',
+                  margin: [0, 15, 20, 10],
                 },
               ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [40, 20, 20, 10],
-        },
-      ],
+            },
+          ],
+        };
+      },
       content: MyContent,
       footer: (currentPage, pageCount) => {
         const currentDate = getFormattedDate();
@@ -125,7 +170,7 @@ const AuditSchedulePrint = async (data,iqaNo) => {
                 margin: [0, 0, 40, 0],
               },
             ],
-            margin: [40, 0, 40, 200],
+            margin: [40, 0, 40, 100],
           },
         ];
       },

@@ -70,7 +70,10 @@ const AuditCheckListComponent = ({router}) => {
        const obsList   = await getObservation();
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
-       
+       console.log('chapters',chapters);
+       console.log('obsList',obsList);
+       console.log('chList',chList);
+       console.log('imgSource',chList);
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
       }
