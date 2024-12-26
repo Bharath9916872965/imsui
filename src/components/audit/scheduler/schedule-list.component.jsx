@@ -106,12 +106,6 @@ const ScheduleListComponent = ({router}) => {
       const auditList      = await getIqaAuditeelist();
       const teamMemDetails = await getTotalTeamMembersList();
       const remarksSch     = await getScheduleRemarks();
-    
-      console.log('remarksSch',remarksSch);
-    console.log('teamMemDetails',teamMemDetails);
-    console.log('auditList',auditList);
-    console.log('team',team);
-    console.log('scdList',scdList);
       
       setSchRemarks(remarksSch);
       setTeamMemberDetails(teamMemDetails)

@@ -23,6 +23,10 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
     metrics   : Yup.string().required("Metrics is required").min(3,'Metrics must be at least 3 characters').max(990,'Metrics must not exceed 990 characters')
     .test("no-trailing-space", "Metrics cannot end with a space", (value) => !/\s$/.test(value))
     .test( "no-leading-space","Metricsr cannot start with a space",(value) => !/^\s/.test(value)),
+    norms     : Yup.string().required("Norms is required").min(3,'Norms must be at least 3 characters').max(990,'Norms must not exceed 490 characters')
+    .test("no-trailing-space", "Norms cannot end with a space", (value) => !/\s$/.test(value))
+    .test( "no-leading-space","Norms cannot start with a space",(value) => !/^\s/.test(value)),
+    metrics   : Yup.string().required("Metrics is required").min(3,'Metrics must be at least 3 characters').max(990,'Metrics must not exceed 990 characters'),
     target    : Yup.number().typeError("Target Must be a number").required("Target is required"),
     kpiUnitId : Yup.string().required("Unit is required"),
     ratings   : Yup.array().of(
@@ -31,7 +35,39 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
         endValue   : Yup.number().typeError("End Value Must be a number").required("End Value is required"),
         rating     : Yup.number().typeError("Rating Must be a number").required("Ratinge is required"),
       })
-    ),
+    ).test("unique-range", "Ranges in ratings must not overlap", (ratings,context) => {
+      if(!ratings) return true;
+      const ranges = ratings.map(({startValue,endValue}) => {
+        const min = Math.min(startValue,endValue);
+        const max = Math.max(startValue,endValue);
+        return [min,max]
+      });
+      //const errors = [];
+
+      for (let i = 0; i < ranges.length; i++) {
+        for (let j = i + 1; j < ranges.length; j++) {
+          if ( ranges[i][0] <= ranges[j][1] &&  ranges[i][1] >= ranges[j][0]) {
+            if(ranges[i][0] !== 0 && ranges[j][1] !== 0 && ranges[i][1] !== 0 && ranges[j][0] !== 0 ){
+              return false;
+            }
+              // errors.push({
+              //   index: i,
+              //   message: `Range ${ranges[i][0]}-${ranges[i][1]} overlaps with ${ranges[j][0]}-${ranges[j][1]}`,
+              // });
+            }
+        }
+      }
+      // if (errors.length > 0) {
+      //   errors.forEach(({ index, message }) => {
+      //     context.createError({
+      //       path: `ratings[${index}].startValue`,
+      //       message,
+      //     });
+      //   });
+      //   return false;
+      // }
+      return true;
+    }),
   });
 
   const handleSubmitClick = async (values) => {
@@ -119,10 +155,14 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
                       <Box flex="5%"></Box>
                     </Box>
                     <Box display="flex" alignItems="center"  gap="10px">
-                      <Box flex="29.5%"></Box>
+                      <Box flex="7%"></Box>
+                      <Box flex="22.5%">
+                        <Field name="norms" id="standard-basic" as={TextField} label="Norms" variant="outlined" fullWidth size="small" margin="normal" required
+                        InputProps={{readOnly: flag === 'M'?false:true,}} error={Boolean(touched.norms && errors.norms)} helperText={touched.norms && errors.norms}></Field>
+                      </Box>
                       <Box flex="21.5%"> 
-                      <Field name="target" id="standard-basic" as={TextField} label="Target/Norms" variant="outlined" fullWidth size="small" margin="normal" required
-                      InputProps={{readOnly: flag === 'M'?false:true,}} error={Boolean(touched.target && errors.target)} helperText={touched.target && errors.target}></Field>
+                        <Field name="target" id="standard-basic" as={TextField} label="Target" variant="outlined" fullWidth size="small" margin="normal" required
+                        InputProps={{readOnly: flag === 'M'?false:true,}} error={Boolean(touched.target && errors.target)} helperText={touched.target && errors.target}></Field>
                       </Box>
                       <Box flex="22%">
                       <Field name="kpiUnitId">

@@ -78,6 +78,16 @@ const ScheduleTransactionComponent = () => {
                   <div className="timeline-row">
                    <div class="timeline-content" >
 						        <h6 className={statusColor}> {scheduleSta[item.auditStatus]}&nbsp;/&nbsp;<span >{item.empName}</span></h6> 
+                      <p style={{ backgroundColor: "#f0f2f5", padding: "10px", borderRadius: "5px" }}>
+                        {item.remarks ? (
+                          <>
+                            <span className="remarks_title" style={{ fontWeight: "bold" }}>Remarks : </span>
+                            {item.remarks}
+                          </>
+                        ) : (
+                          <span className="remarks_title" style={{ fontWeight: "bold" }}>No Remarks</span>
+                        )}
+                      </p>
 						       </div>
                    <div class="timeline-dot fb-bg mid-line"></div>
                    <div class="timeline-time">

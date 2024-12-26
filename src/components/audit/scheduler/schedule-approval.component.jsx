@@ -110,7 +110,7 @@ const ScheduleApprovalComponent = ({router}) => {
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
                           {['AAA','AES','ARS','ABA','RBA'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
-                          {item.fwdFlag === 1 && !['ARS','ABA'].includes(item.scheduleStatus) && flag !== 'A' && ['1','2','3','7'].includes(String(role))  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {item.fwdFlag === 1 && !['ARS','ABA'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7'].includes(String(role)) || flag === 'L')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
                           {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
                           {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Auditee Reject"><i className="material-icons">assignment_return</i></button>}
                           {['ARS','ABA','RBA'].includes(item.scheduleStatus) &&<button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
@@ -128,7 +128,12 @@ const ScheduleApprovalComponent = ({router}) => {
    }
 
    const addCheckList = (item,flag)=>{
-    navigate('/audit-check-list',{state:{element:item,flag : flag}})
+    if(item.auditeeEmpId === Number(localStorage.getItem('empId'))){
+      navigate('/audit-check-list',{state:{element:item,flag : 'A'}})
+    }else{
+      navigate('/audit-check-list',{state:{element:item,flag : flag}})
+    }
+   
    }
 
    const openTran = (item)=>{
