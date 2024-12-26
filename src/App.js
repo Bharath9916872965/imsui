@@ -27,6 +27,8 @@ import RiskRegisterComponent from 'components/riskregister/risk-register.compone
 import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transaction';
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
+import AuditSummaryReport from 'components/report/auditSummary-component-report';
+import NcReportComponent from 'components/report/nc-component-report';
 
 function App() {
   return (
@@ -75,7 +77,12 @@ function App() {
          <Route path="/risk-register" element={<RiskRegisterComponent />} />
          <Route path="/mitigation-risk-register" element={<MitigationRiskRegisterComponent />} />
 
-         
+
+          {/* Report */}
+          <Route path="/audit-summary-report" element={<AuditSummaryReport />} />
+          <Route path="/nc-report" element={<NcReportComponent />} />
+
+
       </Routes>
 {/* <Login/> */}
     </div>
