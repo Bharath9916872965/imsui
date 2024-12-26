@@ -7,45 +7,51 @@ import * as Yup from 'yup';
 import { Autocomplete, ListItemText, TextField } from "@mui/material";
 import { CustomMenuItem } from "services/auth.header";
 import AlertConfirmation from "common/AlertConfirmation.component";
+import { insertMitigationRiskRegister, mitigationRiskRegisterList } from "services/risk.service";
 
 const MitigationRiskRegisterComponent = ({router }) =>{
 
     const { navigate, location } = router
     const { riskRegisterData } = location.state || {};
-     const [average, setAverage] = useState(0);
-      const [riskNo, setRiskNo] = useState(0);
+    const [average, setAverage] = useState(0);
+    const [riskNo, setRiskNo] = useState(0);
+    const [mitigationRiskRegisteredList,setMitigationRiskRegisteredList] = useState([]);
+    const [tblMitigationRiskData, setTblMitigationRiskData] = useState([]);
+    const [actionValue, setActionValue] = useState("S");
 
     const [initialValues, setInitialValues] = useState({
-        mitigationApproach: "",
-        technicalPerformance: "",
-        time: "",
-        cost: "",
-      });
+      probability: "",
+      mitigationApproach: "",
+      technicalPerformance: "",
+      time: "",
+      cost: "",
+    });
 
-
-    useEffect (() =>{
-
-    },[]);
+    useEffect(() => {
+      fetchData();
+    }, [riskRegisterData.riskRegisterId]);
 
     const columns = [
-        { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-        { name: 'Doc Type', selector: (row) => row.docType, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Probability', selector: (row) => row.probability, sortable: true, grow: 2, align: 'text-center' },
-        { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center', },
-        { name: 'Mitigation Approach', selector: (row) => row.mitigationApproach, sortable: true, grow: 2, align: 'text-start' },
-        { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center', },
+        { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center',width: '5%' },
+        { name: 'Mitigation Approach', selector: (row) => row.mitigationApproach, sortable: true, grow: 2, align: 'text-start',width: '25%' },
+        { name: 'Revision No', selector: (row) => row.revisionNo, sortable: true, grow: 2, align: 'text-center',width: '5%'},
+        { name: 'Doc Type', selector: (row) => row.docType, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'Probability', selector: (row) => row.probability, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center', width: '5%'},
+        { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+       
     ];
 
-     const validationSchema = Yup.object().shape({
-        mitigationApproach: Yup.string().required("Mitigation Approach required"),
-        technicalPerformance: Yup.string().required("Technical Performance required"),
-        time: Yup.string().required("Time required"),
-        cost: Yup.string().required("Cost required"),
-      });
+    const validationSchema = Yup.object().shape({
+      mitigationApproach: Yup.string().required("Mitigation Approach required"),
+      technicalPerformance: Yup.number().required("Technical Performance required").min(1, "Must be at least 1"),
+      time: Yup.number().required("Time required").min(1, "Must be at least 1"),
+      cost: Yup.number().required("Cost required").min(1, "Must be at least 1"),
+    });
+    
 
       const updateCalculations = (values) => {
         // Convert string values to numbers using `Number` or parseFloat
@@ -65,15 +71,85 @@ const MitigationRiskRegisterComponent = ({router }) =>{
         }
       };
 
-      const handleSubmit = async (values) => {
-        const successMessage = "Mitigated Risk Added Successfully ";
-        const unsuccessMessage = "Mitigated Risk Add Unsuccessful ";
-        const Title = "Are you sure to Add ?";
+      const fetchData = async () => {
+        try {
+          const mitigationRiskList = await mitigationRiskRegisterList(riskRegisterData.riskRegisterId);
+          setMitigationRiskRegisteredList(mitigationRiskList || []);
+          mappedData(mitigationRiskList || []);
+          
+          if (mitigationRiskList && mitigationRiskList.length > 0) {
+            const firstRow = mitigationRiskList[0];
+            const newInitialValues = {
+              mitigationApproach: firstRow.mitigationApproach || "",
+              technicalPerformance: firstRow.technicalPerformance || "",
+              time: firstRow.time || "",
+              cost: firstRow.cost || "",
+              probability: firstRow.probability || "",
+            };
+            setInitialValues(newInitialValues);
+      
+            // Trigger updateCalculations with the latest row values
+            updateCalculations(newInitialValues);
+          }
+        } catch (error) {
+          console.error("Error fetching mitigation risk data:", error);
+          setMitigationRiskRegisteredList([]);
+          setTblMitigationRiskData([]);
+        }
+      };
+      
+      
+      
+      const mappedData = (list) => {
+        setTblMitigationRiskData(
+          list.map((item, index) => ({
+            sn: index + 1,
+            mitigationApproach:item.mitigationApproach || "-",
+            revisionNo: item.revisionNo || "0",
+            docType: riskRegisterData.docType.toUpperCase() || "-",
+            probability: item.probability || "-",
+            technicalPerformance: item.technicalPerformance || "-",
+            time: item.time || "-",
+            cost: item.cost || "-",
+            average: item.average || "-",
+            riskNo: item.riskNo || "-"
+          }))
+        );
+      };
+      const handleSubmit = async (values, actionValue) => {
+        let Title = "";
+        let successMessage = "";
+        let unsuccessMessage = "";
+        switch (actionValue) {
+          case "S":
+            Title = "Are you sure to Add?";
+            successMessage = "Mitigated Risk Added Successfully!";
+            unsuccessMessage = "Failed to Add Mitigated Risk!";
+            break;
+          case "U":
+            Title = "Are you sure to Update?";
+            successMessage = "Mitigated Risk Updated Successfully!";
+            unsuccessMessage = "Failed to Update Mitigated Risk!";
+            break;
+          case "R":
+            Title = "Are you sure to Revise?";
+            successMessage = "Mitigated Risk Revised Successfully!";
+            unsuccessMessage = "Failed to Revise Mitigated Risk!";
+            break;
+          default:
+            Title = "Are you sure?";
+            successMessage = "Operation Successful!";
+            unsuccessMessage = "Operation Unsuccessful!";
+            break;
+        }
+        const firstRow = mitigationRiskRegisteredList[0];
         const newValue = {
           ...values,
+          action: actionValue, 
           average: parseFloat(average), // Ensure average is a number
           riskNo: parseFloat(riskNo),
           riskRegisterId: riskRegisterData.riskRegisterId, 
+          ...(firstRow && { mitigationRiskRegisterId: firstRow.mitigationRiskRegisterId }),
         };
         const confirm = await AlertConfirmation({
           title: Title,
@@ -83,23 +159,13 @@ const MitigationRiskRegisterComponent = ({router }) =>{
         // if (!confirm.isConfirmed) return;
         if (confirm) {
           try {
-            const result = "";
+            const result = await insertMitigationRiskRegister(newValue);
             if (result === 200) {
-              //riskRegister();
-              setInitialValues({
-                riskDescription: "",
-                technicalPerformance: "",
-                time: "",
-                cost: "",
-                average: "",
-                riskNo: "",
-              });
-              setAverage(0);
-              setRiskNo(0);
+              await fetchData(); // Ensure data is refreshed before setting initialValues
               Swal.fire({
                 icon: "success",
                 title: '',
-                text: `${successMessage} for ${riskRegisterData.docType.toUpperCase()} `,
+                text: `${successMessage} for ${riskRegisterData.docType.toUpperCase()+ ' - ' + riskRegisterData.divisionCode} `,
                 showConfirmButton: false,
                 timer: 2500
               });
@@ -122,26 +188,49 @@ const MitigationRiskRegisterComponent = ({router }) =>{
         navigate(-1);
       };
 
+      const isListEmpty = mitigationRiskRegisteredList.length === 0;
     return (
         <div>
         <Navbar />
           <div className="card">
             <div className="card-body text-center">
-                  <h3>{riskRegisterData.docType.toUpperCase()} : Mitigation Risk Register</h3><br/>
+                  <h3>{riskRegisterData.docType.toUpperCase()} - {riskRegisterData.divisionCode} : Mitigation Risk Register</h3><br/>
                   <div className="row">
-                    <div className="col-md-2"> 
+                    <div className="col-md-1"> 
                        <strong>Risk Description : </strong> 
                     </div>
 
-                    <div className="col-md-10" style={{ textAlign: 'start', fontWeight: 'bold' }}>
+                    <div className="col-md-10" style={{ textAlign: 'start', fontWeight: 'bold',color:'blue' }}>
                         {riskRegisterData.riskDescription}
                     </div>
-                  </div>
-                  <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema} onSubmit={handleSubmit}>
-                                          {({ values, errors, touched, setFieldValue, setFieldTouched }) => (
-                                            <Form>
+                  </div><br/>
+                  <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema}  onSubmit={(values) => {handleSubmit(values, actionValue);}}>
+                                          {({ values, errors, touched, setFieldValue, setFieldTouched, submitForm  }) => (
+                                            <Form> <div className="row">
+                                            <div className="col-md-12">
+                                              <Field name="mitigationApproach">
+                                                {({ field, form }) => (
+                                                  <TextField
+                                                    {...field}
+                                                    label="Mitigation Approach"
+                                                    multiline
+                                                    minRows={3}
+                                                    placeholder="Mitigation Approach"
+                                                    size="small"
+                                                    error={Boolean(form.errors.mitigationApproach && form.touched.mitigationApproach)}
+                                                    helperText={form.touched.mitigationApproach && form.errors.mitigationApproach}
+                                                    fullWidth
+                                                    InputProps={{
+                                                      inputProps: { maxLength: 990 },
+                                                      autoComplete: "off"
+                                                    }}
+                                                  />
+                                                )}
+                                              </Field>
+                                            </div>
+                                          </div><br />
                                               <div className="row">
-                                                <div className="col-md-3">
+                                                <div className="col-md-2">
                                                   <Field name="probability">
                                                     {({ field }) => (
                                                       <Autocomplete
@@ -167,7 +256,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                   </Field>
                   
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-2">
                                                   <Field name="technicalPerformance">
                                                     {({ field }) => (
                                                       <Autocomplete
@@ -185,14 +274,14 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         }}
                                                         onBlur={() => setFieldTouched("technicalPerformance", true)}
                                                         renderInput={(params) => (
-                                                          <TextField {...params} label="technicalPerformance" size="small" fullWidth variant="outlined" margin="normal" />
+                                                          <TextField {...params} label="Technical Performance" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
                                                   </Field>
                                                 </div>
-                                                <div className="col-md-3">
+                                                <div className="col-md-2">
                                                   <Field name="time">
                                                     {({ field }) => (
                                                       <Autocomplete
@@ -210,15 +299,15 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         }}
                                                         onBlur={() => setFieldTouched("time", true)}
                                                         renderInput={(params) => (
-                                                          <TextField {...params} label="time" size="small" fullWidth variant="outlined" margin="normal" />
+                                                          <TextField {...params} label="Time" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
                                                   </Field>
                                                 </div>
-                                                <div className="col-md-3">
-                                                  <Field name="time">
+                                                <div className="col-md-2">
+                                                  <Field name="cost">
                                                     {({ field }) => (
                                                       <Autocomplete
                                                         options={[1, 2, 3, 4, 5]}
@@ -235,16 +324,14 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         }}
                                                         onBlur={() => setFieldTouched("cost", true)}
                                                         renderInput={(params) => (
-                                                          <TextField {...params} label="cost" size="small" fullWidth variant="outlined" margin="normal" />
+                                                          <TextField {...params} label="Cost" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
                                                   </Field>
                                                 </div>
-                                              </div><br />
-                                              <div className="row">
-                                                <div className="col-md-6">
+                                                <div className="col-md-2">
                                                   <Field name="average">
                                                     {({ field }) => (
                                                       <TextField
@@ -260,12 +347,12 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                           inputProps: { maxLength: 49 },
                                                           autoComplete: "off",
                                                         }}
-                                                        style={{ marginTop: "0rem", width: "100%" }}
+                                                        style={{ width: "100%" }}
                                                       />
                                                     )}
                                                   </Field>
                                                 </div>
-                                                <div className="col-md-6">
+                                                <div className="col-md-2">
                                                   <Field name="riskNo">
                                                     {({ field }) => (
                                                       <TextField
@@ -281,49 +368,33 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                           inputProps: { maxLength: 49 },
                                                           autoComplete: "off",
                                                         }}
-                                                        style={{ marginTop: "0rem", width: "100%" }}
+                                                        style={{ width: "100%" }}
                                                       />
                                                     )}
                                                   </Field>
                                                 </div>
                                               </div>
                                               <br />
-                                              <div className="row">
-                                                <div className="col-md-12">
-                                                  <Field name="mitigationApproach">
-                                                    {({ field, form }) => (
-                                                      <TextField
-                                                        {...field}
-                                                        label="Mitigation Approach"
-                                                        multiline
-                                                        minRows={3}
-                                                        placeholder="Mitigation Approach"
-                                                        size="small"
-                                                        error={Boolean(form.errors.mitigationApproach && form.touched.mitigationApproach)}
-                                                        helperText={form.touched.mitigationApproach && form.errors.mitigationApproach}
-                                                        fullWidth
-                                                        InputProps={{
-                                                          inputProps: { maxLength: 990 },
-                                                          autoComplete: "off"
-                                                        }}
-                                                      />
-                                                    )}
-                                                  </Field>
-                                                </div>
-                                              </div><br />
-                                              <div className="col text-center ">
-                                                <button type="submit" className="btn btn-success">
-                                                  Submit
-                                                </button>
-                                                <button className="btn back "  onClick={goBack}>
-                                                    Back
-                                                </button>
-                                              </div>
+                                             
+                                        <div className="col text-center ">
+                                          {isListEmpty ? (
+                                            <>
+                                              <button type="submit" className="btn submit"  onClick={() => { setActionValue("S"); submitForm(); }}>Submit</button>
+                                              <button type="button" className="btn back" onClick={goBack}>Back</button>
+                                            </>
+                                          ) : (
+                                            <>
+                                              <button type="submit" className="btn edit" onClick={() => { setActionValue("U"); submitForm(); }}>Update</button>
+                                              <button type="submit" className="btn revise" onClick={() =>{ setActionValue("R"); submitForm();}}>Revise</button>
+                                              <button type="button" className="btn back" onClick={goBack}>Back</button>
+                                            </>
+                                          )}
+                                        </div>
                                             </Form>
                                           )}
                                         </Formik>
                   <div id="card-body customized-card">
-                            <Datatable columns={columns} data={''}/>
+                            <Datatable columns={columns} data={tblMitigationRiskData}/>
                   </div>
               <div>
           </div>

@@ -49,12 +49,11 @@ const QmRevisionRecordsComponent = ({ router }) => {
   const [initialValues, setInitialValues] = useState({
     initiatedBy: "",
     remarks: "",
-  });;
+  });
 
   const [descriptioninitialValues, setDescriptioninitialValues] = useState({
-    initiatedBy: "",
-    remarks: "",
-  });;
+    description: "",
+  });
 
   const validationSchema = Yup.object().shape({
     initiatedBy: Yup.string()
@@ -117,62 +116,137 @@ const QmRevisionRecordsComponent = ({ router }) => {
 
 
       const mappedData = VersionRecorList.map((item, index) => {
-        let statusColor = `${item.statusCode === 'INI' ? 'initiated' : (item.statusCode === 'FWD' ? 'forwarde' : item.statusCode === 'RWD' ? 'reviewed' : item.statusCode === 'APD' ? 'approved' : item.statusCode === 'RVM' ? 'revoked' : ['RTD', 'RTM'].includes(item.statusCode) ? 'returned' : 'reforwarded')}`;
+        // Map status codes to their corresponding class names
+        const statusClasses = {
+          INI: 'initiated',
+          FWD: 'forwarde',
+          RWD: 'reviewed',
+          APD: 'approved',
+          RVM: 'revoked',
+          RTD: 'returned',
+          RTM: 'returned',
+          RFD: 'reforwarded',
+        };
+        
+        const statusColor = statusClasses[item.statusCode] || 'default';
+      
+        // Generate actions based on the item's status and role
+        const actionButtons = (
+          <>
+            {['INI', 'RTM', 'RTD', 'RVM'].includes(item.statusCode) && (
+              <>
+                <button
+                  className="icon-button edit-icon-button me-1"
+                  onClick={() => redirecttoQmDocument(item)}
+                  title="Edit"
+                >
+                  <i className="material-icons">edit_note</i>
+                </button>
+                <button
+                  className="icon-button me-1"
+                  style={{ color: '#ea5753' }}
+                  onClick={() => addMappingOfClasses(item)}
+                  title="Mapping Of Clauses"
+                >
+                  <i className="material-icons">table_chart</i>
+                </button>
+                <button
+                  className="icon-button me-1"
+                  style={{ color: '#439cfb' }}
+                  onClick={() => {
+                    setSingleDoc(item);
+                    setOpenDialog2(true);
+                  }}
+                  title="Document Summary"
+                >
+                  <i className="material-icons">summarize</i>
+                </button>
+                <button
+                  className="icon-button me-1"
+                  style={{ color: 'rgb(255, 181, 44)' }}
+                  onClick={() => editDescription(item)}
+                  title="Edit Description"
+                >
+                  <i className="material-icons">edit</i>
+                </button>
+              </>
+            )}
+            {getDocPDF('', item)}
+            {roleName?.trim() === 'MR Rep' && ['INI', 'RTM', 'RTD', 'RVM'].includes(item.statusCode) && (
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Forward"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">fast_forward</i>
+              </button>
+            )}
+            {roleName?.trim() === 'MR' && ['FWD', 'RFD'].includes(item.statusCode) && (
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Review"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">check_circle</i>
+              </button>
+            )}
+            {roleName?.trim() === 'Director' && item.statusCode === 'RWD' && (
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Approve"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">check_circle</i>
+              </button>
+            )}
+            {item.statusCode === 'APD' && index === 0 && (
+              <button
+                className="icon-button me-1"
+                style={{ color: 'darkorange' }}
+                title="Amend"
+                onClick={openAmmendModal}
+              >
+                <i className="material-icons">note_alt</i>
+              </button>
+            )}
+            {['FWD', 'RFD'].includes(item.statusCode) &&
+              ['MR Rep', 'MR'].includes(roleName?.trim()) && (
+                <button
+                  className="icon-button me-1"
+                  style={{ color: 'red' }}
+                  title="Revoke"
+                  onClick={() => RevokeSubmit(item, empIdAsNumber)}
+                >
+                  <i className="material-icons">settings_backup_restore</i>
+                </button>
+              )}
+          </>
+        );
+      
         return {
           sn: index + 1,
-          description: item.description || '-' || '-',
-          // from: 'V' + item[5] + '-R' + item[6] || '-',
-          from: index + 1 < VersionRecorList.length ? 'I' + VersionRecorList[index + 1].issueNo + '-R' + VersionRecorList[index + 1].revisionNo : '--',
-          to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-          //issueDate: item.dateOfRevision,
+          description: item.description || '-',
+          from:
+            index + 1 < VersionRecorList.length
+              ? `I${VersionRecorList[index + 1].issueNo}-R${VersionRecorList[index + 1].revisionNo}`
+              : '--',
+          to: `I${item.issueNo}-R${item.revisionNo}` || '-',
           issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-          status: <Box className={statusColor} onClick={() => openTran(item)}><Box class='status'>{item.status}<i class="material-icons float-right font-med">open_in_new</i></Box></Box> || '-',
-          action: (
-            <div>
-              <>
-                {(item.statusCode === 'INI' || item.statusCode === 'RTM' || item.statusCode === 'RTD' || item.statusCode === 'RVM') && (
-                  <>
-                    <button className="icon-button edit-icon-button me-1" onClick={() => redirecttoQmDocument(item)} title="Edit">
-                      <i className="material-icons">edit_note</i>
-                    </button>
-                    <button className="icon-button me-1" style={{ color: '#ea5753' }} onClick={() => addMappingOfClasses(item)} title="Mapping Of Clauses" >
-                      <i className="material-icons">table_chart</i>
-                    </button>
-                    <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true); }} title="Document Summary">
-                      <i className="material-icons">summarize</i>
-                    </button>
-                    <button className="icon-button me-1" style={{ color: 'rgb(255, 181, 44)' }} onClick={() => editDescription(item)} title="Edit Description" >
-                      <i className="material-icons">edit</i>
-                    </button>
-                  </>
-                )}
-                {getDocPDF('', item)}
-                {roleName && roleName.trim() === 'MR Rep' && (item.statusCode === 'INI' || item.statusCode === 'RTM' || item.statusCode === 'RTD' || item.statusCode === 'RVM') ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Forward" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">fast_forward</i>
-                  </button>
-                ) : " "}
-                {roleName && roleName.trim() === 'MR' && (item.statusCode === 'FWD' || item.statusCode === "RFD") ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Review" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">check_circle</i>
-                  </button>
-                ) : " "}
-                {roleName && roleName.trim() === 'Director' && item.statusCode === 'RWD' ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Approve" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">check_circle</i>
-                  </button>
-                ) : " "}
-                {(item.statusCode === 'APD' && index == 0) && (<button className="icon-button me-1" style={{ color: 'darkorange' }} title="Amend" onClick={() => openAmmendModal()}>
-                  <i className="material-icons">note_alt</i>
-                </button>)}
-                {(item.statusCode === 'FWD' || item.statusCode === 'RFD') && roleName && (roleName.trim() === 'MR Rep' || roleName.trim() === 'MR') && (<button className="icon-button me-1" style={{ color: 'red' }} title="Revoke" onClick={() => RevokeSubmit(item, empIdAsNumber)}>
-                  <i className="material-icons">settings_backup_restore</i>
-                </button>)}
-              </>
-            </div>
+          status: (
+            <Box className={statusColor} onClick={() => openTran(item)}>
+              <Box className="status">
+                {item.status}
+                <i className="material-icons float-right font-med">open_in_new</i>
+              </Box>
+            </Box>
           ),
-        }
+          action: <div>{actionButtons}</div>,
+        };
       });
+      
 
       const labdata = await getLabDetails();
       const employee = await getEmployee();
@@ -292,19 +366,25 @@ const QmRevisionRecordsComponent = ({ router }) => {
     }
   }
   const handleSubmit = async (values) => {
-    const approvedBy = selEmpData.length > 0 ? selEmpData[0].empId : "";
-    const reviewedBy = filteredMrList.length > 0 ? filteredMrList[0].empId : ""
+    const approvedBy = selEmpData?.[0]?.empId || "";
+    const reviewedBy = filteredMrList?.[0]?.empId || "";
+    const remarksRequiredStatuses = ['RTM', 'RTD', 'RVM'];
+    
     var action = values.action;
-    if ((action === "R" && (!values.remarks || values.remarks.trim() === "")) || (statusCode === 'RTM' || statusCode === 'RTD' || statusCode === 'RVM') && (!values.remarks || values.remarks.trim() === "")) {
+    if (
+      (!values.remarks?.trim() && action === "R") ||
+      (remarksRequiredStatuses.includes(statusCode) && !values.remarks?.trim())
+    ) {
       return Swal.fire("Warning", "Please Enter the Remarks!", "warning");
     }
     const newValue = { ...values, reviewedBy, approvedBy, revisionRecordId, empId };
-    var submit = statusCode === 'RWD' ? "Are you sure to Approve ? " : "Are you sure to Forward ? ";
-    var textsubmit = statusCode === 'RWD' ? "Approved Successfully " : "Forwarded Successfully  ";
-    var title = action === 'R' ? "Are you sure to Return ? " : submit;
-    var text = action === 'R' ? "Returned Successfully" : textsubmit;
+    const isApproval = statusCode === 'RWD';
+    const isReturn = action === 'R';
+    const confirmationMessage = isReturn ? "Are you sure to Return?" : isApproval ? "Are you sure to Approve?" : "Are you sure to Forward?";
+    const successMessage = isReturn  ? "Returned Successfully" : isApproval ? "Approved Successfully" : "Forwarded Successfully";
+
     const confirm = await AlertConfirmation({
-      title: title,
+      title: confirmationMessage,
       message: '',
     });
     if (confirm) {
@@ -319,7 +399,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
           Swal.fire({
             icon: "success",
             title: `Quality Manual`,
-            text: text,
+            text: successMessage,
             showConfirmButton: false,
             timer: 1500
           });
@@ -446,6 +526,33 @@ const QmRevisionRecordsComponent = ({ router }) => {
     }
   }
 
+  const getReviewLabelText = (statusCode) => {
+    if (["INI", "FWD", "RFD", "RTD", "RVM"].includes(statusCode)) {
+      return "Review By";
+    }
+    if (statusCode === "RTM") {
+      return "Returned By";
+    }
+    return "Reviewed By";
+  };
+
+  const getApprovalLabelText = (statusCode) => {
+    if (["INI", "FWD", "RWD", "RFD", "RTD", "RVM", "RTM"].includes(statusCode)) {
+      return "Approve By";
+    }
+    if (statusCode === "RTD") {
+      return "Returned By";
+    }
+    return "Approved By";
+  };
+  
+  const getPrepareLabel = (statusCode) => {
+    if (["INI", "RTM", "RTD", "RVM"].includes(statusCode)) {
+      return "Prepare By MR Rep";
+    }
+    return "Prepared By MR Rep";
+  };
+  
   return (
 
     <div className="card">
@@ -521,8 +628,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
                               ) : (
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start" }}>
-                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}>{(statusCode === "INI" || statusCode === "RTM" || statusCode === "RTD" || statusCode === "RVM")
-                                      ? "Prepare By" : "Prepared By"} : </span>
+                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}> {["INI", "RTM", "RTD", "RVM"].includes(statusCode) ? "Prepare By" : "Prepared By"}: </span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start" }}>
                                     <span style={{ color: "blue", fontSize: "1.2rem", padding: "15px" }}>{versionRecordList.length > 0 ? versionRecordList[0].initiatedByEmployee : ""}</span>
@@ -537,12 +643,12 @@ const QmRevisionRecordsComponent = ({ router }) => {
                                 <Field
                                   name="reviewedBy"
                                   as={TextField}
-                                  label="ReviewedBy By"
+                                  label="Reviewed By"
                                   size="small"
                                   margin="normal"
                                   value={
                                     filteredMrList.length > 0
-                                      ? `${filteredMrList[0].empName}, ${filteredMrRepList[0].empDesigName}`
+                                      ? `${filteredMrList[0].empName}, ${filteredMrList[0].empDesigName}`
                                       : ""
                                   }
                                   InputProps={{
@@ -555,11 +661,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
                               ) :
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start" }}>
-                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}> {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RFD" || statusCode === "RTD" || statusCode === 'RVM')
-                                      ? "Review By "
-                                      : statusCode === "RTM"
-                                        ? "Returned By "
-                                        : "Reviewed By "} : </span>
+                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}>{getReviewLabelText(statusCode)}: </span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start" }}>
                                     <span style={{ color: "blue", fontSize: "1.2rem", padding: "15px" }}>{versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : ""}</span> </div>
@@ -591,11 +693,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
                                 />) :
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start" }}>
-                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}>{(statusCode === "INI" || statusCode === "FWD" || statusCode === "RWD" || statusCode === "RFD" || statusCode === "RTD" || statusCode === 'RVM' || statusCode === 'RTM')
-                                      ? "Approve By "
-                                      : statusCode === "RTD"
-                                        ? "Returned By "
-                                        : "Approved By "} : </span>
+                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "15px" }}> {getApprovalLabelText(statusCode)}: </span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start" }}>
                                     <span style={{ color: "blue", fontSize: "1.2rem", padding: "15px" }}>{versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : ""}</span> </div>
@@ -806,31 +904,21 @@ const QmRevisionRecordsComponent = ({ router }) => {
         :
         (<div className="d-flex align-items-center justify-content-center" style={{ gap: "15px" }}>
           <div style={{ background: "linear-gradient(to top,#3c96f7 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
-            {(statusCode === "INI" || statusCode === "RTM" || statusCode === "RTD" || statusCode === "RVM")
-              ? "Prepare By MR Rep" : "Prepared By MR Rep"} - {versionRecordList.length > 0 ? versionRecordList[0].initiatedByEmployee : ""}
+          {getPrepareLabel(statusCode)} - {versionRecordList.length > 0 ? versionRecordList[0].initiatedByEmployee : "N/A"}
             {(statusCode === "FWD" || statusCode === "RWD" || statusCode === "APD" || statusCode === "RFD") && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}
           </div>
           <span style={{ fontSize: "1.5rem" }}>→</span>
           <div style={{ background: "linear-gradient(to top, #eb76c3 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
-
-            {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RFD" || statusCode === "RTD" || statusCode === 'RVM')
-              ? "Review By MR"
-              : statusCode === "RTM"
-                ? "Returned By MR"
-                : "Reviewed By MR"} - {versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : ""}
+          {getReviewLabelText(statusCode)} - {versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : "N/A"}
             {(statusCode === "RWD" || statusCode === "APD") && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}
           </div>
           <span style={{ fontSize: "1.5rem" }}>→</span>
           <div style={{ background: "linear-gradient(to top, #9b999a 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
-            {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RWD" || statusCode === "RFD" || statusCode === "RTD" || statusCode === 'RVM' || statusCode === 'RTM ')
-              ? "Approve By DIRECTOR"
-              : statusCode === "RTD"
-                ? "Returned By DIRECTOR"
-                : "Approved By DIRECTOR"} - {versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : ""}
+          {getApprovalLabelText(statusCode)} - {versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : "N/A"}
             {statusCode === "APD" && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}
