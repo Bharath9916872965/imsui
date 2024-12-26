@@ -27,6 +27,7 @@ import RiskRegisterComponent from 'components/riskregister/risk-register.compone
 import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transaction';
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
+import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
 import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
 
@@ -50,7 +51,9 @@ function App() {
         <Route path="/dwp" element={<DwpRevisionrecordsComponent docName='dwp' />} />
         <Route path="/gwp" element={<DwpRevisionrecordsComponent docName='gwp' />} />
         <Route path="/dwp-add-content" element={<DwpAddDocContentComponent />} />
-        <Route path="/revision-tran" element={<RevisionTransactionComponent />} />
+        <Route path="/qm-revision-tran" element={<RevisionTransactionComponent />} />
+        <Route path="/dwp-revision-tran" element={<DWPRevisionTransactionComponent />} />
+        
 
 
         {/* Audit */}
