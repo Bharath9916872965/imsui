@@ -12,6 +12,7 @@ const Navbar = (props) => {
   const [headerModuleList, setHeaderModuleList] = useState([]);
   const [headerModuleDetailList, setHeaderModuleDetailList] = useState([]);
   const [empName, setEmpName] = useState('');
+  const [title, setTitle] = useState('');
   const [designation, setDesignation] = useState('');
   const [formRoleName, setFormRoleName] = useState('');
 
@@ -19,12 +20,12 @@ const Navbar = (props) => {
     const fetchData = async () => {
       try {
 
-        const { empName, designation, empId, imsFormRoleId, formRoleName  } = await getLoginEmployeeDetails();
+        const { empName, designation, empId, imsFormRoleId, formRoleName, title } = await getLoginEmployeeDetails();
 
         setEmpName(empName);
         setDesignation(designation);
         setFormRoleName(formRoleName);
-
+        setTitle(title);
         // const imsFormRoleId = 2;
         if(imsFormRoleId){
           fetchHeaderModuleList(imsFormRoleId);
@@ -77,7 +78,7 @@ const Navbar = (props) => {
                   <span className="i-name">I</span><span className="ms-name">MS</span>
                 </h3>
                 <h6 className="mb-0 d-flex align-items-end">
-                  {empName && empName}, {designation && designation} ({formRoleName && formRoleName})
+                  {title || ''} {empName}, {designation || ''} ({formRoleName || ''})
                 </h6>
               </div>
             </a>

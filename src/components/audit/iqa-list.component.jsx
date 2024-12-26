@@ -21,7 +21,7 @@ const IqaListComponent = () => {
     const [modalVisible, setModalVisible] = useState(false);
     const [nextIqaNo, setNextIqaNo] = useState(null);
     const [actionFrom, setActionFrom] = useState("Add");
-    const [isAddMode,setIsAddMode] = useState(false);
+    const [isAddMode, setIsAddMode] = useState(false);
 
     const [initialValues, setInitialValues] = useState({
         iqaNo: (iqaList.length + 1) + "",
@@ -69,21 +69,21 @@ const IqaListComponent = () => {
 
     const toggleModal = (action) => {
         setActionFrom(action);
-        if(action === 'Add'){
+        if (action === 'Add') {
             setIsAddMode(true);
-            setInitialValues(prevValues =>({
+            setInitialValues(prevValues => ({
                 prevValues,
                 fromDate: "",
                 toDate: "",
                 scope: "",
                 description: "",
-        }));
-        }else{
+            }));
+        } else {
             setIsAddMode(false)
         }
         setShowModal(!showModal);
         if (!showModal) {
-             setModalVisible(true)
+            setModalVisible(true)
         } else {
             setModalVisible(false);
         }
@@ -126,33 +126,31 @@ const IqaListComponent = () => {
 
     const handleSubmit = async (values) => {
         let iqaCheck = false;
-        const successMessage = isAddMode ?  " Added Successfully!" :" Updated Successfully!";
+        const successMessage = isAddMode ? " Added Successfully!" : " Updated Successfully!";
         const unsuccessMessage = isAddMode ? " Add Unsuccessful!" : " Update Unsuccessful!";
-        const Title = isAddMode ?  "Are you sure to Add ?": "Are you sure to Update ?";
+        const Title = isAddMode ? "Are you sure to Add ?" : "Are you sure to Update ?";
 
-        console.log('values.iqaNo',values.iqaNo);
-
-        if(isAddMode){
-            if(Number(values.iqaNo) <= 0){
+        if (isAddMode) {
+            if (Number(values.iqaNo) <= 0) {
                 Swal.fire({
                     icon: "error",
                     title: 'Enter a Positive IQA Number',
                     showConfirmButton: false,
                     timer: 2500
                 });
-            }else{
+            } else {
                 iqaCheck = true;
             }
-        }else{
+        } else {
             iqaCheck = true;
         }
 
-        if(iqaCheck){
+        if (iqaCheck) {
             const confirm = await AlertConfirmation({
                 title: Title,
                 message: '',
             });
-    
+
             // if (!confirm.isConfirmed) return;
             if (confirm) {
                 try {
@@ -160,7 +158,7 @@ const IqaListComponent = () => {
                     if (result === 200) {
                         await iqalist();
                         const latestIqaNo = values.iqaNo || "";
-    
+
                         setShowModal(false);
                         setInitialValues('');
                         Swal.fire({
@@ -234,7 +232,7 @@ const IqaListComponent = () => {
                                             </div>
 
                                             <div className="modal-body">
-                                                <Formik initialValues= {isAddMode ? { iqaNo: iqaList.length === 0 ? "" : nextIqaNo } : initialValues } validationSchema={validationSchema} onSubmit={handleSubmit}>
+                                                <Formik initialValues={isAddMode ? { iqaNo: iqaList.length === 0 ? "" : nextIqaNo } : initialValues} validationSchema={validationSchema} onSubmit={handleSubmit}>
                                                     {({ errors, touched, handleChange, handleBlur, values }) => (
                                                         <Form>
                                                             <div className="row">
@@ -371,7 +369,7 @@ const IqaListComponent = () => {
                                                                 </div>
                                                             </div>
                                                             <div className="d-flex justify-content-center mt-3">
-                                                            {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
+                                                                {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                                                             </div>
                                                         </Form>
                                                     )}

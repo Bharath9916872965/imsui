@@ -521,7 +521,7 @@ const AuditeeListComponent = () => {
                                                             </Field>
                                                         </div>
                                                         <div className="col text-center subclass">
-                                                        {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
+                                                            {actionFrom === "Add" ? <button type="submit" className="btn btn-success">Submit</button> : <button type="submit" className="btn edit">Update</button>}
                                                         </div>
                                                     </Form>
                                                 )}
