@@ -91,7 +91,7 @@ const ScheduleTransactionComponent = () => {
 						       </div>
                    <div class="timeline-dot fb-bg mid-line"></div>
                    <div class="timeline-time">
-                     <div class="form-inline margin-half-top"><span className="date-styles">{format(new Date(item.transactionDate),'MMM dd, yyyy, HH:MM a')}</span></div>
+                     <div class="form-inline margin-half-top"><span className="date-styles">{format(new Date(item.transactionDate),'MMM dd, yyyy, hh:mm a')}</span></div>
                    </div>
                  </div>
                 </>

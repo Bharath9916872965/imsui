@@ -42,30 +42,14 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
         const max = Math.max(startValue,endValue);
         return [min,max]
       });
-      //const errors = [];
 
       for (let i = 0; i < ranges.length; i++) {
         for (let j = i + 1; j < ranges.length; j++) {
           if ( ranges[i][0] <= ranges[j][1] &&  ranges[i][1] >= ranges[j][0]) {
-            if(ranges[i][0] !== 0 && ranges[j][1] !== 0 && ranges[i][1] !== 0 && ranges[j][0] !== 0 ){
               return false;
-            }
-              // errors.push({
-              //   index: i,
-              //   message: `Range ${ranges[i][0]}-${ranges[i][1]} overlaps with ${ranges[j][0]}-${ranges[j][1]}`,
-              // });
             }
         }
       }
-      // if (errors.length > 0) {
-      //   errors.forEach(({ index, message }) => {
-      //     context.createError({
-      //       path: `ratings[${index}].startValue`,
-      //       message,
-      //     });
-      //   });
-      //   return false;
-      // }
       return true;
     }),
   });
@@ -210,6 +194,7 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
                     <Box className = 'text-center mg-top-10'>
                       {flag === 'M' && <Button variant="contained" color="success" type="submit"  disabled={!isValid }> Submit</Button>}
                     </Box>
+                    <h6 className="noteColor" >Note : System will not allow the overlap range values</h6>
                   </DialogContent>
                 </Form>
               )}
