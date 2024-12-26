@@ -47,7 +47,6 @@ const AuditSummaryReport = () => {
       const [logoimage, setLogoimage] = useState(null);
       const [drdoLogo, setDrdoLogo] = useState(null);
 
-console.log('selectedOption',selectedOption);
       const fetchData = async () => {
          try {
            const scdList        = await getScheduleList();
@@ -105,7 +104,7 @@ console.log('selectedOption',selectedOption);
       }, {});
       const handleRadioChange = (event) => {
         setSelectedOption(event.target.value);
-        console.log("Selected Option:", event.target.value); // For debugging
+     
         // Add any additional logic here
       };
       const auditTeamList = async () => {
@@ -192,7 +191,7 @@ console.log('selectedOption',selectedOption);
           });
           
           // Set tableBody into the component state if needed
-          console.log('tableBody', tableBody);
+         
            
     
        useEffect(() => {

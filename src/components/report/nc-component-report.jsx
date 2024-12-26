@@ -41,8 +41,7 @@ const NcReport = ({ router }) => {
         getIqaDtoList(),
         getCheckListByObservation(),
       ]);
-console.log('iqaList',iqaList);
-console.log('checkListDetailsBasedOnObservation',checkListDetailsBasedOnObservation);
+
       if (iqaList.length > 0) {
         const iqaNum = router.location.state?.iqaNo;
         const selectedIqa =
