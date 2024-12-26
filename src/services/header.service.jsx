@@ -34,8 +34,9 @@ export const getLoginEmployeeDetails = async () => {
       const empId = details.empId;
       const imsFormRoleId = details.imsFormRoleId;
       const formRoleName = details.formRoleName;
+      const title = details.title;
   
-      return { empName, designation, empId, imsFormRoleId, formRoleName };
+      return { empName, designation, empId, imsFormRoleId, formRoleName, title };
   
     } catch (error) {
       console.error('Error occurred in getLoginEmployeeDetails:', error);

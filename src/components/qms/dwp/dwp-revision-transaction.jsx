@@ -4,9 +4,9 @@ import Navbar from "../../Navbar/Navbar";
 import '../../audit/auditor-list.component.css';
 import '../../audit/scheduler/schedule-tran.css'
 import { format } from "date-fns";
-import { revisionTran } from "services/qms.service";
+import { dwprevisionTran, revisionTran } from "services/qms.service";
 
-const RevisionTransactionComponent = () => {
+const DWPRevisionTransactionComponent = () => {
 
   const [data, setData] = useState(undefined);
   const [transaction, setTransaction] = useState([])
@@ -14,13 +14,12 @@ const RevisionTransactionComponent = () => {
 
   const fetchData = async () => {
     try {
-      const data = JSON.parse(localStorage.getItem('revisionData'));
-      if (data) {
-        setData(data)
-        const trans = await revisionTran(data.revisionRecordId)
-        setTransaction(trans)
+      const storedData = JSON.parse(localStorage.getItem("revisionData"));
+      if (storedData) {
+        setData(storedData);
+        const trans = await dwprevisionTran(storedData.revisionRecordId);
+        setTransaction(trans);
       }
-
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -30,16 +29,18 @@ const RevisionTransactionComponent = () => {
     fetchData();
   }, []);
 
-  const revisionSta = {
-    'INI': ' QM Inititated By',
-    'FWD': ' QM Forwarded By',
-    'RWD': ' QM Reviewed by ',
-    'APD': ' QM Approved by ',
-    'RVM': ' QM Revoked by ',
-    'RTD': ' QM Returned by ',
-    'RTM': ' QM Returned by ',
-    'RFD': ' QM ReForwarded By',
-  };
+  const revisionSta = data
+    ? {
+      INI: " " + data.docType + " Initiated By",
+      FWD: " " + data.docType + " Forwarded By",
+      RWD: " " + data.docType + " Reviewed by ",
+      APG: " " + data.docType + " Approved by ",
+      RVD: " " + data.docType + " Revoked by ",
+      RTG: " " + data.docType + " Returned by ",
+      RTM: " " + data.docType + " Returned by ",
+      RFD: " " + data.docType + " ReForwarded By",
+    }
+    : {};
 
   const back = () => {
     window.close();
@@ -51,7 +52,12 @@ const RevisionTransactionComponent = () => {
       <Navbar />
       <div className="card">
         <Box display="flex" alignItems="center" gap="10px" >
-          <Box flex="87%" className='text-center'><h3> QM Revision Transaction</h3></Box>
+          <Box flex="87%" className="text-center">
+            <h3>
+              {data && data.docType ? `${data.docType.toUpperCase()} Revision Transaction` : "Revision Transaction"}
+            </h3>
+          </Box>
+
           <Box flex="13%"><button className="btn backClass" onClick={() => back()}>Back</button></Box>
         </Box>
         <Box className="col-md-11 card l-bg-blue-dark text-left-center-card mg-top-10"  >
@@ -96,4 +102,4 @@ const RevisionTransactionComponent = () => {
   );
 
 }
-export default RevisionTransactionComponent;
+export default DWPRevisionTransactionComponent;

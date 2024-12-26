@@ -29,6 +29,9 @@ import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transact
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
 import AuditSummaryReport from 'components/report/auditSummary-component-report';
 import NcReportComponent from 'components/report/nc-component-report';
+import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
+import QspComponent from 'components/qms/qsp/qsp.component';
+import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
 
 function App() {
   return (
@@ -50,7 +53,9 @@ function App() {
         <Route path="/dwp" element={<DwpRevisionrecordsComponent docName='dwp' />} />
         <Route path="/gwp" element={<DwpRevisionrecordsComponent docName='gwp' />} />
         <Route path="/dwp-add-content" element={<DwpAddDocContentComponent />} />
-        <Route path="/revision-tran" element={<RevisionTransactionComponent />} />
+        <Route path="/qm-revision-tran" element={<RevisionTransactionComponent />} />
+        <Route path="/dwp-revision-tran" element={<DWPRevisionTransactionComponent />} />
+        
 
 
         {/* Audit */}
@@ -83,6 +88,19 @@ function App() {
           <Route path="/nc-report" element={<NcReportComponent />} />
 
 
+         
+         {/* QSP */}
+         <Route path="/qsp1" element={<QspComponent docName={'qsp1'}/>} />
+         <Route path="/qsp2" element={<QspComponent docName={'qsp2'}/>} />
+         <Route path="/qsp3" element={<QspComponent docName={'qsp3'}/>} />
+         <Route path="/qsp4" element={<QspComponent docName={'qsp4'}/>} />
+         <Route path="/qsp5" element={<QspComponent docName={'qsp5'}/>} />
+         <Route path="/qsp6" element={<QspComponent docName={'qsp6'}/>} />
+         <Route path="/qsp7" element={<QspComponent docName={'qsp7'}/>} />
+         <Route path="/qsp8" element={<QspComponent docName={'qsp8'}/>} />
+         <Route path="/qsp-add-content" element={<QspAddDocContentComponent/>} />
+
+         
       </Routes>
 {/* <Login/> */}
     </div>
