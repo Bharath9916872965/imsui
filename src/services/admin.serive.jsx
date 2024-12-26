@@ -4,6 +4,17 @@ import config from "../environment/config";
 const API_URL = config.API_URL;
 const resetPsdLink = config.RESET_PASSWORD_LINK;
 
+export class UserManagerDto {
+  constructor(loginId, userName, divisionId, roleId, logintypeId, empId) {
+    this.loginId = loginId;
+    this.userName = userName;
+    this.divisionId = divisionId;
+    this.roleId = roleId;
+    this.logintypeId = logintypeId;
+    this.empId = empId;
+  }
+}
+
 export const getHeaderModuleList = async (role) => {
     try {
         return (await axios.post(`${API_URL}header-module`, role, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
@@ -100,6 +111,50 @@ export const getRolesList = async () => {
       return response.data;
     } catch (error) {
       console.error('Error occurred in updateFormRoleAccess:', error);
+      throw error;
+    }
+  };
+  
+  export const userManagerEditData = async (loginId) => {
+    try {
+      if (!loginId) throw new Error('No loginId found');
+      const response = await axios.post(
+        `${API_URL}user-manager-edit-data`,
+        loginId,
+        { headers: { 'Content-Type': 'application/json', ...authHeader() } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in userManagerEditData:', error);
+      throw error;
+    }
+  };
+
+  export const submitUserManagerEdit = async (userManagerDto) => {
+    try {
+      const response = await axios.post(
+        `${API_URL}user-manager-edit-submit`,
+        userManagerDto,
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in submitUserManagerEdit:', error);
+      throw error;
+    }
+  };
+
+  export const usernameDuplicateCheckInAdd = async (username) => {
+    try {
+      if (!username) throw new Error('No user found');
+      const response = await axios.post(
+        `${API_URL}username-present-count`,
+        username, 
+        { headers: { 'Content-Type': 'application/json', ...authHeader() } }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in usernameDuplicateCheckInAdd:', error);
       throw error;
     }
   };

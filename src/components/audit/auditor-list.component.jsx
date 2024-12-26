@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
-import { deleteAditor, getAuditorDtoList, getEmployee, insertAditor,checkAuditorPresent, deleteAuditor } from "../../services/audit.service";
+import { deleteAditor, getAuditorDtoList, getEmployee, insertAditor, checkAuditorPresent, deleteAuditor } from "../../services/audit.service";
 import Datatable from "../datatable/Datatable";
-import { Switch,Tooltip,IconButton } from "@mui/material";
+import { Switch, Tooltip, IconButton } from "@mui/material";
 import { Field, Formik, Form } from "formik";
 import Navbar from "../Navbar/Navbar";
 import "./auditor-list.component.css";
@@ -55,48 +55,48 @@ const AuditorListComponent = () => {
         divisionCode: item.divisionName || "-",
         action: (
           <>
-          <Switch
-            checked={item.isActive === 1}
-            onChange={() => handleToggleIsActive(item.auditorId, item.isActive)}
-            color="default"
-            sx={{
-              "& .MuiSwitch-switchBase.Mui-checked": { color: "green" },
-              "& .MuiSwitch-switchBase": { color: "red" },
-              "& .MuiSwitch-track": { backgroundColor: item.isActive === 1 ? "green" : "red" },
-            }}
-          />
-          <Tooltip title="Delete Auditor"><IconButton  id="iconButtons" onClick={() => auditorDelete(item)} ><img src={DeleteIcon} alt="Delete" className='fwdButton uploadStyles  mgb5' /></IconButton></Tooltip></>
+            <Switch
+              checked={item.isActive === 1}
+              onChange={() => handleToggleIsActive(item.auditorId, item.isActive)}
+              color="default"
+              sx={{
+                "& .MuiSwitch-switchBase.Mui-checked": { color: "green" },
+                "& .MuiSwitch-switchBase": { color: "red" },
+                "& .MuiSwitch-track": { backgroundColor: item.isActive === 1 ? "green" : "red" },
+              }}
+            />
+            <Tooltip title="Delete Auditor"><IconButton id="iconButtons" onClick={() => auditorDelete(item)} ><img src={DeleteIcon} alt="Delete" className='fwdButton uploadStyles  mgb5' /></IconButton></Tooltip></>
         ),
       }))
     );
   };
 
-  const auditorDelete = async (item)=>{
+  const auditorDelete = async (item) => {
     const response = await checkAuditorPresent(item.auditorId);
-    if(response > 0){
+    if (response > 0) {
       Swal.fire({
         icon: "error",
         title: "Auditor can't be Deleted, Auditor already exists in a Team",
         showConfirmButton: false,
         timer: 3000
       });
-    }else{
+    } else {
       await AlertConfirmation({
         title: '',
-        message:  'Do you want to Delete '+item.empName+', '+item.designation+' ?' ,
-        }).then(async (result) => {
-          if(result){
-            const delResponse = await deleteAuditor(item.auditorId);
-            if(delResponse > 0){
-             auditorlist();
-             Swal.fire({
-               icon: "success",
-               title: item.empName+', '+item.designation+" deleted Successfully!",
-               showConfirmButton: false,
-               timer: 1500
-             });
-            }
+        message: 'Do you want to Delete ' + item.empName + ', ' + item.designation + ' ?',
+      }).then(async (result) => {
+        if (result) {
+          const delResponse = await deleteAuditor(item.auditorId);
+          if (delResponse > 0) {
+            auditorlist();
+            Swal.fire({
+              icon: "success",
+              title: item.empName + ', ' + item.designation + " deleted Successfully!",
+              showConfirmButton: false,
+              timer: 1500
+            });
           }
+        }
       })
     }
   }
@@ -112,7 +112,6 @@ const AuditorListComponent = () => {
   };
 
   const handleSubmit = async (values) => {
-    console.log('values',values); 
     if (values.empId.length === 0) {
       return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
     }
@@ -121,7 +120,7 @@ const AuditorListComponent = () => {
       message: '',
     });
 
-   
+
     // if (!confirm.isConfirmed) return;
     if (confirm) {
       try {
