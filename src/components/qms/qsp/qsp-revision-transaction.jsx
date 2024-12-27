@@ -4,9 +4,9 @@ import Navbar from "../../Navbar/Navbar";
 import '../../audit/auditor-list.component.css';
 import '../../audit/scheduler/schedule-tran.css'
 import { format } from "date-fns";
-import { revisionTran } from "services/qms.service";
+import { qspRevisionTran, revisionTran } from "services/qms.service";
 
-const RevisionTransactionComponent = () => {
+const QSPRevisionTransactionComponent = () => {
 
   const [data, setData] = useState(undefined);
   const [transaction, setTransaction] = useState([])
@@ -17,7 +17,7 @@ const RevisionTransactionComponent = () => {
       const data = JSON.parse(localStorage.getItem('revisionData'));
       if (data) {
         setData(data)
-        const trans = await revisionTran(data.revisionRecordId)
+        const trans = await qspRevisionTran(data.revisionRecordId)
         setTransaction(trans)
       }
 
@@ -31,14 +31,14 @@ const RevisionTransactionComponent = () => {
   }, []);
 
   const revisionSta = {
-    'INI': ' QM Inititated By',
-    'FWD': ' QM Forwarded By',
-    'RWD': ' QM Reviewed by ',
-    'APD': ' QM Approved by ',
-    'RVM': ' QM Revoked by ',
-    'RTD': ' QM Returned by ',
-    'RTM': ' QM Returned by ',
-    'RFD': ' QM ReForwarded By',
+    'INI': ' QSP Inititated By',
+    'FWD': ' QSP Forwarded By',
+    'RWD': ' QSP Reviewed by ',
+    'APD': ' QSP Approved by ',
+    'RVM': ' QSP Revoked by ',
+    'RTD': ' QSP Returned by ',
+    'RTM': ' QSP Returned by ',
+    'RFD': ' QSP ReForwarded By',
   };
 
   const back = () => {
@@ -51,7 +51,7 @@ const RevisionTransactionComponent = () => {
       <Navbar />
       <div className="card">
         <Box display="flex" alignItems="center" gap="10px" >
-          <Box flex="87%" className='text-center'><h3> QM Revision Transaction</h3></Box>
+          <Box flex="87%" className='text-center'><h3> QSP Revision Transaction</h3></Box>
           <Box flex="13%"><button className="btn backClass" onClick={() => back()}>Back</button></Box>
         </Box>
         <Box className="col-md-11 card l-bg-blue-dark text-left-center-card mg-top-10"  >
@@ -96,4 +96,4 @@ const RevisionTransactionComponent = () => {
   );
 
 }
-export default RevisionTransactionComponent;
+export default QSPRevisionTransactionComponent;

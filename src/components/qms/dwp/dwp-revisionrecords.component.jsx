@@ -87,8 +87,9 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       const { empName, designation, empId, imsFormRoleId, formRoleName } = await getLoginEmployeeDetails();
-      setDwpDivisionList(imsFormRoleId, empId);
-      setDwpDivisionGroupList(imsFormRoleId, empId);
+      const divisionId = router.location.state?.divisionId;
+      setDwpDivisionList(imsFormRoleId, empId,divisionId);
+      setDwpDivisionGroupList(imsFormRoleId, empId,divisionId);
     }
     fetchGroupData();
   }, [])
@@ -146,62 +147,166 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
       }
       const userManagerList = await getUserManagerList();
       setUserManagerList(userManagerList);
+      const statusClasses = {
+        INI: 'initiated',
+        FWD: 'forwarde',
+        RWD: 'reviewed',
+        APG: 'approved',
+        RVD: 'revoked',
+        RTG: 'returned',
+        RTM: 'returned',
+        RFD: 'reforwarded',
+      };
+
       const mappedData = versionRecorList.map((item, index) => {
-        let statusColor = `${item.statusCode === 'INI' ? 'initiated' : (item.statusCode === 'FWD' ? 'forwarde' : item.statusCode === 'RWD' ? 'reviewed' : item.statusCode === 'APG' ? 'approved' : item.statusCode === 'RVD' ? 'revoked' : ['RTG', 'RTM'].includes(item.statusCode) ? 'returned' : 'reforwarded')}`;
+        const statusColor = statusClasses[item.statusCode] || 'default';
+
+        const generateActionButtons = () => {
+          const buttons = [];
+
+          // Common actions for specific statuses
+          if (['INI', 'RTM', 'RTG', 'RVD'].includes(item.statusCode)) {
+            buttons.push(
+              <button
+                className="icon-button edit-icon-button me-1"
+                onClick={() => redirecttoQmDocument(item)}
+                title="Edit"
+              >
+                <i className="material-icons">edit_note</i>
+              </button>,
+              <button
+                className="icon-button me-1"
+                style={{ color: '#439cfb' }}
+                onClick={() => {
+                  setSingleDoc(item);
+                  setOpenDialog2(true);
+                }}
+                title="Document Summary"
+              >
+                <i className="material-icons">summarize</i>
+              </button>
+            );
+            buttons.push(
+              <button
+                className="icon-button kpi-icon-button me-1"
+                onClick={() => addKpi(item)}
+                title="Add KPI"
+              >
+                <i className="material-icons">fact_check</i>
+              </button>,
+              <button
+                className="icon-button me-1"
+                style={{ color: 'rgb(255, 181, 44)' }}
+                onClick={() => editDescription(item)}
+                title="Edit Description"
+              >
+                <i className="material-icons">edit</i>
+              </button>
+            );
+          }
+          if ((docName === 'dwp' || docName === 'gwp') && (item.statusCode !=='APG')) {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: '#439cfb' }}
+                onClick={() => redirecttoRiskRegisterComponent(item)}
+                title="Risk"
+              >
+                <i className="material-icons">app_registration</i>
+              </button>
+            );
+          }
+          buttons.push(getDocPDF('', item));
+          // Role-based actions
+          if (roleName?.trim() === 'Divisional MR' && ['INI', 'RTM', 'RTG', 'RVD'].includes(item.statusCode)) {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Forward"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">fast_forward</i>
+              </button>
+            );
+          }
+
+          if (roleName?.trim() === 'MR' && ['FWD', 'RFD'].includes(item.statusCode)) {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Review"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">check_circle</i>
+              </button>
+            );
+          }
+
+          if (empIdAsNumber === versionRecorList[0]?.approvedBy && item.statusCode === 'RWD') {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: 'green' }}
+                title="Approve"
+                onClick={() => openModal(item, roleName)}
+              >
+                <i className="material-icons">check_circle</i>
+              </button>
+            );
+          }
+
+          // Additional actions
+          if (item.statusCode === 'APG' && index === 0) {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: 'darkorange' }}
+                title="Amend"
+                onClick={openAmmendModal}
+              >
+                <i className="material-icons">note_alt</i>
+              </button>
+            );
+          }
+
+          if (['FWD', 'RFD'].includes(item.statusCode) && ['Divisional MR', 'MR'].includes(roleName?.trim())) {
+            buttons.push(
+              <button
+                className="icon-button me-1"
+                style={{ color: 'red' }}
+                title="Revoke"
+                onClick={() => RevokeSubmit(item, empIdAsNumber)}
+              >
+                <i className="material-icons">settings_backup_restore</i>
+              </button>
+            );
+          }
+
+          return buttons;
+        };
+
         return {
           sn: index + 1,
-          description: item.description || '-' || '-',
-          // from: 'V' + item[5] + '-R' + item[6] || '-',
-          from: index + 1 < versionRecorList.length ? 'I' + versionRecorList[index + 1].issueNo + '-R' + versionRecorList[index + 1].revisionNo : '--',
-          to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+          description: item.description || '-',
+          from: index + 1 < versionRecorList.length
+            ? `I${versionRecorList[index + 1].issueNo}-R${versionRecorList[index + 1].revisionNo}`
+            : '--',
+          to: `I${item.issueNo}-R${item.revisionNo}` || '-',
           issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-          // status: item.status || '--',
-          status: <Box className={statusColor} onClick={() => openTran(item)}><Box class='status'>{item.status}<i class="material-icons float-right font-med">open_in_new</i></Box></Box> || '-',
-          action: (
-            <div>
-
-              <>
-                {(item.statusCode === 'INI' || item.statusCode === 'RTM' || item.statusCode === 'RTG' || item.statusCode === 'RVD') && (
-                  <>
-                    <button className="icon-button edit-icon-button me-1" onClick={() => redirecttoQmDocument(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
-                    <button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => { setSingleDoc(item); setOpenDialog2(true); }} title="Document Summary"> <i className="material-icons"  >summarize</i></button>
-                    {docName && docName === 'dwp' ? (<button className="icon-button me-1" style={{ color: '#439cfb' }} onClick={() => redirecttoRiskRegisterComponent(item)} title="Risk"> <i className="material-icons"  >app_registration</i></button>) : " "}
-                    <button className="icon-button kpi-icon-button me-1" onClick={() => addKpi(item)} title="Add KPI"> <i className="material-icons"  >fact_check</i></button>
-                    <button className="icon-button me-1" style={{ color: 'rgb(255, 181, 44)' }} onClick={() => editDescription(item)} title="Edit Description" >
-                      <i className="material-icons">edit</i>
-                    </button>
-                  </>
-                )}
-                {getDocPDF('', item)}
-                {roleName && roleName.trim() === 'Divisional MR' && (item.statusCode === 'INI' || item.statusCode === 'RTM' || item.statusCode === 'RTD' || item.statusCode === 'RVD') ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Forward" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">fast_forward</i>
-                  </button>
-                ) : " "}
-                {roleName && roleName.trim() === 'MR' && (item.statusCode === 'FWD' || item.statusCode === "RFD") ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Review" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">check_circle</i>
-                  </button>
-                ) : " "}
-                {empIdAsNumber === versionRecorList[0].approvedBy && item.statusCode === 'RWD' ? (
-                  <button className="icon-button me-1" style={{ color: 'green' }} title="Approve" onClick={() => openModal(item, roleName)}>
-                    <i className="material-icons">check_circle</i>
-                  </button>
-                ) : " "}
-                {(item.statusCode === 'APG' && index == 0) && (<button className="icon-button me-1" style={{ color: 'darkorange' }} title="Amend" onClick={() => openAmmendModal()}>
-                  <i className="material-icons">note_alt</i>
-                </button>)}
-                {(item.statusCode === 'FWD' || item.statusCode === 'RFD') && roleName && (roleName.trim() === 'Divisional MR' || roleName.trim() === 'MR') && (<button className="icon-button me-1" style={{ color: 'red' }} title="Revoke" onClick={() => RevokeSubmit(item, empIdAsNumber)}>
-                  <i className="material-icons">settings_backup_restore</i>
-                </button>)}
-
-                {/* <button className="icon-button me-1" style={{color: '#ea5753'}} title="Mapping Of Clauses" onClick={()=>addMappingOfClasses(item)} > <i className="material-icons"  >table_chart</i></button> */}
-
-              </>
-            </div>
+          status: (
+            <Box className={statusColor} onClick={() => openTran(item)}>
+              <Box className="status">
+                {item.status}
+                <i className="material-icons float-right font-med">open_in_new</i>
+              </Box>
+            </Box>
           ),
-        }
+          action: <div>{generateActionButtons()}</div>,
+        };
       });
+
 
       const employee = await getEmployee();
       const MRList = await getMRList();
@@ -283,14 +388,19 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
     window.open('/dwp-revision-tran', '_blank');
   }
 
-  const setDwpDivisionList = async (imsFormRoleId, empId) => {
+  const setDwpDivisionList = async (imsFormRoleId, empId,divisionId) => {
 
     const dwpDivisionList = await getDwpDivisionList(imsFormRoleId, empId);
 
     if (dwpDivisionList && dwpDivisionList.length > 0) {
       if (docName === 'dwp') {
-        setGroupDivisionId(dwpDivisionList[0].divisionId);
-        setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: dwpDivisionList[0]?.divisionId || 0 }));
+        if(divisionId){
+          setGroupDivisionId(divisionId);
+          setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: divisionId || 0 }));
+        }else{
+          setGroupDivisionId(dwpDivisionList[0].divisionId);
+          setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: dwpDivisionList[0]?.divisionId || 0 }));
+        }
       }
     }
 
@@ -298,13 +408,18 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
 
   };
 
-  const setDwpDivisionGroupList = async (imsFormRoleId, empId) => {
+  const setDwpDivisionGroupList = async (imsFormRoleId, empId,groupId) => {
 
     const dwpDivisionGroupList = await getDwpDivisionGroupList(imsFormRoleId, empId);
     if (dwpDivisionGroupList && dwpDivisionGroupList.length > 0) {
       if (docName === 'gwp') {
-        setGroupDivisionId(dwpDivisionGroupList[0].groupId);
-        setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: dwpDivisionGroupList[0]?.groupId || 0 }));
+        if(groupId){
+          setGroupDivisionId(groupId);
+          setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: groupId || 0 }));
+        }else{
+          setGroupDivisionId(dwpDivisionGroupList[0].groupId);
+          setQmsDocTypeDto(prevState => ({ ...prevState, groupDivisionId: dwpDivisionGroupList[0]?.groupId || 0 }));
+        }
       }
     }
     setDivisionGroupList(dwpDivisionGroupList);
@@ -385,29 +500,42 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
   }
 
   const handleSubmit = async (values) => {
-    const reviewedBy = filteredMrList.length > 0 ? filteredMrList[0].empId : ""
-    var action = values.action;
-    if ((action === "R" && (!values.remarks || values.remarks.trim() === "")) || (statusCode === 'RTM' || statusCode === 'RTG' || statusCode === 'RVD') && (!values.remarks || values.remarks.trim() === "")) {
+    const reviewedBy = filteredMrList.length > 0 ? filteredMrList[0].empId : "";
+
+    const { action, remarks } = values;
+
+    // Check if remarks are required for specific actions and statuses
+    if (
+      (action === "R" && (!remarks || remarks.trim() === "")) ||
+      (['RTM', 'RTG', 'RVD'].includes(statusCode) && (!remarks || remarks.trim() === ""))
+    ) {
       return Swal.fire("Warning", "Please Enter the Remarks!", "warning");
     }
+
+    // Prepare new values for submission
     const newValue = { ...values, reviewedBy, revisionRecordId, empId };
-    var submit = statusCode === 'RWD' ? "Are you sure to  Approve ? " : "Are you sure to Forward ? ";
-    var textsubmit = statusCode === 'RWD' ? "Approved Successfully " : "Forwarded Successfully  ";
-    var title = action === 'R' ? "Are you sure to Return ? " : submit;
-    var text = action === 'R' ? "Returned Successfully" : textsubmit;
-    const confirm = await AlertConfirmation({
-      title: title,
-      message: '',
-    });
+
+    // Define submission messages based on statusCode
+    const submitMessage = statusCode === 'RWD' ? "Are you sure to Approve?" : "Are you sure to Forward?";
+    const successMessage = statusCode === 'RWD' ? "Approved Successfully" : "Forwarded Successfully";
+
+    const title = action === 'R' ? "Are you sure to Return?" : submitMessage;
+    const text = action === 'R' ? "Returned Successfully" : successMessage;
+
+    // Show confirmation alert
+    const confirm = await AlertConfirmation({ title, message: '' });
+
     if (confirm) {
       try {
+        // Call the API to forward or approve the document
         const response = await forwardDwpGwp(newValue);
+
         if (response === 200) {
           fetchData();
           setShowModal(false);
-          setInitialValues({
-            reviewedBy: ""
-          })
+          setInitialValues({ reviewedBy: "" });
+
+          // Show success alert
           Swal.fire({
             icon: "success",
             title: docName.toUpperCase(),
@@ -416,14 +544,18 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
             timer: 1500
           });
         } else {
-          Swal.fire("Error!", "Failed to Forward" + docName.toUpperCase() + " ", "error");
+          // Show error alert if the API response is not successful
+          Swal.fire("Error!", `Failed to Forward ${docName.toUpperCase()}`, "error");
         }
       } catch (error) {
-        console.error("Error Forward " + docName.toUpperCase() + ":", error);
-        Swal.fire("Error!", "There was an issue Forward " + docName.toUpperCase() + ".", "error");
+        console.error(`Error Forwarding ${docName.toUpperCase()}:`, error);
+
+        // Show error alert for any exception
+        Swal.fire("Error!", `There was an issue Forwarding ${docName.toUpperCase()}.`, "error");
       }
     }
-  }
+  };
+
 
   const onchangeIsNewIssue = (event) => {
     if (versionRecordList && versionRecordList.length > 0) {
@@ -539,6 +671,26 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
       }
     }
   }
+
+  const prepareLabel =
+    (statusCode === "INI" || statusCode === "RTM" || statusCode === "RTG" || statusCode === "RVD")
+      ? "Prepare By Divisional MR"
+      : "Prepared By Divisional MR";
+
+  const reviewLabel =
+    (statusCode === "INI" || statusCode === "FWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === "RVD")
+      ? "Review By"
+      : statusCode === "RTM"
+        ? "Returned By"
+        : "Reviewed By";
+
+  const approvalLabel =
+    (statusCode === "INI" || statusCode === "FWD" || statusCode === "RWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === "RVD" || statusCode === "RTM")
+      ? "Approve By"
+      : statusCode === "RTG"
+        ? "Returned By"
+        : "Approved By";
+
   return (
 
     <div className="card">
@@ -666,8 +818,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start", display: "flex", alignItems: "center" }}>
                                     <span style={{ color: "black", fontSize: "1.2rem", padding: "0px", marginRight: "5px" }}>
-                                      {(statusCode === "INI" || statusCode === "RTM" || statusCode === "RTG" || statusCode === "RVD")
-                                        ? "Prepare By" : "Prepared By"} :
+                                      {["INI", "RTM", "RTG", "RVD"].includes(statusCode) ? "Prepare By" : "Prepared By"}:
                                     </span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start", display: "flex", alignItems: "center" }}>
@@ -705,11 +856,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
                               ) :
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start" }}>
-                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "0px" }}> {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === 'RVD')
-                                      ? "Review By "
-                                      : statusCode === "RTM"
-                                        ? "Returned By "
-                                        : "Reviewed By "} : </span>
+                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "0px" }}> {reviewLabel} :</span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start" }}>
                                     <span style={{ color: "blue", fontSize: "1.2rem", padding: "0px" }}>{versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : ""}</span> </div>
@@ -741,11 +888,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
                                 </Field>) :
                                 <div className="row">
                                   <div className="col-md-2" style={{ textAlign: "start" }}>
-                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "0px" }}>{(statusCode === "INI" || statusCode === "FWD" || statusCode === "RWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === 'RVD' || statusCode === 'RTM')
-                                      ? "Approve By "
-                                      : statusCode === "RTG"
-                                        ? "Returned By "
-                                        : "Approved By "} : </span>
+                                    <span style={{ color: "black", fontSize: "1.2rem", padding: "0px" }}>{approvalLabel} :</span>
                                   </div>
                                   <div className="col-md-8" style={{ textAlign: "start" }}>
                                     <span style={{ color: "blue", fontSize: "1.2rem", padding: "0px" }}>{versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : ""}</span> </div>
@@ -969,8 +1112,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
         :
         (<div className="d-flex align-items-center justify-content-center" style={{ gap: "15px" }}>
           <div style={{ background: "linear-gradient(to top,#3c96f7 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
-            {(statusCode === "INI" || statusCode === "RTM" || statusCode === "RTG" || statusCode === "RVD")
-              ? "Prepare By Divisional MR" : "Prepared By Divisional MR"} - {versionRecordList.length > 0 ? versionRecordList[0].initiatedByEmployee : ""}
+            {prepareLabel}  - {versionRecordList.length > 0 ? versionRecordList[0].initiatedByEmployee : ""}
             {(statusCode === "FWD" || statusCode === "RWD" || statusCode === "APG" || statusCode === "RFD") && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}
@@ -978,22 +1120,14 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
           <span style={{ fontSize: "1.5rem" }}>→</span>
           <div style={{ background: "linear-gradient(to top, #eb76c3 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
 
-            {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === 'RVD')
-              ? "Review By MR"
-              : statusCode === "RTM"
-                ? "Returned By MR"
-                : "Reviewed By MR"} - {versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : ""}
+            {reviewLabel} - {versionRecordList.length > 0 ? versionRecordList[0].reviewedByEmployee : ""}
             {(statusCode === "RWD" || statusCode === "APG") && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}
           </div>
           <span style={{ fontSize: "1.5rem" }}>→</span>
           <div style={{ background: "linear-gradient(to top, #9b999a 10%, transparent 115%)", padding: "10px 20px", textAlign: "center", borderRadius: "5px", }}>
-            {(statusCode === "INI" || statusCode === "FWD" || statusCode === "RWD" || statusCode === "RFD" || statusCode === "RTG" || statusCode === 'RVD' || statusCode === 'RTM')
-              ? "Approve By GD"
-              : statusCode === "RTG"
-                ? "Returned By GD"
-                : "Approved By GD"} - {versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : ""}
+            {approvalLabel}  - {versionRecordList.length > 0 ? versionRecordList[0].approvedByEmployee : ""}
             {statusCode === "APG" && (
               <span style={{ marginLeft: "10px", color: "green !important", fontSize: "1.2rem" }}>✔</span>
             )}

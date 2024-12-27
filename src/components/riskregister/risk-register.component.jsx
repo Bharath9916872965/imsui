@@ -8,6 +8,7 @@ import { Autocomplete, ListItemText, TextField } from "@mui/material";
 import withRouter from "common/with-router";
 import { CustomMenuItem } from "services/auth.header";
 import { getRiskRegisterList, insertRiskRegister } from "services/risk.service";
+import RiskRegisterPrint from "components/prints/qms/risk-register-print";
 
 
 const RiskRegisterComponent = ({ router }) => {
@@ -19,9 +20,12 @@ const RiskRegisterComponent = ({ router }) => {
   const [riskNo, setRiskNo] = useState(0);
   const [tblriskRegisterList, setTblRiskRegisterList] = useState([]);
   const [actionFrom, setActionFrom]=useState([]);
+  const [element,setElement] = useState('')
 
  
-  var data1 = revisionElements.divisionMasterDto;
+  const data1 = revisionElements.docType === "dwp" 
+  ? revisionElements.divisionMasterDto 
+  : revisionElements.divisionGroupDto;
   const [initialValues, setInitialValues] = useState({
     riskDescription: "",
     technicalPerformance: "",
@@ -55,6 +59,8 @@ const RiskRegisterComponent = ({ router }) => {
 
   const riskRegister = async () => {
     try {
+      const eleData = router.location.state?.revisionElements;
+      setElement(eleData)
       const riskregisterlist = await getRiskRegisterList(revisionElements.revisionRecordId);
       setTableData(riskregisterlist);
     } catch (error) {
@@ -63,6 +69,10 @@ const RiskRegisterComponent = ({ router }) => {
 
     }
   };
+
+  const getDocPDF = (action, revisionElements) => {
+    return <RiskRegisterPrint action={action} revisionElements={revisionElements} />
+  }
 
   const setTableData = (list) => {
     const mappedData = list.map((item, index) => ({
@@ -84,9 +94,15 @@ const RiskRegisterComponent = ({ router }) => {
   }
 
   const AddSubRiskRegister = useCallback((element) => {
-    navigate('/mitigation-risk-register', { state: { riskRegisterData: element } })
-  }, [navigate]);
-
+      const updatedElement = {
+        ...element,
+        divisionCode: revisionElements.docType === "dwp" ?  data1.divisionCode: data1.groupCode // Add divisionCode here
+      };
+      navigate('/mitigation-risk-register', { state: { riskRegisterData: updatedElement } });
+    },
+    [navigate, revisionElements.docType === "dwp" ?  data1.divisionCode: data1.groupCode] 
+  );
+  
 
   const editRiskRegister = async (item) => {
     setShowModal(true);
@@ -134,7 +150,10 @@ const RiskRegisterComponent = ({ router }) => {
           Swal.fire({
             icon: "success",
             title: '',
-            text: `${successMessage} for ${revisionElements.docType.toUpperCase() + ' - ' + data1.divisionCode} `,
+            text: `${successMessage} for ${revisionElements.docType.toUpperCase()} - ${
+              revisionElements.docType === "dwp" ? data1.divisionCode : data1.groupCode
+            }`,
+            
             showConfirmButton: false,
             timer: 2500
           });
@@ -187,7 +206,13 @@ const RiskRegisterComponent = ({ router }) => {
   }
 
   const goBack = () => {
-    navigate(-1);
+    if(element.docType === 'dwp'){
+      navigate('/dwp', { state: { divisionId: element.groupDivisionId } })
+    }else{
+      navigate('/gwp', { state: { divisionId: element.groupDivisionId } })
+    }
+    //navigate('/risk-register', { state: { divisionId: element.groupDivisionId } })
+   // navigate(-1, { state: { divisionId: element }});
   };
 
   return (
@@ -195,7 +220,7 @@ const RiskRegisterComponent = ({ router }) => {
       <Navbar />
       <div className="card">
         <div className="card-body text-center">
-          <h3>{revisionElements.docType.toUpperCase() + '-' + data1.divisionCode} : Risk Register</h3>
+          <h3>{revisionElements.docType.toUpperCase() }-{revisionElements.docType === "dwp" ?  data1.divisionCode: data1.groupCode} : Risk Register</h3>
           <div id="card-body customized-card">
             <Datatable columns={columns} data={tblriskRegisterList} />
           </div>
@@ -206,7 +231,10 @@ const RiskRegisterComponent = ({ router }) => {
             <button className="btn back "  onClick={goBack}>
               Back
             </button>
-          </div>
+            {/* <button className="btn btn-dark" onClick={getDocPDF('', revisionElements)}>
+              PRINT
+            </button> */}
+             </div>
           {showModal && (
             <>
               {/* Backdrop */}
