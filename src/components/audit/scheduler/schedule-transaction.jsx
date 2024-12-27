@@ -43,6 +43,8 @@ const ScheduleTransactionComponent = () => {
     'AAL': ' Schedule Acknowledged By',
     'AES': ' Schedule CheckList Submitted By',
     'ARS': ' Schedule CheckList Submitted By',
+    'ABA': ' Schedule CheckList Accepted By',
+    'RBA': ' Schedule CheckList Rejected By',
   };
 
   const back = ()=>{
@@ -70,16 +72,26 @@ const ScheduleTransactionComponent = () => {
           <div id="card-body customized-card">
           <Box className="col-md-11  text-left-center-card mg-top-10"  >
             {transaction && transaction.length >0 && transaction.map(item =>{
-                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':['AES'].includes(item.auditStatus)?'aditee-sub':['ARS'].includes(item.auditStatus)?'aditor-sub':'acknowledge-bg')}`;
+                    let statusColor = `${item.auditStatus === 'INI'?'initiated-bg' : (item.auditStatus === 'FWD' ? 'forwarde-bg' : item.auditStatus === 'ARF'?'reschedule-bg':['ASR','ARL','RBA'].includes(item.auditStatus)?'returned-bg':['ASA','AAL'].includes(item.auditStatus)?'lead-auditee-bg':['AES'].includes(item.auditStatus)?'aditee-sub':['ARS'].includes(item.auditStatus)?'aditor-sub':'acknowledge-bg')}`;
               return(
                 <>
                   <div className="timeline-row">
                    <div class="timeline-content" >
 						        <h6 className={statusColor}> {scheduleSta[item.auditStatus]}&nbsp;/&nbsp;<span >{item.empName}</span></h6> 
+                      <p style={{ backgroundColor: "#f0f2f5", padding: "10px", borderRadius: "5px" }}>
+                        {item.remarks ? (
+                          <>
+                            <span className="remarks_title" style={{ fontWeight: "bold" }}>Remarks : </span>
+                            {item.remarks}
+                          </>
+                        ) : (
+                          <span className="remarks_title" style={{ fontWeight: "bold" }}>No Remarks</span>
+                        )}
+                      </p>
 						       </div>
                    <div class="timeline-dot fb-bg mid-line"></div>
                    <div class="timeline-time">
-                     <div class="form-inline margin-half-top"><span className="date-styles">{format(new Date(item.transactionDate),'MMM dd, yyyy, HH:MM a')}</span></div>
+                     <div class="form-inline margin-half-top"><span className="date-styles">{format(new Date(item.transactionDate),'MMM dd, yyyy, hh:mm a')}</span></div>
                    </div>
                  </div>
                 </>
