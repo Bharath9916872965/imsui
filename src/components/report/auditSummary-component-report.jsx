@@ -262,11 +262,9 @@ setFilScheduleList(mappedData);
           </div><br />
           <div className="row">    
   <div style={{ padding: '10px' }}>
-  <input type="radio" id="auditorTeams" name="auditOption" value="A"  checked={selectedOption === "A"} onChange={handleRadioChange} /> <label htmlFor="auditorTeams" style={{ fontWeight: 'bold' }}>Auditors </label>&nbsp;&nbsp;
-  <input type="radio" id="scheduleList" name="auditOption" value="S"  checked={selectedOption === "S"} onChange={handleRadioChange} /> <label htmlFor="scheduleList" style={{ fontWeight: 'bold' }}>Schedule List</label>&nbsp;&nbsp;
-  <input type="radio" id="nc" name="auditOption" value="N"  checked={selectedOption === "N"} onChange={handleRadioChange} /> <label htmlFor="nc" style={{ fontWeight: 'bold' }}>NC</label>&nbsp;&nbsp;
-  <input type="radio" id="obc" name="auditOption" value="B"  checked={selectedOption === "B"} onChange={handleRadioChange} /> <label htmlFor="obc" style={{ fontWeight: 'bold' }}>OBS</label>&nbsp;&nbsp;
-  <input type="radio" id="ofi" name="auditOption" value="O"  checked={selectedOption === "O"} onChange={handleRadioChange} /> <label htmlFor="ofi" style={{ fontWeight: 'bold' }}>OFI</label>
+  <input type="radio" id="auditorTeams" name="auditOption" value="A"  checked={selectedOption === "A"} onChange={handleRadioChange} /> <label htmlFor="auditorTeams" style={{ fontWeight: 'bold' }}>Auditors </label>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  <input type="radio" id="scheduleList" name="auditOption" value="S"  checked={selectedOption === "S"} onChange={handleRadioChange} /> <label htmlFor="scheduleList" style={{ fontWeight: 'bold' }}>Schedule List</label>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
+  
  
  &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
   {selectedOption === 'A' && (
