@@ -29,9 +29,11 @@ import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transact
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
 import AuditSummaryReport from 'components/report/auditSummary-component-report';
 import NcReportComponent from 'components/report/nc-component-report';
+import CorrectiveActionList from 'components/audit/scheduler/check-list/corrective-action/corrective-action-list';
 import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
 import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
+import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
 
 function App() {
   return (
@@ -55,8 +57,7 @@ function App() {
         <Route path="/dwp-add-content" element={<DwpAddDocContentComponent />} />
         <Route path="/qm-revision-tran" element={<RevisionTransactionComponent />} />
         <Route path="/dwp-revision-tran" element={<DWPRevisionTransactionComponent />} />
-        
-
+        <Route path="/qsp-revision-tran" element={<QSPRevisionTransactionComponent />} />
 
         {/* Audit */}
         <Route path="/auditor-list" element={<AuditorListComponent />} />
@@ -71,8 +72,9 @@ function App() {
         <Route path="/schedule-tran" element={<ScheduleTransactionComponent />} />
         <Route path="/check-list-master" element={<CheckListMasterComponent />} />
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
+        <Route path="/car-master" element={<CorrectiveActionList />} />
 
-        {/* Schedule */}
+        {/* KPI */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
         <Route path="/kpi-list" element={<KpiObjectiveAction />} />
 

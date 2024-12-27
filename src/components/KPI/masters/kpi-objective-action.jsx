@@ -34,6 +34,7 @@ const KpiObjectiveAction = ({router}) => {
   const [showModal, setShowModal] = useState(false);
   const [kpiUnitList,setKpiUnitList] = useState([])
   const [revisionName,setRevisionName] = useState('A');
+  const [divisionName,setDivisionName] = useState('A');
   const [avgKpiRating,setAvgKpiRating] = useState(0)
   const [initialValues,setInitialValues] = useState({
       kpiId     : 0,
@@ -86,6 +87,7 @@ const KpiObjectiveAction = ({router}) => {
 
       if(dwpList && dwpList.length >0 && iqaList.length >0){
         setRevisionId(String(dwpList[0].revisionRecordId))
+        setDivisionName(dwpList[0].description)
         if(kpiRatingList.filter(item => item.revisionRecordId === dwpList[0].revisionRecordId && iqaList[0].iqaId === item.iqaId).length > 0){
           setIsAddMode(false)
           const filrating = kpiRatingList.filter(item => item.revisionRecordId === dwpList[0].revisionRecordId && iqaList[0].iqaId === item.iqaId);
@@ -157,6 +159,8 @@ const KpiObjectiveAction = ({router}) => {
 
   const onRevisionChange = (value)=>{
     setRevisionId(value);
+    const revRow = revisionOptions.filter(data => Number(data.value) === Number(value));
+    setDivisionName(revRow[0].label)
     if(iqaOptions.length > 0){
       if(kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(value) && iqaId === item.iqaId).length > 0){
         setIsAddMode(false)
@@ -317,13 +321,14 @@ const KpiObjectiveAction = ({router}) => {
 
   const openRating =async(item)=>{
    const kpiRow =  kpiMasterList.filter(data => Number(data.kpiId) === Number(item.kpiId))
-    setRevisionName(kpiRow[0].groupDivisionCode+' - '+iqaNo)
+   setRevisionName(kpiRow[0].groupDivisionCode+' - '+iqaNo)
     const ratingList = await getKpiRatingList();
     setKpiRatingList(ratingList);
     setInitialValues({
       kpiId     : item.kpiId,
       objective : item.kpiObjectives,
       metrics   : item.kpiMerics,
+      norms     : item.kpiNorms,
       target    : item.kpiTarget,
       kpiUnitId : item.kpiUnitId,
       revisionRecordId : item.revisionRecordId,
@@ -340,15 +345,15 @@ const KpiObjectiveAction = ({router}) => {
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
           <Box flex="73%" className='text-center'><h3>Key Process Indicator List</h3></Box>
-          <Box flex="15%">
-            <SelectPicker options={revisionOptions} label="Division/Group" 
-            value={revisionOptions && revisionOptions.length >0 && revisionOptions.find(option => option.value === revisionId) || null}
-             handleChange={(newValue) => {onRevisionChange( newValue?.value) }}/>
-          </Box>
           <Box flex="12%">
             <SelectPicker options={iqaOptions} label="IQA No"
             value={iqaOptions && iqaOptions.length >0 && iqaOptions.find(option => option.value === iqaId) || null}
              handleChange={(newValue) => {onIqaChange( newValue?.value) }}/>
+          </Box>
+          <Box flex="15%">
+            <SelectPicker options={revisionOptions} label="Division/Group" 
+            value={revisionOptions && revisionOptions.length >0 && revisionOptions.find(option => option.value === revisionId) || null}
+             handleChange={(newValue) => {onRevisionChange( newValue?.value) }}/>
           </Box>
          </Box>
           <div id="card-body customized-card">
@@ -392,7 +397,7 @@ const KpiObjectiveAction = ({router}) => {
                  })}
                 </tbody>
                </table>
-               <h5 className="noteColor" >{iqaNo+' Average KPI Rating of '+revisionName+': '+ avgKpiRating}</h5>
+               <h5 className="noteColor" >{iqaNo+' Average KPI Rating of '+divisionName+': '+ avgKpiRating}</h5>
                { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
                  <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
               </CardContent>

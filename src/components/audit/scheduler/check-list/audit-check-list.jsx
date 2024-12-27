@@ -35,10 +35,12 @@ const AuditCheckListComponent = ({router}) => {
   const fileInputRef = useRef(null);
   const [imgView, setimgView] = useState('');
   const [isValidationActive, setIsValidationActive] = useState(false);
-  const [isAditor,setIsAditor] = useState(false);
+  const [isAuditor,setIsAuditor] = useState(false);
   const [isAuditeeAdd,setIsAuditeeAdd] = useState(true);
   const [isAdmin,setIsAdmin] = useState(false)
-  const [roleId,setRoleId] = useState(0)
+  const [schduleDate,setSchduleDate] = useState(new Date())
+  const [roleId,setRoleId] = useState(0);
+  const [flag,setFlag] = useState('')
   let attachMocId = 0;
   let auditorRemarksValid = false
   let lv1MocId ='';
@@ -51,9 +53,9 @@ const AuditCheckListComponent = ({router}) => {
     try {
      const role = localStorage.getItem('roleId')
      if(Number(role) === 7){
-      setIsAditor(true)
+      setIsAuditor(true)
      }else {
-      setIsAditor(false)
+      setIsAuditor(false)
      }
 
      if(['1','2','3','4'].includes(String(role))){
@@ -64,16 +66,25 @@ const AuditCheckListComponent = ({router}) => {
 
      setRoleId(role)
       const eleData = router.location.state?.element;
+      console.log('eleData------- ',eleData)
+      const scDate = eleData.scheduleDate;
+      const [datePart] = scDate.split(" ")
+      console.log('new Date(datePart)------- ',new Date(datePart))
+      console.log('new Date------- ',new Date())
+      console.log('new Date------- ',new Date(datePart) <= new Date())
+      
+
+      setSchduleDate(new Date(datePart));
+      const flag = router.location.state?.flag;
+      setFlag(flag)
       if(eleData){
         setElement(eleData)
        const chapters  = await getMocTotalList();
        const obsList   = await getObservation();
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
-       console.log('chapters',chapters);
-       console.log('obsList',obsList);
-       console.log('chList',chList);
-       console.log('imgSource',chList);
+
+       
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
       }
@@ -113,7 +124,7 @@ const AuditCheckListComponent = ({router}) => {
       setMainClause(mainChapter);
       setFilMainClause(mainChapter.filter((item, index, self) => index === self.findIndex((el)=>el.sectionNo === item.sectionNo)))
       sectionOpenRef.current = mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo;
-      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4'].includes(String(role)))
+      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4'].includes(String(role)),flag,eleData)
       }
 
     } catch (error) {
@@ -125,10 +136,10 @@ const AuditCheckListComponent = ({router}) => {
     fetchData();
   }, []);
 
-  const setButtoncolors = (list,isAditor,isAdmin)=>{
+  const setButtoncolors = (list,isAuditor,isAdmin)=>{
     let newSuccessBtns = [];
     let newUnsuccessBtns = [];
-    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && ((!isAditor && !isAdmin) || data.auditorRemarks !== '')).map(item => item.sectionNo))];
+    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && ((!isAuditor && !isAdmin) || data.auditorRemarks !== '')).map(item => item.sectionNo))];
     secs.forEach(item =>{
       if(setColor(list,item)){
         newUnsuccessBtns.push(String(item))
@@ -157,14 +168,14 @@ const AuditCheckListComponent = ({router}) => {
 
   const afterSubmit = async ()=>{
     const chList   = await getAuditCheckList(element.scheduleId);
-    setButtoncolors(chList,isAditor,isAdmin)
+    setButtoncolors(chList,isAuditor,isAdmin)
     setCheckList(chList);
     if(isAddMode){
       const nextSection = getNextValue(sectionOpenRef.current);
       sectionOpenRef.current = nextSection;
-      setInitialValues(mainClause,nextSection,masterChapters,chList,isAditor,isAdmin)
+      setInitialValues(mainClause,nextSection,masterChapters,chList,isAuditor,isAdmin,flag,element)
     }else{
-      setInitialValues(mainClause,sectionOpenRef.current,masterChapters,chList,isAditor,isAdmin)
+      setInitialValues(mainClause,sectionOpenRef.current,masterChapters,chList,isAuditor,isAdmin,flag,element)
     }
     setIsValidationActive(false)
   }
@@ -180,9 +191,9 @@ const AuditCheckListComponent = ({router}) => {
   };
   
 
-  const setInitialValues = (mainChapter,secNo,filChapter,chList,isAditor,isAdmin)=>{
+  const setInitialValues = (mainChapter,secNo,filChapter,chList,isAuditor,isAdmin,flag,element)=>{
     selectionCount = 0; 
-    //setIsAditor(false)
+    //setIsAuditor(false)
     setAuditeeRemarksValidation([]);
     setObservations(new Map());
     const initialObservations   = new Map();
@@ -192,8 +203,8 @@ const AuditCheckListComponent = ({router}) => {
     if(chList.some(data => Number(data.sectionNo) === Number(secNo) && (data.clauseNo !== '8.3.1'))){
       chList.forEach((chapter) => {
         if (Number(chapter.sectionNo) === Number(secNo)) {
-          if(chapter.auditorRemarks === '' && (isAditor || isAdmin)){
-            //setIsAditor(true)
+          if(chapter.auditorRemarks === '' && (isAuditor || isAdmin ) && element.scheduleStatus !== 'AAA' ){
+            //setIsAuditor(true)
             //afterAuditeeSubmit
             mainChapter.forEach((chapter) => {
               if(Number(chapter.clauseNo) === Number(secNo) || compareSec(chapter.clauseNo,secNo)){
@@ -207,8 +218,8 @@ const AuditCheckListComponent = ({router}) => {
                   filChapter.forEach((chapter1) => {
                     if(chapter1.mocParentId === chapter.mocId){
                       leve1MocId = chapter1.mocId;
-                      //withoutChail
-                      if(!checksubChapter(chapter1.mocId)){
+                      //withoutChaild
+                      if(!checksubChapter(chapter1.mocId,filChapter)){
                         initialObservations.set(chapter1.mocId, 1);
                         initialAuditorRemarks.set(chapter1.mocId, 'NA');
                       }else{
@@ -254,7 +265,7 @@ const AuditCheckListComponent = ({router}) => {
             filChapter.forEach((chapter1) => {
               if(chapter1.mocParentId === chapter.mocId){
                 leve1MocId = chapter1.mocId;
-                if(!checksubChapter(chapter1.mocId)){
+                if(!checksubChapter(chapter1.mocId,filChapter)){
                   //withoutChaild
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
@@ -367,7 +378,7 @@ const AuditCheckListComponent = ({router}) => {
   }
 
   const openTable = (item)=>{
-    setInitialValues(mainClause,item,masterChapters,checkList,isAditor,isAdmin);
+    setInitialValues(mainClause,item,masterChapters,checkList,isAuditor,isAdmin,flag,element);
     //setSectionOpen(item)
     sectionOpenRef.current = item;
   }
@@ -424,7 +435,8 @@ const AuditCheckListComponent = ({router}) => {
     setIsValidationActive(true)
     auditorRemarksValid = false
     const mergedMap = new Map();
-    if(isAditor || isAdmin){
+    //Auditor
+    if((isAuditor && flag !== 'A') || isAdmin || (flag === 'L' && element.scheduleStatus === 'AES' )){
       observations.forEach((value,key)=>{
         if(value !== 0 && value !== 5 && value !== 1){
           if(auditorRemarks.get(key)?.trim() === 'NA' || auditorRemarks.get(key)?.trim() === ''){
@@ -447,7 +459,7 @@ const AuditCheckListComponent = ({router}) => {
           })
         }
       });
-
+    //Auditee
     }else{
       auditeeRemarks.forEach((value,key)=>{
         if(isAddMode){
@@ -467,8 +479,7 @@ const AuditCheckListComponent = ({router}) => {
         }
       });
     }
-
-    if(auditeeRemarksValidation.length !== selectionCount && !isAditor && !isAdmin){
+    if(auditeeRemarksValidation.length !== selectionCount && (!isAuditor || flag === 'A') && element.scheduleStatus === 'AAA'){
       Swal.fire({
         icon: "error",
         title: 'Please Add Auditee Remarks',
@@ -491,7 +502,7 @@ const AuditCheckListComponent = ({router}) => {
           if (result) {
             try {
              let response = '';
-             if(isAditor || (element.scheduleStatus === 'AES' && isAdmin)){
+             if(((isAuditor && flag !== 'A') || (element.scheduleStatus === 'AES' && isAdmin) || (element.scheduleStatus === 'AES' && flag === 'L')) && (new Date(schduleDate) <= new Date())){
               response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
              }else{
               response = await addAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
@@ -526,7 +537,7 @@ const AuditCheckListComponent = ({router}) => {
           if (result) {
             try {
              let response = '';
-             if(isAditor || (element.scheduleStatus === 'AES' && isAdmin)){
+             if(((isAuditor && flag !== 'A') || ((['ARS','RBA','AES'].includes(element.scheduleStatus)) && isAdmin) || (element.scheduleStatus === 'AES' && flag === 'L')) && (new Date(schduleDate) <= new Date())){
               response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
              }else{
               response = await updateAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
@@ -557,8 +568,8 @@ const AuditCheckListComponent = ({router}) => {
     }
   }
 
-  const checksubChapter =(mocId)=>{
-    return masterChapters.some(data => data.mocParentId === mocId)
+  const checksubChapter =(mocId,masterChapters)=>{
+    return masterChapters.some(data => Number(data.mocParentId) === Number(mocId))
   }
 
   const onFileSelected = (e) => {
@@ -646,7 +657,7 @@ const AuditCheckListComponent = ({router}) => {
                   {filMainClause.length > 0 &&filMainClause.map(item =>{
                     const fx = 90/filMainClause.length -1;
                     return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+item.description}</span>}>
-                      <button className={(isAditor || element.scheduleStatus === 'ARS' || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
+                      <button className={((flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) && (new Date(schduleDate) <= new Date()) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
                       (auditeeSuccessBtns.includes(item.sectionNo)?'btn btn-sm bg-auditee-success':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')} 
                       onClick={()=>openTable(Number(item.sectionNo))}>{item.sectionNo}</button></Tooltip></Box>)
                   })}
@@ -679,7 +690,7 @@ const AuditCheckListComponent = ({router}) => {
                                   <TextField label="Choose File" variant="outlined" type="file" size="small" margin="normal"
                                    onChange={(e) => onFileSelected(e)} InputLabelProps={{ shrink: true,}}
                                    inputProps={{ accept: "image/*",}} error={Boolean(fileError)} helperText={fileError} inputRef={fileInputRef} />&emsp;&emsp;
-                                   <button title="Upload Image" onClick={() => uploadImage()} className="btn btn-sm btn-success bt-sty upload-bt" disabled = {!isAditor}>Upload</button></td>
+                                   <button title="Upload Image" onClick={() => uploadImage()} className="btn btn-sm btn-success bt-sty upload-bt" disabled = {!isAuditor && !['1','2','3','4','7'].includes(String(roleId))}>Upload</button></td>
                               </tr>
                               <tr className="table-active box-border"><td colSpan={3} className="text-left  box-border">
                               {imgView && imgView !== '' && (<img src={imgView} alt="Selected" style={{  marginTop: '10px' }} /> )}
@@ -690,7 +701,7 @@ const AuditCheckListComponent = ({router}) => {
                               l = 0;
                               if(checkCont(chapter1.mocId,k)){
                                 lv1MocId = chapter1.mocId;
-                                if(checksubChapter(chapter1.mocId)){
+                                if(checksubChapter(chapter1.mocId,masterChapters)){
                                   return(
                                     <tr  className="table-active box-border">
                                      <td colSpan={3} className="text-left width60 box-border">&nbsp;{toRoman(k)+'. '+chapter1.description}</td>
@@ -706,9 +717,9 @@ const AuditCheckListComponent = ({router}) => {
                                       <Box flex="30%">
                                         <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
-                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : isAditor || element.scheduleStatus === 'ARS'}}
+                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly :  (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
                                          sx={{
-                                             '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
+                                             '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAuditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
                                              "& .MuiOutlinedInput-root": {
                                              "&:hover .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},
                                              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId)? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},
@@ -719,11 +730,11 @@ const AuditCheckListComponent = ({router}) => {
                                      </Box>
                                      </td>
                                      <td className="text-center width15 box-border">
-      {((element.scheduleStatus === 'ARS') || ((isAditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && <SelectPicker options={selectOptions}  value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
-                                     readOnly = {element.scheduleStatus === 'ARS'} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}</td>  
+      {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions}  value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
+                                     readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}</td>  
                                      <td className="width25 box-border">
-      {((element.scheduleStatus === 'ARS') || ((isAditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) &&<TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
-                                      inputProps={{readOnly : element.scheduleStatus === 'ARS'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
+      {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) &&<TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
+                                      inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                        InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}
                                       sx={{
                                         "& .MuiOutlinedInput-root": {
@@ -751,9 +762,9 @@ const AuditCheckListComponent = ({router}) => {
                                     <Box flex="30%">
                                       <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
-                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : isAditor || element.scheduleStatus === 'ARS'}}
+                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
                                          sx={{
-                                           '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
+                                           '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAuditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
                                            "& .MuiOutlinedInput-root": {
                                              "&:hover .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},
                                              "&.Mui-focused .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId)? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},
@@ -764,12 +775,12 @@ const AuditCheckListComponent = ({router}) => {
                                  </Box>
                                 </td>
                                 <td className="text-center width15 box-border">
-    {((element.scheduleStatus === 'ARS') || ((isAditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && <SelectPicker options={selectOptions} value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
-                                 readOnly = {element.scheduleStatus === 'ARS'} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}
+    {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions} value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
+                                 readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}
                                 </td>
                                 <td className="width25 box-border">
-    {((element.scheduleStatus === 'ARS') || ((isAditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && <TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
-                                   inputProps={{readOnly : element.scheduleStatus === 'ARS'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
+    {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
+                                   inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || Number(roleId) === 6 && !flag === 'L'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                     InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
@@ -790,7 +801,7 @@ const AuditCheckListComponent = ({router}) => {
                       )
                     }
                  })}
-                 {element && element.scheduleStatus !== 'ARS' && (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
+                 {element && (!['ARS','ABA'].includes(element.scheduleStatus)) && (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
                  <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
                  </CardContent>
                 </Card>

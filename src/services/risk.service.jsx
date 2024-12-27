@@ -40,3 +40,23 @@ export const insertRiskRegister = async (values)=>{
         throw error;
     }
 };
+
+export const mitigationRiskRegisterList = async (riskRegisterId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}mititgation-risk-register-list`,riskRegisterId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in mitigationRiskRegisterList', error);
+        throw error; 
+    }
+    
+};
+
+export const insertMitigationRiskRegister = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}insert-mititgation-risk-register`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in insertMitigationRiskRegisterList:', error);
+        throw error;
+    }
+};

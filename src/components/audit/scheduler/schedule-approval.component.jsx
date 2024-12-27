@@ -29,18 +29,20 @@ const ScheduleApprovalComponent = ({router}) => {
   const [element,setElement] = useState('');
   const [isBoth,setIsBoth] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
+  const [roleId,setRoleId] = useState(0);
+  const [heading,setHeading] = useState('')
 
 
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
+    { name: 'Date & Time (Hrs)', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '9%'  },
     { name: 'Division/Group', selector: (row) => row.divisionCode, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
     { name: 'Project', selector: (row) => row.project, sortable: true, grow: 2, align: 'text-center', width: '19%'  },
-    { name: 'Auditee', selector: (row) => row.auditee, sortable: true, grow: 2, align: 'text-start', width: '17%'  },
+    { name: 'Auditee', selector: (row) => row.auditee, sortable: true, grow: 2, align: 'text-start', width: '15%'  },
     { name: 'Team', selector: (row) => row.team, sortable: true, grow: 2, align: 'text-center', width: '7%'  },
-    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
+    { name: 'Status', selector: (row) => row.status, sortable: true, grow: 2, align: 'text-center', width: '14%'  },
     { name: 'Revision', selector: (row) => row.revision, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
-    { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '8%' },
+    { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '13%' },
   ];
 
 
@@ -49,6 +51,8 @@ const ScheduleApprovalComponent = ({router}) => {
       const scdList        = await getScheduleApprovalList();
       const iqaList        = await getIqaDtoList();
       const iqaNum = router.location.state?.iqaNo;
+      const role = localStorage.getItem('roleId')
+      setRoleId(role)
       setIqaFullList(iqaList);
       setScheduleList(scdList)
     
@@ -66,11 +70,11 @@ const ScheduleApprovalComponent = ({router}) => {
           const auditee = scList.filter(data => data.auditeeFlag === 'A');
           const auditor = scList.filter(data => data.auditeeFlag === 'L');
           if(auditee.length >0 && auditor.length >0){
-            setDataTable(auditee,'A')
-            setDataTable(auditor,'L')
+            setDataTable(auditee,'A',role)
+            setDataTable(auditor,'L',role)
             setIsBoth(true)
           }else{
-            setDataTable(scList,'F')
+            setDataTable(scList,'F',role)
             setIsBoth(false)
           }
         }else{
@@ -91,9 +95,9 @@ const ScheduleApprovalComponent = ({router}) => {
     fetchData();
   }, []);
 
-  const setDataTable = (list,flag)=>{
+  const setDataTable = (list,flag,role)=>{
     const mappedData = list.map((item,index)=>{
-      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
+      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
       return{
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',
@@ -105,9 +109,11 @@ const ScheduleApprovalComponent = ({router}) => {
         revision     : 'R'+item.revision || '-',
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
-                          {['AAA','AES','ARS'].includes(item.scheduleStatus) && <button title='Add CheckList' className={(item.fwdFlag === 1 && !['ARS'].includes(item.scheduleStatus)) ? " btn btn-outline-primary btn-sm me-1":" btn btn-outline-primary btn-sm me-1 mg-l-40"} onClick={() => addCheckList(item)}  ><i className="material-icons">playlist_add_check</i></button>}
-                          {item.fwdFlag === 1 && !['ARS'].includes(item.scheduleStatus)  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
-                          {['ARS'].includes(item.scheduleStatus) &&<button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
+                          {['AAA','AES','ARS','ABA','RBA'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
+                          {item.fwdFlag === 1 && !['ARS','ABA'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7'].includes(String(role)) || flag === 'L')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
+                          {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Auditee Reject"><i className="material-icons">assignment_return</i></button>}
+                          {['ARS','ABA','RBA'].includes(item.scheduleStatus) &&<button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
                           </>  
       }      
     });
@@ -121,8 +127,13 @@ const ScheduleApprovalComponent = ({router}) => {
     }
    }
 
-   const addCheckList = (item)=>{
-    navigate('/audit-check-list',{state:{element:item}})
+   const addCheckList = (item,flag)=>{
+    if(item.auditeeEmpId === Number(localStorage.getItem('empId'))){
+      navigate('/audit-check-list',{state:{element:item,flag : 'A'}})
+    }else{
+      navigate('/audit-check-list',{state:{element:item,flag : flag}})
+    }
+   
    }
 
    const openTran = (item)=>{
@@ -130,7 +141,46 @@ const ScheduleApprovalComponent = ({router}) => {
     window.open('/schedule-tran', '_blank');
    }
 
-   const forwardByAuditor = async (item)=>{
+   const acceptByAuditee = async (item)=>{
+    await AlertConfirmation({
+      title: 'Are you sure Accept CheckList ?' ,
+      message: '',
+      }).then(async (result) => {
+      if (result) {
+        try {
+         const response = await auditorForward(item);
+         if(response.status === 'S'){
+          afterSubmit(item);
+          Swal.fire({
+            icon: "success",
+            title: 'CheckList Accepted Successfully',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        } else {
+          Swal.fire({
+            icon: "error",
+            title: 'CheckList Accept Unsuccessful',
+            showConfirmButton: false,
+            timer: 1500
+          });
+        }
+        }catch (error) {
+            Swal.fire('Error!', 'There was an issue auditorForward.', 'error');
+          }
+      }
+    })
+   }
+
+   const forwardByAuditor = (item)=>{
+    if(item.scheduleStatus === 'RBA'){
+      scheduleReturn(item);
+    }else{
+      AuditorSubmit(item)
+    }
+   }
+
+   const AuditorSubmit = async (item)=>{
     await AlertConfirmation({
       title: 'Are you sure Forward CheckList ?' ,
       message: '',
@@ -159,6 +209,7 @@ const ScheduleApprovalComponent = ({router}) => {
           }
       }
     })
+    setShowModal(false);
    }
 
   const scheduleApprove = async (item)=>{
@@ -193,6 +244,11 @@ const ScheduleApprovalComponent = ({router}) => {
   }
 
   const scheduleReturn = (item)=>{
+    if(item.scheduleStatus === 'RBA'){
+      setHeading('Please, Add Your Forward Message Here.')
+    }else{
+      setHeading('Please, Add Your Send Back Message Here.')
+    }
     setShowModal(true);
     setElement(item)
   }
@@ -204,11 +260,11 @@ const ScheduleApprovalComponent = ({router}) => {
       const auditee = scList.filter(data => data.auditeeFlag === 'A');
       const auditor = scList.filter(data => data.auditeeFlag === 'L');
       if(auditee.length >0 && auditor.length >0){
-        setDataTable(auditee,'A')
-        setDataTable(auditor,'L')
+        setDataTable(auditee,'A',roleId)
+        setDataTable(auditor,'L',roleId)
         setIsBoth(true)
       }else{
-        setDataTable(scList,'F')
+        setDataTable(scList,'F',roleId)
         setIsBoth(false)
       }
     }else{
@@ -230,11 +286,11 @@ const ScheduleApprovalComponent = ({router}) => {
       const auditee = scList.filter(data => data.auditeeFlag === 'A');
       const auditor = scList.filter(data => data.auditeeFlag === 'L');
       if(auditee.length >0 && auditor.length >0){
-        setDataTable(auditee,'A')
-        setDataTable(auditor,'L')
+        setDataTable(auditee,'A',roleId)
+        setDataTable(auditor,'L',roleId)
         setIsBoth(true)
       }else{
-        setDataTable(scList,'F')
+        setDataTable(scList,'F',roleId)
         setIsBoth(false)
       }
     }else{
@@ -260,36 +316,42 @@ const ScheduleApprovalComponent = ({router}) => {
         timer: 1500
       });
     }else{
-      await AlertConfirmation({
-        title: 'Are you sure Return Schedule ?' ,
-        message: '',
-        }).then(async (result) => {
-        if (result) {
-          try {
-           element.message = message
-           const response = await returnSchedule(element);
-           if(response.status === 'S'){
-            afterSubmit(element);
-            setShowModal(false);
-            Swal.fire({
-              icon: "success",
-              title: response.message,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          } else {
-            Swal.fire({
-              icon: "error",
-              title: response.message,
-              showConfirmButton: false,
-              timer: 1500
-            });
-          }
-          }catch (error) {
-              Swal.fire('Error!', 'There was an issue Returning the Schdule.', 'error');
+      if(element.scheduleStatus === 'RBA'){
+          element.message = message
+          AuditorSubmit(element);
+      }else{
+        await AlertConfirmation({
+          title: element.scheduleStatus === 'ARS'?'Are you sure Reject CheckList ?.':'Are you sure Return Schedule ?',
+          message: '',
+          }).then(async (result) => {
+          if (result) {
+            try {
+             element.message = message
+             const response = await returnSchedule(element);
+             if(response.status === 'S'){
+              afterSubmit(element);
+              setShowModal(false);
+              Swal.fire({
+                icon: "success",
+                title: element.scheduleStatus === 'ARS'?'Check List Rejected Successfully':response.message,
+                showConfirmButton: false,
+                timer: 1500
+              });
+            } else {
+              Swal.fire({
+                icon: "error",
+                title: element.scheduleStatus === 'ARS'?'Check List Reject Unsuccessful':response.message,
+                showConfirmButton: false,
+                timer: 1500
+              });
             }
-        }
-      })
+            }catch (error) {
+                Swal.fire('Error!', 'There was an issue Returning the Schdule.', 'error');
+              }
+          }
+        })
+      }
+
     }
    }
 
@@ -324,7 +386,7 @@ const ScheduleApprovalComponent = ({router}) => {
           </div>
         </div>
       </div>
-       <ReturnDialog open={showModal} onClose={handleReturnDialogClose} onConfirm={handleReturnDialogConfirm}/>
+       <ReturnDialog open={showModal} onClose={handleReturnDialogClose} onConfirm={handleReturnDialogConfirm} heading ={heading}/>
     </div>
   );
 

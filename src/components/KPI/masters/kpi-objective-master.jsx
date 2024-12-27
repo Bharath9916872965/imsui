@@ -31,6 +31,7 @@ const KpiObjectiveMaster = ({router}) => {
       kpiId     : 0,
       objective : '',
       metrics   : '',
+      norms     : '',
       target    : '',
       kpiUnitId : 1,
       revisionRecordId : '0',
@@ -41,9 +42,10 @@ const KpiObjectiveMaster = ({router}) => {
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
     { name: 'Division/Group/LAB', selector: (row) => row.division, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
-    { name: 'Objectives', selector: (row) => row.objectives, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
-    { name: 'Metrics', selector: (row) => row.metrics, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
-    { name: 'Target/Norms', selector: (row) => row.target, sortable: true, grow: 2, align: 'text-center', width: '12%'  },
+    { name: 'Objectives', selector: (row) => row.objectives, sortable: true, grow: 2, align: 'text-left', width: '23%'  },
+    { name: 'Metrics', selector: (row) => row.metrics, sortable: true, grow: 2, align: 'text-left', width: '22%'  },
+    { name: 'Norms', selector: (row) => row.norms, sortable: true, grow: 2, align: 'text-left', width: '15%'  },
+    { name: 'Target', selector: (row) => row.target, sortable: true, grow: 2, align: 'text-center', width: '12%'  },
     { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',  width: '10%' },
   ];
 
@@ -118,6 +120,7 @@ const KpiObjectiveMaster = ({router}) => {
             division    : item.groupDivisionCode || '-',
             objectives  : item.kpiObjectives || '-',
             metrics     : item.kpiMerics || '-',
+            norms       : item.kpiNorms || '-',
             target      : kpiUnit || '-',
             action      : <><button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editKpi(item)}  title="Edit"> <i className="material-icons"  >edit_note</i></button></>
           }      
@@ -138,6 +141,7 @@ const KpiObjectiveMaster = ({router}) => {
       kpiId     : 0,
       objective : '',
       metrics   : '',
+      norms     : '',
       target    : '',
       kpiUnitId : 1,
       revisionRecordId : '0',
@@ -157,6 +161,7 @@ const KpiObjectiveMaster = ({router}) => {
       kpiId     : item.kpiId,
       objective : item.kpiObjectives,
       metrics   : item.kpiMerics,
+      norms     : item.kpiNorms,
       target    : item.kpiTarget,
       kpiUnitId : item.kpiUnitId,
       revisionRecordId : item.revisionRecordId,
@@ -178,9 +183,9 @@ const KpiObjectiveMaster = ({router}) => {
 
   const back = ()=>{
     if(dwpData.docType === 'dwp'){
-      navigate('/dwp')
+      navigate('/dwp', { state: { divisionId: dwpData.groupDivisionId } })
     }else{
-      navigate('/gwp')
+      navigate('/gwp', { state: { divisionId: dwpData.groupDivisionId } })
     }
   }
 

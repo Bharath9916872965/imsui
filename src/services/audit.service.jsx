@@ -542,7 +542,7 @@ export const getIqaAuditeeList = async (iqaId) => {
     }
   };
 
- const convertMapToOrderedArray = (map) => {
+  const convertMapToOrderedArray = (map) => {
     return Array.from(map.entries()).map(([key, value]) => ({
       mocId: key,
       ...value,
@@ -667,3 +667,28 @@ export const auditorForward = async (values)=>{
         throw error;
     }
 }
+export const getCarList = async (scheduleId) => {
+    try {
+      return (await axios.post(`${API_URL}get-car-list`,scheduleId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+      console.error('Error occurred in getCarList:', error);
+      throw error;
+    }
+};
+
+const convertMapToArray = (map) => {
+    return Array.from(map.entries()).map(([key, value]) => ({
+        correctiveActionId: key,
+      ...value,
+    }));
+  };
+
+export const insertCorrectiveAction = async (values)=>{
+    try {
+        const valuesToSend = convertMapToArray(values);
+        return (await axios.post(`${API_URL}add-corrective-action`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in insertCorrectiveAction:', error);
+        throw error;
+    }
+  }
