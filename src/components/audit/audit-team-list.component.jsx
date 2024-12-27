@@ -10,7 +10,6 @@ import SelectPicker from '../selectpicker/selectPicker';
 import MultipleSelectPicker from "../selectpicker/multipleSelectPicker";
 import AlertConfirmation from "../../common/AlertConfirmation.component";
 import { CustomMenuItem } from "../../services/auth.header";
-import internalAuditorTeamsPrint from "components/prints/qms/internalAduitor-teams-print";
 const AuditTeamListComponent = () => {
 
   const [showModal, setShowModal] = useState(false);
@@ -245,15 +244,12 @@ const AuditTeamListComponent = () => {
       <div className="card">
         <div className="card-body text-center">
           <div className="row">
+          <div className="col-md-2">
+          </div>
             <div className="col-md-7">
               <h3>{iqaNo} : Auditor Team List</h3>
             </div>
-
-            <div className="col-md-2">
-              
-            <button className=" btn-primary"  onClick={() =>internalAuditorTeamsPrint(filAuditTeamDtoList,teamMembersGrouped,iqaNo)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
-        </div>
-            <div className="col-md-2">
+          <div className="col-md-2">
               <SelectPicker options={iqaOptions} label="IQA No"
                 value={iqaOptions && iqaOptions.length > 0 && iqaOptions.find(option => option.value === iqaId) || null}
                 handleChange={(newValue) => { onIqaChange(newValue?.value) }} />

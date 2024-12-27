@@ -585,7 +585,7 @@ export const revokeSubmit = async(values) =>{
 
 export const revisionTran = async (revisionRecordId)=>{
     try {
-        return (await axios.post(`${API_URL}revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+        return (await axios.post(`${API_URL}qm-revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in revisionTran:', error);
         throw error;
@@ -678,6 +678,55 @@ export const UpdateDwpGwpDescription = async(values) =>{
         return (await axios.post(`${API_URL}update-dwp-gwp-description`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
     } catch (error) {
         console.error('Error occured in UpdateDwpGwpDescription', error);
+        throw error;
+    }
+}
+
+export const qspRevokeSubmit = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}revoke-qsp-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in qspRevokeSubmit', error);
+        throw error;
+    }
+}
+
+
+export const forwardQsp = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}forward-qsp`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in forwardQsp', error);
+        throw error;
+    }
+}
+
+
+export const amendQsp = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}add-qsp-revision`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in amendQsp', error);
+        throw error;
+    }
+}
+
+export const UpdateQspDescription = async(values) =>{
+    try {
+        return (await axios.post(`${API_URL}update-qsp-description`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+    } catch (error) {
+        console.error('Error occured in UpdateQspDescription', error);
+        throw error;
+    }
+}
+
+
+
+export const qspRevisionTran = async (revisionRecordId)=>{
+    try {
+        return (await axios.post(`${API_URL}qsp-revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in qspRevisionTran:', error);
         throw error;
     }
 }

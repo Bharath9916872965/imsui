@@ -1,8 +1,12 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import React from 'react';
-
+import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 const InternalAuditorTeamsPrint = async (filAuditTeamDtoList, teamMembersGrouped, iqaNo) => {
   try {
+     const labDetails = await getLabDetails();
+        const logoImg = await getLogoImage();
+        const drdoLogo = await getDrdoLogo();
+      
     const getFormattedDate = () => {
       const date = new Date();
       const weekday = date.toLocaleString('en-IN', { weekday: 'short' });
@@ -48,20 +52,20 @@ const InternalAuditorTeamsPrint = async (filAuditTeamDtoList, teamMembersGrouped
 
       const row = [
         { text: index + 1, style: 'normal', alignment: 'center' },
-        { text: team.teamCode || '-', style: 'normal', alignment: 'center' },
+        { text: team.teamCode || '-', style: 'normal', alignment: 'text-left',margin: [5, 2, 5, 2] },
       ];
 
       for (let i = 0; i < maxAuditors; i++) {
         row.push({
           text: auditors[i] || '-',
           style: 'normal',
-          alignment: 'left',
+          alignment: 'text-left',margin: [2, 2, 5, 2]
         });
       }
 
       tableBody.push(row);
     });
-
+//console.log('tableBodyinside',tableBody);
     // Define the PDF content
     let MyContent = [
       {
@@ -77,35 +81,67 @@ const InternalAuditorTeamsPrint = async (filAuditTeamDtoList, teamMembersGrouped
     // Define the document structure and styles
     const docDefinition = {
       info: {
-        title: 'INTERNAL AUDITOR TEAMS Print',
+        title: 'Internal Auditor Teams Print',
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [40, 80, 40, 20],
-      header: () => [
-        {
-          style: 'headertable',
-          table: {
-            widths: ['100%'],
-            body: [
-              [
+      pageMargins: [50, 120, 40, 50],
+  
+      header: (currentPage) => {
+        return {
+          stack: [
+            {
+              columns: [
                 {
-                  stack: [
-                    {
-                      text: iqaNo + '\u00A0(INTERNAL AUDITOR TEAMS)',
-                      style: 'superheader',
-                      fontSize: 15,
-                      alignment: 'center',
-                    },
-                  ],
+                  image:
+                    logoImg
+                      ? `data:image/png;base64,${logoImg}`
+                      : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC',
+                  width: 30,
+                  height: 30,
+                  alignment: 'left',
+                  margin: [35, 15, 0, 10],
+                },
+                {
+                              stack: [
+                                {
+                                  text: `Electronics and Radar Development Establishment, CV Raman Nagar, Bangalore-560093`,
+                                  style: 'superheader',
+                                  fontSize: 14,
+                                  alignment: 'center',
+                                  margin: [0, 0, 0, 4],
+                                },
+                                {
+                                  text: `Audit Summary`,
+                                  style: 'superheader',
+                                  fontSize: 14,
+                                  alignment: 'center',
+                                  margin: [0, 0, 0, 4],
+                                },
+                                {
+                                  text: iqaNo + '\u00A0(INTERNAL AUDITOR TEAMS)',
+                                  style: 'superheader',
+                                  fontSize: 15,
+                                  alignment: 'center',
+                                },
+                              ],
+                              margin: [0, 20, 20, 10],
+                            },
+                {
+                  image:
+                    drdoLogo
+                      ? `data:image/png;base64,${drdoLogo}`
+                      : 'data:image/png;base64,iVBORw0KGgoAAAANSUhEUgAAAOEAAADhCAMAAAAJbSJIAAAAA1BMVEX///+nxBvIAAAASElEQVR4nO3BgQAAAADDoPlTX+AIVQEAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAADwDcaiAAFXD1ujAAAAAElFTkSuQmCC',
+                  width: 30,
+                  height: 30,
+                  alignment: 'right',
+                  margin: [0, 15, 20, 10],
                 },
               ],
-            ],
-          },
-          layout: 'noBorders',
-          margin: [40, 20, 20, 10],
-        },
-      ],
+            },
+          ],
+        };
+      },
       content: MyContent,
       footer: (currentPage, pageCount) => {
         const currentDate = getFormattedDate();
