@@ -2,9 +2,12 @@
     width: 100%;
 }
 
+.dashboard-body{
+  /* background: #f2f2f2!important; */
+}
+
 
 .dashboard-container {
-    background: #f2f2f2;
     padding: 1.5rem 1.5rem;
     padding-top:0.5em;
     width: 100%;
@@ -21,10 +24,33 @@
     font-size: 15px;
 }
 
+.header-selectpicker-div{
+  padding-right:0px!important;
+}
+
+.header-label-div{
+  padding-right:0px!important;
+}
+
+
+.header-label{
+  color: 'black'!important;
+  font-weight: 400!important;
+   margin-top: '2px'!important;
+}
+
+.header-selectpicker{
+  flex-grow: 1!important;
+  max-width: '100%'!important;
+}
+
+
 .dashboard-iqa-select-picker{
   width: 100%; 
   height: 40px; 
 }
+
+
 .dashboard-iqa-select-picker .MuiFormLabel-root {
   color: darkblue !important; /* Apply darkblue color specifically to the label of this instance */
 }
@@ -469,9 +495,10 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 
 
 /********************simple counter end*****************************/
-.iqa-graphs-card{
+.common-graphs-card{
   background-color:transparent;
-  border:none!important;
+  margin-top:10px!important;
+  min-height:350px!important;
 }
 
 .panel{
@@ -643,12 +670,12 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
   padding-left:0px!important;
 }
 
-.imsCounter{
-  width: 15.66666667%;
+
+.master-graphs{
+  padding-top:18px!important;
 }
 
-
-.master-bar-graph{
+.user-graphs{
   padding-top:18px!important;
 }
 
@@ -665,8 +692,10 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
   display: flex; 
 }   
 .toggleIms-tabs li a{
-    color: #fff!important;
-    background-color: #16a085;
+    color: #16a085!important;
+    /* background-color: #4f8bed; */
+    border: 2px solid #16a085!important;
+    box-shadow: inset #16a085 4px 4px 0 0;
     font-size: 15px;
     font-weight: 600;
     letter-spacing: 0.5px;
@@ -693,8 +722,8 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 .toggleIms-tabs li a.currentSel,
 .toggleIms-tabs li a:hover,
 .toggleIms-tabs li a.currentSel:hover {
-    color: #34495e !important;
-    background-color: transparent;
+  color: #fff!important;
+  background-color: #16a085!important;
     border: none;
     box-shadow: 0 0 10px -5px #34495e;
 }
@@ -703,7 +732,8 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 .toggleIms-tabs li a:before,
 .toggleIms-tabs li a:after{
     content: "";
-    background: repeating-linear-gradient(-43deg, transparent, transparent 5px, #16a085 5px, #16a085 10px, transparent 10px, transparent 15px, #34495e 15px, #34495e 20px );
+    background: repeating-linear-gradient(-43deg, transparent, transparent 5px, #16a085 5px, #16a085 10px, transparent 10px, transparent 15px, #16a085 15px, #16a085 20px );
+    background-color: #16a085!important;
     width: 100%;
     height: 100%;
     opacity: 0;
@@ -749,3 +779,63 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
   }
   .toggleIms-tabs .nav-tabs li a{ margin: 0 0 10px; }
 }
+
+
+.docs-row{
+  display: flex; 
+  gap: 1px;
+}
+
+:root{ --doc-main-color: #161616; }
+
+.docs-div{
+    font-family: 'Rubik', sans-serif;
+    text-align: center;
+    padding-top: 8px;
+    padding-bottom: 1px;
+    position: relative;
+    z-index: 1;
+    flex: 1; 
+  text-align: center;
+  cursor:pointer!important;
+}
+
+
+.docs-div .docs-content{
+    padding-top: 1px;
+    padding-bottom: 1px;
+    padding-left: 10px;
+    padding-right: 10px;
+    border: 5px solid var(--doc-main-color);
+    border-radius: 13px;
+    /* box-shadow: 0 0 0 4px #fff, 0 0 35px rgba(248, 245, 245, 0.7); */
+    cursor:pointer!important;
+
+}
+
+.docs-div .docs-label{
+    color: var(--doc-main-color);
+    font-size: 15px;
+    line-height: 20px;
+    font-weight: 600;
+}
+
+.docs-div.qm{ --doc-main-color:  #068791; }
+.docs-div.qsp{ --doc-main-color: #a33e9a; }
+.docs-div.dwp{ --doc-main-color: #634ebf; }
+.docs-div.gwp{ --doc-main-color: #5991e4; }
+@media screen and (max-width:990px){
+    .docs-div{ margin-bottom: 10px; }
+}
+
+.docs-panel{
+  margin-top:-15px;
+}
+
+.counter-row{
+  display: flex!important;
+  justify-content: space-between!important;
+}
+
+
+
