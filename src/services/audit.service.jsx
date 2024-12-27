@@ -658,6 +658,15 @@ export const auditorForward = async (values)=>{
     }
 }
 
+
+  export const getAuditCheckListbyObs = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}auditcheck-list-byObsIds`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getScheduleApprovalList:', error);
+        throw error;
+    }
+}
 export const getCarList = async (scheduleId) => {
     try {
       return (await axios.post(`${API_URL}get-car-list`,scheduleId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;

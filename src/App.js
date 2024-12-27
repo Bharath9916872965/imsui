@@ -27,6 +27,8 @@ import RiskRegisterComponent from 'components/riskregister/risk-register.compone
 import MitigationRiskRegisterComponent from 'components/riskregister/mitigation-risk-register.component';
 import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transaction';
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
+import AuditSummaryReport from 'components/report/auditSummary-component-report';
+import NcReportComponent from 'components/report/nc-component-report';
 import CorrectiveActionList from 'components/audit/scheduler/check-list/corrective-action/corrective-action-list';
 import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
@@ -81,6 +83,12 @@ function App() {
          {/* Risk Register */}
          <Route path="/risk-register" element={<RiskRegisterComponent />} />
          <Route path="/mitigation-risk-register" element={<MitigationRiskRegisterComponent />} />
+
+
+          {/* Report */}
+          <Route path="/audit-summary-report" element={<AuditSummaryReport />} />
+          <Route path="/nc-report" element={<NcReportComponent />} />
+
 
          
          {/* QSP */}
