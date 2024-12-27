@@ -44,12 +44,12 @@ const GenerateCombinedPDF = async (
 
     auditData.forEach((item, index) => {
       auditTableBody.push([
-        { text: index + 1, style: 'normal', alignment: 'center',margin: [5, 2, 5, 2] },
-        { text: item.date || '-', style: 'normal', alignment: 'center',margin: [5, 2, 5, 2] },
-        { text: item.divisionCode || '-', style: 'normal', alignment: 'left',margin: [5, 2, 5, 2] },
-        { text: item.project || '-', style: 'normal', alignment: 'left' ,margin: [5, 2, 5, 2]},
-        { text: item.auditee || '-', style: 'normal', alignment: 'left',margin: [5, 2, 5, 2] },
-        { text: item.team || '-', style: 'normal', alignment: 'left',margin: [5, 2, 5, 2] },
+        { text: index + 1, style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.date || '-', style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.divisionCode || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        { text: item.project || '-', style: 'normal', alignment: 'left' ,margin: [0, 0, 0, 0]},
+        { text: item.auditee || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        { text: item.team || '-', style: 'normal', alignment: 'left',margin:[0, 5, 0, 0] },
       ]);
     });
 

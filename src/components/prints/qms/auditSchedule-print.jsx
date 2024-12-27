@@ -65,13 +65,14 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
         }
     
         tableBody.push([
-          { text: index + 1, style: 'normal', alignment: 'center', margin: [2, 2, 2, 2] },
-          { text: formattedDate || '-', style: 'normal', alignment: 'center', margin: [2, 2, 2, 2] },
-          { text: item.divisionCode || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
-          { text: item.project || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
-          { text: item.auditee || '-', style: 'normal', alignment: 'left', margin: [2, 2, 2, 2] },
-          { text: item.team || '-', style: 'normal', alignment: 'left', margin: [2, 2, 5, 2] },
+          { text: index + 1, style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
+          { text: formattedDate || '-', style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
+          { text: item.divisionCode || '-', style: 'normal', alignment: 'left', margin: [0, 5, 0, 0] },
+          { text: item.project || '-', style: 'normal', alignment: 'left', margin: [2, 0, 2, 0] },
+          { text: item.auditee || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
+          { text: item.team || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
         ]);
+        
       }
     
 
@@ -99,7 +100,7 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [40, 120, 40, 80],
+      pageMargins: [40, 120, 40, 50],
  header: (currentPage) => {
         return {
           stack: [
