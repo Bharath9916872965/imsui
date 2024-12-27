@@ -31,6 +31,7 @@ import CorrectiveActionList from 'components/audit/scheduler/check-list/correcti
 import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
 import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
+import CorrectiveActionReport from 'components/audit/scheduler/check-list/corrective-action/corrective-action-report';
 
 function App() {
   return (
@@ -71,6 +72,7 @@ function App() {
         <Route path="/check-list-master" element={<CheckListMasterComponent />} />
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
         <Route path="/car-master" element={<CorrectiveActionList />} />
+        <Route path="/car-report" element={<CorrectiveActionReport />} />
 
         {/* KPI */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />
