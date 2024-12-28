@@ -29,6 +29,7 @@ import RevisionTransactionComponent from 'components/qms/qm/qm-revision-transact
 import KpiObjectiveAction from 'components/KPI/masters/kpi-objective-action';
 import AuditSummaryReport from 'components/report/auditSummary-component-report';
 import NcReportComponent from 'components/report/nc-component-report';
+import MostFrequentNcs from "components/report/most-frequent-ncs";
 import CorrectiveActionList from 'components/audit/scheduler/check-list/corrective-action/corrective-action-list';
 import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
@@ -88,6 +89,7 @@ function App() {
           {/* Report */}
           <Route path="/audit-summary-report" element={<AuditSummaryReport />} />
           <Route path="/nc-report" element={<NcReportComponent />} />
+          <Route path="/most-frequent-ncs" element={<MostFrequentNcs />} />
 
 
          
