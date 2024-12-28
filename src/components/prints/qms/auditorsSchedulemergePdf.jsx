@@ -117,7 +117,7 @@ const GenerateCombinedPDF = async (
     // Combine both contents into a single PDF with page breaks
     const docDefinition = {
       info: {
-        title: 'Combined PDF',
+        title: 'Audit Summary Print',
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',

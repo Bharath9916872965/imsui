@@ -692,3 +692,11 @@ export const insertCorrectiveAction = async (values)=>{
         throw error;
     }
   }
+  export const getMostFrequentNC = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}mostFrequent-Nc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in mostFrequent-Nc-list:', error);
+        throw error;
+    }
+}
