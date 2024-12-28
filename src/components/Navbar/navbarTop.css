@@ -80,6 +80,10 @@
   width: 20%;
 }
 
+.width21{
+  width: 21%;
+}
+
 .width22{
   width: 22%;
 }
@@ -90,6 +94,10 @@
 
 .width30{
   width: 30%;
+}
+
+.width33{
+  width: 33%;
 }
 
 .width35{
@@ -112,6 +120,10 @@
   width: 60%;
 }
 
+.width67{
+  width: 67%;
+}
+
 .width70{
   width: 70%;
 }
@@ -120,8 +132,16 @@
   width: 80%;
 }
 
+.width87{
+  width: 87%;
+}
+
 .fw-bolder{
   font-weight: bolder;
+}
+
+.fw-500{
+  font-weight: 500 !important;
 }
 
 .date-color{
@@ -178,6 +198,10 @@
 
 .float-right{
   float: right;
+}
+
+.float-left{
+  float: left;
 }
 .status{
   cursor: pointer;
@@ -311,6 +335,14 @@
   color: #0444c3 !important;
   text-align: left;
   font-weight: bold;
+}
+
+.hi-60{
+  height: 60px;
+}
+
+.completionDate{
+  margin-top: 17px !important;
 }
 
 
