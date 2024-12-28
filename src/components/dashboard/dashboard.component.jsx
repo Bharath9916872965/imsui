@@ -2,22 +2,21 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; 
 import Navbar from "../Navbar/Navbar";
 import "./dashboard.css";
-import SelectPicker from 'components/selectpicker/selectPicker';
 import { Autocomplete, TextField, Box, ListItemText } from '@mui/material';
 import { CustomMenuItem } from 'services/auth.header';
 import {getIqaAuditeeList,getAuditeeTeamDtoList,getScheduleList} from "services/audit.service";
 import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
 import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount,
-  getTotalChecklistObsCountByIqa,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList} from "services/dashboard.service";
+  getTotalChecklistObsCountByIqa,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList}
+   from "services/dashboard.service";
 import QmDocPrint from 'components/prints/qms/qm-doc-print';
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 import { AgCharts } from 'ag-charts-react'; 
 import Datatable from "components/datatable/Datatable";
-
+import {getDwpDivisionList,getDwpDivisionGroupList,getDwpProjectList} from "services/qms.service";
 
 
 import { format } from "date-fns";
-import { Field, Formik, Form  } from "formik";
 
 
 const labelColorsChecklist = {
@@ -32,26 +31,32 @@ const labelColorsChecklist = {
 
 const Dashboard = () => {
 
+    //const [activeAuditeesCount,setActiveAuditeesCount] = useState(0);
     //const [activeTeamsCount,setActiveTeamsCount] = useState(0);
     //const [activeSchedulesCount,setActiveSchedulesCount] = useState(0);
     //const [auditTeamFullList, setAuditTeamFullList] = useState([]);
     // const [teamsCountBasedOnIqaSel,setTeamsCountBasedOnIqaSel] = useState(0);
     // const [schedulesCountBasedOnIqaSel,setSchedulesCountBasedOnIqaSel] = useState(0);
+    //const isHidden =currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' );
+
 
   let currentLoggerRoleName = localStorage.getItem('roleName');
   let currentLoggerRoleId = localStorage.getItem('roleId');
   let currentLoggerDivId = localStorage.getItem('divId');
+  let currentLoggerEmpId = localStorage.getItem('empId');
 
-   const isHidden =currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' );
-
+ 
 
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaAuditeeFullList, setIqaAuditeeFullList] = useState([]);
   const [iqaOptions,setIqaOptions] = useState([]);
-
+  const [divisionListByRoleId, setDivisionListByRoleId] = useState([]);
+  const [groupListByRoleId, setGroupListByRoleId] = useState([]);
+  const [projectListByRoleId, setProjectListByRoleId] = useState([]);
 
   const [iqaNoSelected,setIqaNo] = useState('');
   const [iqaIdSelected,setIqaId] = useState('');
+  const [auditeeValSel, setAuditeeValSel] = useState(0);
 
   const [scheduleFullList,setScheduleFullList] = useState([]);
   const [filteredScheduleList,setFilteredScheduleList] = useState([]);
@@ -67,9 +72,6 @@ const Dashboard = () => {
   const [showGWPModal, setGWPShowModal] = useState(false);
 
   const [activeAuditorsCount,setActiveAuditorsCount] = useState(0);
-  const [activeAuditeesCount,setActiveAuditeesCount] = useState(0);
-
-  const [auditeeValSel, setAuditeeValSel] = useState(0);
   const [auditeeCountBasedOnIqaSel,setAuditeeCountBasedOnIqaSel] = useState(0);
 
   const [totalObsCountBasedOnIqaSel, setTotalObsBasedOnIqaSel] = useState({
@@ -83,11 +85,9 @@ const Dashboard = () => {
   const [selectedType, setSelectedType] = useState('div'); // Default to 'Division'
   const [agChartCheckListOptions, setAgChartChecklistOptions] = useState({});
 
-  const [revisionRecordIdByIqaAndAuditee,setRevisionRecordIdByIqaAndAuditee] = useState(0);
+
   
-  const [kpiMasterList,setKpiMasterList] = useState([]);
-  const [kpiObjRatingList,setKpiObjRatingList] = useState([])
-  const [filKpiMasterList,setFilKpiMasterList] = useState([]);
+
 
 
 
@@ -96,20 +96,100 @@ const Dashboard = () => {
     await onIqaChange(iqaIdSelected,value);
   };
   
+  const scheduleListBasedOnLoggerRole= async (iqaId, iqaNo) => {
+  try {
+const ScheduleDtoList = await getScheduleList();
+if (ScheduleDtoList && ScheduleDtoList.length > 0) {
+      setScheduleFullList(ScheduleDtoList);
+      const filteredSchedules = ScheduleDtoList.filter(data => data.iqaId === iqaId);
 
+
+   /////////////////Filter RoleWise ////////////////////
+   let scheduleListRoleWise = [];
+      if (currentLoggerRoleName &&
+           ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
+      ){
+            let divisionIdsForLoggerRoleId = divisionListByRoleId
+            .map(division => division.divisionId)
+            .join(','); // Join all division IDs
+
+            let groupIdsForLoggerRoleId = groupListByRoleId
+           .map(group => group.groupId)
+           .join(','); // Join all group division IDs
+
+           let projectIdsForLoggerRoleId = projectListByRoleId
+           .map(group => group.projectId)
+           .join(','); // Join all group project IDs
+
+
+           //console.log("Division IDs:", divisionIdsForLoggerRoleId || "None");
+           //console.log("Group IDs:", groupIdsForLoggerRoleId || "None");
+           //console.log("Project IDs:", projectIdsForLoggerRoleId || "None");
+
+
+           // If divisionIdsForLoggerRoleId is not empty, filter schedules by divisionId
+           if (divisionIdsForLoggerRoleId) {
+             const divisionIdsArray = divisionIdsForLoggerRoleId.split(',').map(Number);
+             const divisionMatchedSchedules = filteredSchedules.filter(schedule =>
+             divisionIdsArray.includes(Number(schedule.divisionId))
+            );
+            scheduleListRoleWise = [...scheduleListRoleWise, ...divisionMatchedSchedules];
+          }
+
+          // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
+          if (groupIdsForLoggerRoleId) {
+          const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
+          const groupMatchedSchedules = filteredSchedules.filter(schedule =>
+           groupIdsArray.includes(Number(schedule.groupId))
+          );
+          scheduleListRoleWise = [...scheduleListRoleWise, ...groupMatchedSchedules];
+         }
+
+         
+          // If projectIdsForLoggerRoleId is not empty, filter schedules by projectId
+          if (projectIdsForLoggerRoleId) {
+            const projectIdsArray = projectIdsForLoggerRoleId.split(',').map(Number);
+            const projectMatchedSchedules = filteredSchedules.filter(schedule =>
+              projectIdsArray.includes(Number(schedule.projectId))
+            );
+            scheduleListRoleWise = [...scheduleListRoleWise, ...projectMatchedSchedules];
+           }
+
+         //console.log("ScheduleListRoleWise:", scheduleListRoleWise);
+         setFilteredScheduleList(scheduleListRoleWise);
+          }else{
+         setFilteredScheduleList(filteredSchedules);
+         }
+
+
+    /////////////////////////////////////////////////////////////
+
+
+      if (filteredSchedules && filteredSchedules.length > 0 
+        && !filteredSchedules.some(schedule => schedule.auditeeId === auditeeValSel)) {
+      setAuditeeValSel(0); // Reset to "All"
+      //setSchedulesCountBasedOnIqaSel(filteredSchedules.length);
+     
+    
+
+    }
+
+    } else {
+     // setSchedulesCountBasedOnIqaSel(0);
+    }
+
+  } catch (error) {
+    console.error('Error fetching scheduleListBasedOnLoggerRole:', error);
+  }
+  };
 
         const updateGraphsData = async (iqaId, iqaNo, selectedTypeData, currentAuditeeIdSel) => {
           try {
             
-            // let dataForKPI = [
-            //   { kpiName: "KPI1", kpiFullName:"Data  of KPI1", kpiRating: 1 },
-            //   { kpiName: "KPI2", kpiFullName:"Data  of KPI2",kpiRating: 5 },
-            //   { kpiName: "KPI3", kpiFullName:"Data  of KPI3",kpiRating: 3 },
-            //   { kpiName: "KPI4", kpiFullName:"Data  of KPI4",kpiRating: 5 },
-            //   { kpiName: "KPI5", kpiFullName:"Data  of KPI5",kpiRating: 2 },
-            //   { kpiName: "KPI6", kpiFullName:"Data  of KPI6",kpiRating: 4 },
-            //   { kpiName: "KPI7", kpiFullName:"Data  of KPI7",kpiRating: 5 },
-            // ];
+ 
+
+
+            //from dwpDivisionList you can compare and filter by divisionId column
 
           let dataForKPI = [
           { kpiName: "KPI not Found",kpiFullName:"Not Found", kpiRating: 0 },
@@ -122,6 +202,10 @@ const Dashboard = () => {
           
             let modifiedIqaNo = iqaNo.substring(4);  
             const checkListDetailsBasedOnObservation = await getCheckListByObservation();
+            //filter checklist rolewise
+
+
+
             let dataForObs = [0, 0, 0]; 
 ///////////////////////////////AUDITEEID GREATER THAN 0/////////////////////////////////////////////////////////////
             if (currentAuditeeIdSel > 0) {
@@ -129,7 +213,8 @@ const Dashboard = () => {
       let checkListByObsBasedOnIqaIdSelData = checkListDetailsBasedOnObservation.filter(item => item.iqaId === iqaId && item.auditeeId === currentAuditeeIdSel);
         
              if (checkListByObsBasedOnIqaIdSelData && checkListByObsBasedOnIqaIdSelData.length > 0) {
- 
+              
+
      
 
                   // Extract the first (and only) row that matches the condition
@@ -161,8 +246,8 @@ const Dashboard = () => {
 
         //////////////////KPI logic startedif currentAuditeeIdSel > 0 then KPI /////
         let revisionId = 0;
-        console.log("groupDivisionId "+groupDivisionId);
-        console.log("docType "+docType);
+        //console.log("groupDivisionId "+groupDivisionId);
+        //console.log("docType "+docType);
         const dwpRevisionList = await getAllActiveDwpRecordList();
         if (dwpRevisionList) {
              //Finding Primary key RevisionRecordId
@@ -184,25 +269,15 @@ const Dashboard = () => {
 
             }
         }
-        setRevisionRecordIdByIqaAndAuditee(revisionId);
         
-        console.log("revisionRecordId for KPI :"+revisionId);
-        console.log("iqaId for KPI :"+iqaId);
+        //console.log("revisionRecordId for KPI :"+revisionId);
+        //console.log("iqaId for KPI :"+iqaId);
 
-
-
-   
         const kpiMasterList = await getKpiMasterList();
-        setKpiMasterList(kpiMasterList);
         const kpiObjRatingList = await getKpiObjRatingList();
-        setKpiObjRatingList(getKpiObjRatingList);
-   
-
-
-    
 
           if (Array.isArray(kpiObjRatingList) && kpiObjRatingList.length > 0) {
-              console.log("kpiObjRatingList"+JSON.stringify(kpiObjRatingList, null, 2)); 
+             // console.log("kpiObjRatingList"+JSON.stringify(kpiObjRatingList, null, 2)); 
             const filratingData = kpiObjRatingList.filter(
               (item) =>
                 Number(item.revisionRecordId) === Number(revisionId) &&
@@ -211,15 +286,15 @@ const Dashboard = () => {
            if (filratingData.length > 0) {
 
 
-                console.log("KPI data after adddddddddddd"+JSON.stringify(filratingData, null, 2)); 
-                setFilKpiMasterList(filratingData);
+                //console.log("KPI data after add"+JSON.stringify(filratingData, null, 2)); 
+
          
                 dataForKPI = filratingData.map((item, index) => ({
                    kpiName: `KPI-${index + 1}` || "KPI", 
                    kpiFullName : item.kpiObjectives  || "", 
                    kpiRating: item.kpiRating || 0, 
                   }));
-                  // getAvgRating(filrating)
+            
           } else {
              
                 const filKpiMasterData = kpiMasterList.filter(
@@ -228,8 +303,7 @@ const Dashboard = () => {
                  item.revisionRecordId === '0'
                  );
                 if (filKpiMasterData.length > 0) {
-                  console.log("KPI data before adddddddddddd"+JSON.stringify(filKpiMasterData, null, 2)); 
-                  setFilKpiMasterList(filKpiMasterData)
+                  //console.log("KPI data before add"+JSON.stringify(filKpiMasterData, null, 2)); 
                     dataForKPI = filKpiMasterData.map((item, index) => ({
                       kpiName: `KPI-${index + 1}` || "KPI", 
                       kpiFullName : item.kpiObjectives  || "", 
@@ -326,7 +400,7 @@ const Dashboard = () => {
  
             const doughnutOptionsKPIAuditeeSel = {
               title: {
-                text: `KPI Statistics For ${iqaNo} And Auditee ${selAuditeeName}`,
+                text: `KPI Statistics for ${iqaNo} and the Auditee ${selAuditeeName}`,
                 position: "bottom", 
               },
               data: dataForKPI, // Pass the data here
@@ -393,33 +467,60 @@ const Dashboard = () => {
             } else {
 
               ///////////////////////COUNTER START////////////////////////////////////
-              const checkListTotalObsCountList = await getTotalChecklistObsCountByIqa();
-              if (checkListTotalObsCountList && checkListTotalObsCountList.length > 0) {
-                const filteredTotalObsCount = checkListTotalObsCountList.filter(data => data.iqaId === iqaId);
+              // const checkListTotalObsCountList = await getTotalChecklistObsCountByIqa();
+              // if (checkListTotalObsCountList && checkListTotalObsCountList.length > 0) {
+              //   const filteredTotalObsCount = checkListTotalObsCountList.filter(data => data.iqaId === iqaId);
                 
-                if (filteredTotalObsCount.length > 0) {
-                  setTotalObsBasedOnIqaSel({
-                    totalCountNC: filteredTotalObsCount[0].totalCountNC,
-                    totalCountOBS: filteredTotalObsCount[0].totalCountOBS,
-                    totalCountOFI: filteredTotalObsCount[0].totalCountOFI
-                  });
-                }
-              } else {
+              //   if (filteredTotalObsCount.length > 0) {
+              //     setTotalObsBasedOnIqaSel({
+              //       totalCountNC: filteredTotalObsCount[0].totalCountNC,
+              //       totalCountOBS: filteredTotalObsCount[0].totalCountOBS,
+              //       totalCountOFI: filteredTotalObsCount[0].totalCountOFI
+              //     });
+              //   }
+              // } else {
+              //   setTotalObsBasedOnIqaSel({
+              //     totalCountNC: 0,
+              //     totalCountOBS: 0,
+              //     totalCountOFI: 0
+              //   });
+              // }
+               ///////////////////////COUNTER END////////////////////////////////////
+
+               if (!checkListDetailsBasedOnObservation.length) {
+
                 setTotalObsBasedOnIqaSel({
                   totalCountNC: 0,
                   totalCountOBS: 0,
                   totalCountOFI: 0
                 });
+                console.log('No data found in all auditee graphs');
+                setAgChartChecklistOptions({
+                  title: {
+                    text: `Internal Quality Audit ${modifiedIqaNo}`,
+                  },
+                  subtitle: {
+                    text: "",
+                  },
+                  data: [], // Clear data
+                  series: [], // Clear series
+                });
+                return;
               }
-               ///////////////////////COUNTER END////////////////////////////////////
-
-        
-              // Filter data based on the iqaId only 
+             
+             
+               // Filter data based on the iqaId only 
               let checkListByObsBasedOnIqaIdSelData = checkListDetailsBasedOnObservation.filter(item => item.iqaId === iqaId);
         
-              // If no data is found, reset the chart options and return
+
               if (!checkListByObsBasedOnIqaIdSelData.length) {
-                console.log('No data found');
+
+                setTotalObsBasedOnIqaSel({
+                  totalCountNC: 0,
+                  totalCountOBS: 0,
+                  totalCountOFI: 0
+                });
+                console.log('No data found in all auditee graphs');
                 setAgChartChecklistOptions({
                   title: {
                     text: `Internal Quality Audit ${modifiedIqaNo}`,
@@ -433,39 +534,124 @@ const Dashboard = () => {
                 return;
               }
         
-              // Filter data based on the selected type
-              if (selectedTypeData === 'div') {
-                checkListByObsBasedOnIqaIdSelData = checkListByObsBasedOnIqaIdSelData.filter(
-                  item => item.divisionId > 0
+     
+
+              let checkListByObsRoleWise = [];
+                /////////////////Filter RoleWise ////////////////////
+                if (currentLoggerRoleName &&
+                  ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
+                ){
+                  let divisionIdsForLoggerRoleId = divisionListByRoleId
+                  .map(division => division.divisionId)
+                  .join(','); // Join all division IDs
+                  
+                  let groupIdsForLoggerRoleId = groupListByRoleId
+                 .map(group => group.groupId)
+                 .join(','); // Join all group division IDs
+
+                 let projectIdsForLoggerRoleId = projectListByRoleId
+                 .map(group => group.projectId)
+                 .join(','); // Join all group project IDs
+      
+                
+                 // If divisionIdsForLoggerRoleId is not empty, filter schedules by divisionId
+                 if (divisionIdsForLoggerRoleId) {
+                   const divisionIdsArray = divisionIdsForLoggerRoleId.split(',').map(Number);
+                   const divisionMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
+                   divisionIdsArray.includes(Number(checkList.divisionId))
+                  );
+                  checkListByObsRoleWise = [...checkListByObsRoleWise, ...divisionMatchedSchedules];
+                }
+      
+                // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
+                if (groupIdsForLoggerRoleId) {
+                const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
+                const groupMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
+                 groupIdsArray.includes(Number(checkList.groupId))
                 );
-              } else if (selectedTypeData === 'grp') {
-                checkListByObsBasedOnIqaIdSelData = checkListByObsBasedOnIqaIdSelData.filter(
-                  item => item.groupId > 0
-                );
-              } else if (selectedTypeData === 'prj') {
-                checkListByObsBasedOnIqaIdSelData = checkListByObsBasedOnIqaIdSelData.filter(
-                  item => item.projectId > 0
-                );
-              }
+                checkListByObsRoleWise = [...checkListByObsRoleWise, ...groupMatchedSchedules];
+               }
+
+               // If projectIdsForLoggerRoleId is not empty, filter schedules by projectId
+              if (projectIdsForLoggerRoleId) {
+                  const projectIdsArray = projectIdsForLoggerRoleId.split(',').map(Number);
+                  const projectMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
+                     projectIdsArray.includes(Number(checkList.projectId))
+                 );
+                 checkListByObsRoleWise = [...checkListByObsRoleWise, ...projectMatchedSchedules];
+               }
+
+             }else{
+                  checkListByObsRoleWise = checkListByObsBasedOnIqaIdSelData;
+            }
+    
+
+
+            if (!checkListByObsRoleWise.length) {
+
+              setTotalObsBasedOnIqaSel({
+                totalCountNC: 0,
+                totalCountOBS: 0,
+                totalCountOFI: 0
+              });
+              console.log('No data found in all graphs');
+              setAgChartChecklistOptions({
+                title: {
+                  text: `Internal Quality Audit ${modifiedIqaNo}`,
+                },
+                subtitle: {
+                  text: "",
+                },
+                data: [], // Clear data
+                series: [], // Clear series
+              });
+              return;
+            }
+      
+            const totals = checkListByObsRoleWise.reduce(
+              (acc, entry) => {
+                acc.totalCountNC += entry.countOfNC || 0;
+                acc.totalCountOBS += entry.countOfOBS || 0;
+                acc.totalCountOFI += entry.countOfOFI || 0;
+                return acc;
+              },
+              { totalCountNC: 0, totalCountOBS: 0, totalCountOFI: 0 }
+            );
         
+            setTotalObsBasedOnIqaSel(totals);
+
+                 // Filter data based on the selected type
+                 if (selectedTypeData === 'div') {
+                  checkListByObsRoleWise = checkListByObsRoleWise.filter(
+                    item => item.divisionId > 0
+                  );
+                } else if (selectedTypeData === 'grp') {
+                  checkListByObsRoleWise = checkListByObsRoleWise.filter(
+                    item => item.groupId > 0
+                  );
+                } else if (selectedTypeData === 'prj') {
+                  checkListByObsRoleWise = checkListByObsRoleWise.filter(
+                    item => item.projectId > 0
+                  );
+                }
               // Function to get the relevant data based on the selected type
               const getData = () => {
                 if (selectedTypeData === 'div') {
-                  return checkListByObsBasedOnIqaIdSelData.map(entry => ({
+                  return checkListByObsRoleWise.map(entry => ({
                     quarter: entry.divisionName,
                     NC: entry.countOfNC,
                     OBS: entry.countOfOBS,
                     OFI: entry.countOfOFI,
                   }));
                 } else if (selectedTypeData === 'grp') {
-                  return checkListByObsBasedOnIqaIdSelData.map(entry => ({
+                  return checkListByObsRoleWise.map(entry => ({
                     quarter: entry.groupName,
                     NC: entry.countOfNC,
                     OBS: entry.countOfOBS,
                     OFI: entry.countOfOFI,
                   }));
                 } else if (selectedTypeData === 'prj') {
-                  return checkListByObsBasedOnIqaIdSelData.map(entry => ({
+                  return checkListByObsRoleWise.map(entry => ({
                     quarter: entry.projectName,
                     NC: entry.countOfNC,
                     OBS: entry.countOfOBS,
@@ -566,7 +752,7 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
     //setSchedulesCountBasedOnIqaSel(0);
   }
 
-
+   await scheduleListBasedOnLoggerRole(selectedIqaId,selectedIqa.iqaNo);
    await updateGraphsData(selectedIqaId,selectedIqa.iqaNo,selectedTypeData,0);
 
   } else {
@@ -587,7 +773,18 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
         const activeAuditorsCount = await getActiveAuditorsCount();
         const activeAuditeesCount = await getActiveAuditeeCount();
         const IqaList = await getIqaDtoListForDahboard();
-        const ScheduleDtoList = await getScheduleList();
+
+        const divisionListByRoleId = await getDwpDivisionList(currentLoggerRoleId, currentLoggerEmpId);
+        setDivisionListByRoleId(divisionListByRoleId);
+
+          const groupListByRoleId = await getDwpDivisionGroupList(currentLoggerRoleId, currentLoggerEmpId);
+        setGroupListByRoleId(groupListByRoleId);
+
+        const projectListByRoleId = await getDwpProjectList(currentLoggerRoleId, currentLoggerEmpId);
+        setProjectListByRoleId(projectListByRoleId);
+        
+
+
         //const AuditTeamDtoList = await getAuditeeTeamDtoList();
   
 
@@ -601,11 +798,9 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
         // }
 
          // activeAuditorsCount 
-       
          setActiveAuditorsCount(activeAuditorsCount);
          // activeAuditeesCount 
-    
-         setActiveAuditeesCount(activeAuditeesCount);
+         //setActiveAuditeesCount(activeAuditeesCount);
          //activeTeams
          //const activeTeamsCount = await getActiveTeams();
         // setActiveTeamsCount(activeTeamsCount);
@@ -631,20 +826,7 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             setIqaId(iqa.iqaId)
 
 
-            if (ScheduleDtoList && ScheduleDtoList.length > 0) {
-              setScheduleFullList(ScheduleDtoList);
-              const filteredSchedules = ScheduleDtoList.filter(data => data.iqaId === iqa.iqaId);
-              setFilteredScheduleList(filteredSchedules);
-              if (filteredSchedules && filteredSchedules.length > 0 && !filteredSchedules.some(schedule => schedule.auditeeId === auditeeValSel)) {
-              setAuditeeValSel(0); // Reset to "All"
-              //setSchedulesCountBasedOnIqaSel(filteredSchedules.length);
-            } else {
-              //setSchedulesCountBasedOnIqaSel(0);
-            }
-            } else {
-             // setSchedulesCountBasedOnIqaSel(0);
-            }
-
+           
        
             const IqaAuditeeDtoList = await getIqaAuditeeList(iqa.iqaId);
 
@@ -687,7 +869,7 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             setGWPRecordList(gwpVersionRecordList);
 
      
-
+            await scheduleListBasedOnLoggerRole(iqaIdSelected,iqaNoSelected)
             await updateGraphsData(iqaIdSelected,iqaNoSelected,'div',0);
 
           }
@@ -857,7 +1039,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
         <div className="main-panel">
         {/* style={{ display: 'none' }} */}
         <div className="content-wrapper dashboard-wrapper pb-0"
-          style={{ display: isHidden ? 'block' : 'none' }}
+          // style={{ display: isHidden ? 'block' : 'none' }}
           >
 
 {/************************************ HEADER START ***************************************/}
