@@ -15,6 +15,14 @@ export class UserManagerDto {
   }
 }
 
+export class ApprovalAuthorityDto{
+    
+  constructor(mrsId,isActive){
+      this.mrsId=mrsId;
+      this.isActive=isActive;
+  }
+};
+
 export const getHeaderModuleList = async (role) => {
     try {
         return (await axios.post(`${API_URL}header-module`, role, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
@@ -159,4 +167,44 @@ export const getRolesList = async () => {
     }
   };
   
+  export const insertApprovalAuthority = async(values)=>{
+    try {
+      return (await axios.post(`${API_URL}insert-approval-authority`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+  } catch (error) {
+      console.error('Error occured in insertApprovalAuthority', error);
+      throw error;
+  }
+  }
   
+  export const getapprovalAuthorityList = async () => {
+    try {
+      const response = await axios.post( `${API_URL}approval-authority-list`,  {},{ headers: authHeader() } );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in approvalAuthorityList:', error);
+      throw error;
+    }
+};
+  
+
+
+export const deleteMrs = async (mrsId,isActive) => {
+  try {
+    const response = await axios.post( `${API_URL}approval_authority-inactive`,new ApprovalAuthorityDto(mrsId,isActive), {headers: authHeader() });
+    return response.data;
+
+  } catch (error) {
+    console.error('Error occurred in deleteMrs:', error);
+    throw error;
+  }
+};
+
+
+export const UpdateApprovalAuthority = async(values) =>{
+  try {
+      return (await axios.post(`${API_URL}update-approval-authority`,values, {headers: {'Content-Type' : 'application/json', ...authHeader() }})).data;
+  } catch (error) {
+      console.error('Error occured in UpdateApprovalAuthority', error);
+      throw error;
+  }
+}

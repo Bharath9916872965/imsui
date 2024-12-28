@@ -34,6 +34,7 @@ import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-tra
 import QspComponent from 'components/qms/qsp/qsp.component';
 import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
 import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
+import ApprovalAuthorityListComponent from 'components/admin/approvalAuthorityList';
 
 function App() {
   return (
@@ -48,6 +49,7 @@ function App() {
         {/* Admin */}
         <Route path="/user-manager-list" element={<UserManagerComponent />} />
         <Route path="/form-role-access" element={<FormRoleAccess />} />
+        <Route path="/approval-authority" element={<ApprovalAuthorityListComponent />} />
         
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />

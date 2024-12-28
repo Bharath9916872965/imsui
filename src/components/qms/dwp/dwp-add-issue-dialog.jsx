@@ -23,16 +23,16 @@ const DwpDocsAddIssueDialog = ({ open, onClose, revisionElements, docType, group
                 if (revisionElements && revisionElements.length > 0) {
                     setInitialValues((prevValues) => ({
                         ...prevValues,
-                        currentVersion: "V" + revisionElements[5] + "-R" + revisionElements[6],
+                        currentVersion: "I" + revisionElements[5] + "-R" + revisionElements[6],
                     }));
-                    setNewAmendVersion("V" + revisionElements[5] + "-R" + (revisionElements[6] + 1));
+                    setNewAmendVersion("I" + revisionElements[5] + "-R" + (revisionElements[6] + 1));
                 } else {
                     setInitialValues((prevValues) => ({
                         ...prevValues,
-                        currentVersion: "V1-R0",
+                        currentVersion: "I1-R0",
                         amendParticulars: "Original ISSUE and Revision"
                     }));
-                    setNewAmendVersion("V1-R0");
+                    setNewAmendVersion("I1-R0");
                 }
             } catch (error) {
                 setError("An error occurred");
@@ -106,9 +106,9 @@ const DwpDocsAddIssueDialog = ({ open, onClose, revisionElements, docType, group
 
     const onchangeIsNewIssue = (event) => {
         if (event.target.checked) {
-            setNewAmendVersion("V" + (revisionElements[5] + 1) + "-R0");
+            setNewAmendVersion("I" + (revisionElements[5] + 1) + "-R0");
         } else {
-            setNewAmendVersion("V" + revisionElements[5] + "-R" + (revisionElements[6] + 1));
+            setNewAmendVersion("I" + revisionElements[5] + "-R" + (revisionElements[6] + 1));
         }
     };
 

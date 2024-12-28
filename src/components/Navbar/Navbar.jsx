@@ -67,13 +67,16 @@ const Navbar = (props) => {
 
   return (
 
+    
     <nav className="navbar sticky-top navbar-expand-lg navbar-dark bg-dark bg-gradient">
+      <div className="row" style={{width: '100%'}}>
       <div className="container d-flex">
         {/* Left-aligned IMS item */}
+        <div className="col-md-3 ">
         <ul className="navbar-nav">
           <li className="nav-item">
             <a href="/dashboard" className="nav-link">
-              <div className="d-flex">
+              <div className="d-flex" style={{ float: 'left' }}>
                 <h3 className="mb-0 d-flex align-items-center me-2">
                   <span className="i-name">I</span><span className="ms-name">MS</span>
                 </h3>
@@ -85,7 +88,8 @@ const Navbar = (props) => {
             
           </li>
         </ul>
-
+        </div>
+        <div className="col-md-9 d-flex justify-content-end">
         {/* Right-aligned navigation items */}
         <ul className="navbar-nav ms-auto">
           <li className="nav-item dropdown">
@@ -175,8 +179,9 @@ const Navbar = (props) => {
             </a>
           </li>
         </ul>
-      </div>
-
+        </div>
+        </div>
+        </div>
     </nav>
 
   )
