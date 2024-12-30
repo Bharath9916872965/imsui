@@ -253,7 +253,6 @@ export const getDwpVersionRecordDtoList = async (qmsDocTypeDto) => {
 
 export const getDwpAllChapters = async (qmsDocTypeDto) => {
     try {
-        console.log('qmsDocTypeDto-----', qmsDocTypeDto)
         return (await axios.post(`${API_URL}get-all-dwp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getDwpAllChapters', error);

@@ -9,14 +9,16 @@ import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
 import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount,
   getTotalChecklistObsCountByIqa,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList}
    from "services/dashboard.service";
+   
 import QmDocPrint from 'components/prints/qms/qm-doc-print';
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 import { AgCharts } from 'ag-charts-react'; 
 import Datatable from "components/datatable/Datatable";
-import {getDwpDivisionList,getDwpDivisionGroupList,getDwpProjectList} from "services/qms.service";
+import {getDwpDivisionList,getDwpDivisionGroupList,getDwpProjectList,qspDocumentList} from "services/qms.service";
 
 
 import { format } from "date-fns";
+import QspDocPrint from "components/prints/qms/qsp-doc-print";
 
 
 const labelColorsChecklist = {
@@ -42,9 +44,9 @@ const Dashboard = () => {
 
   let currentLoggerRoleName = localStorage.getItem('roleName');
   let currentLoggerRoleId = localStorage.getItem('roleId');
-  let currentLoggerDivId = localStorage.getItem('divId');
   let currentLoggerEmpId = localStorage.getItem('empId');
-
+  let currentLoggerDivId = localStorage.getItem('divId');
+  let currentLoggerGroupId = localStorage.getItem('groupId');
  
 
   const [iqaFullList,setIqaFullList] = useState([]);
@@ -63,6 +65,7 @@ const Dashboard = () => {
 
 
   const [qmRecordList, setQMRecordList] = useState([]);
+  const [qspRecordList, setQSPRecordList] = useState([]);
   const [dwpRecordList, setDWPRecordList] = useState([]);
   const [gwpRecordList,setGWPRecordList] = useState([]);
 
@@ -122,9 +125,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
            .join(','); // Join all group project IDs
 
 
-           //console.log("Division IDs:", divisionIdsForLoggerRoleId || "None");
-           //console.log("Group IDs:", groupIdsForLoggerRoleId || "None");
-           //console.log("Project IDs:", projectIdsForLoggerRoleId || "None");
 
 
            // If divisionIdsForLoggerRoleId is not empty, filter schedules by divisionId
@@ -155,7 +155,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
             scheduleListRoleWise = [...scheduleListRoleWise, ...projectMatchedSchedules];
            }
 
-         //console.log("ScheduleListRoleWise:", scheduleListRoleWise);
          setFilteredScheduleList(scheduleListRoleWise);
           }else{
          setFilteredScheduleList(filteredSchedules);
@@ -246,21 +245,16 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
         //////////////////KPI logic startedif currentAuditeeIdSel > 0 then KPI /////
         let revisionId = 0;
-        //console.log("groupDivisionId "+groupDivisionId);
-        //console.log("docType "+docType);
         const dwpRevisionList = await getAllActiveDwpRecordList();
         if (dwpRevisionList) {
              //Finding Primary key RevisionRecordId
-             //console.log("dwpRevisionList"+JSON.stringify(dwpRevisionList, null, 2)); 
             const filteredRows = dwpRevisionList.filter(item => 
                 item.groupDivisionId === groupDivisionId && item.docType === docType
             );
-            //console.log("filteredRows of dwp"+JSON.stringify(filteredRows, null, 2)); 
             if (filteredRows.length > 0) {
  
                 // Find the row with the highest revisionNo
     const highestRevisionRow = filteredRows.reduce((max, current) => {
-      //console.log("Comparing revisionNos", current.revisionNo, "with", max.revisionNo);
       return current.revisionNo > max.revisionNo ? current : max;
   });
   
@@ -269,26 +263,18 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
             }
         }
-        
-        //console.log("revisionRecordId for KPI :"+revisionId);
-        //console.log("iqaId for KPI :"+iqaId);
 
         const kpiMasterList = await getKpiMasterList();
         const kpiObjRatingList = await getKpiObjRatingList();
 
           if (Array.isArray(kpiObjRatingList) && kpiObjRatingList.length > 0) {
-             // console.log("kpiObjRatingList"+JSON.stringify(kpiObjRatingList, null, 2)); 
             const filratingData = kpiObjRatingList.filter(
               (item) =>
                 Number(item.revisionRecordId) === Number(revisionId) &&
                 iqaId === item.iqaId
             );
            if (filratingData.length > 0) {
-
-
-                //console.log("KPI data after add"+JSON.stringify(filratingData, null, 2)); 
-
-         
+        
                 dataForKPI = filratingData.map((item, index) => ({
                    kpiName: `KPI-${index + 1}` || "KPI", 
                    kpiFullName : item.kpiObjectives  || "", 
@@ -303,7 +289,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                  item.revisionRecordId === '0'
                  );
                 if (filKpiMasterData.length > 0) {
-                  //console.log("KPI data before add"+JSON.stringify(filKpiMasterData, null, 2)); 
                     dataForKPI = filKpiMasterData.map((item, index) => ({
                       kpiName: `KPI-${index + 1}` || "KPI", 
                       kpiFullName : item.kpiObjectives  || "", 
@@ -770,8 +755,9 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
     const fetchData = async () => {
       try {
         const qmDetails = await getQmDashboardDetailedList();
+       const qspRevisionRecordDetails = await qspDocumentList();
         const activeAuditorsCount = await getActiveAuditorsCount();
-        const activeAuditeesCount = await getActiveAuditeeCount();
+        //const activeAuditeesCount = await getActiveAuditeeCount();
         const IqaList = await getIqaDtoListForDahboard();
 
         const divisionListByRoleId = await getDwpDivisionList(currentLoggerRoleId, currentLoggerEmpId);
@@ -789,6 +775,7 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
   
 
         setQMRecordList(qmDetails);
+        setQSPRecordList(qspRevisionRecordDetails);
   
         // qmDetails 
         //const [qmDetailedData, setqmDetailedData] = useState({});
@@ -824,9 +811,6 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             iqaIdSelected = iqa.iqaId;
             setIqaNo(iqa.iqaNo)
             setIqaId(iqa.iqaId)
-
-
-           
        
             const IqaAuditeeDtoList = await getIqaAuditeeList(iqa.iqaId);
 
@@ -837,8 +821,6 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
               setAuditeeCountBasedOnIqaSel(0);
             }
 
-
-           
             // if (AuditTeamDtoList && AuditTeamDtoList.length > 0) {
             //   setAuditTeamFullList(AuditTeamDtoList);
             //   const filteredTeams = AuditTeamDtoList.filter(data => data.iqaId === iqa.iqaId);
@@ -854,17 +836,13 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
                 ? '0' 
                 : currentLoggerDivId,
             });
-            //console.log('dwpVersionRecordList Data:', JSON.stringify(dwpVersionRecordList, null, 2));
-
-
             
             const gwpVersionRecordList = await getAllVersionRecordDtoList({
             docType: 'gwp',
             groupDivisionId: (currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' )) 
             ? '0' 
-            : currentLoggerDivId,
+            : currentLoggerGroupId,
            });
-           //console.log('gwpVersionRecordList Data:', JSON.stringify(gwpVersionRecordList, null, 2));
             setDWPRecordList(dwpVersionRecordList);
             setGWPRecordList(gwpVersionRecordList);
 
@@ -940,6 +918,65 @@ const columnsQM = [
 const getQMDocPDF = (action, revisionElements) => {
   return <QmDocPrint action={action} revisionElements={revisionElements} />
 }
+
+const columnsQSP = [
+   { name: 'QSP', selector: (row) => row.qsp, sortable: true, grow: 1, align: 'text-center', width: '30%'  },
+   { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start', width: '25%'  },
+   { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+   { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
+   { name: 'Date Of Revision', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+   { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center', width: '15%'  },
+   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center', width: '20%'  },
+];
+
+
+const getDocPDFQSP = (action, revisionElements) => {
+  return <QspDocPrint action={action} revisionElements={revisionElements} />;
+}
+
+
+const documentNameMapping = {
+  qsp1: 'QSP1 - Control of Documents and Records',
+  qsp2: 'QSP2 - Internal Quality Audit',
+  qsp3: 'QSP3 - Management Review',
+  qsp4: 'QSP4 - Non conformity & Corrective Action',
+  qsp5: 'QSP5 - Quality Objectives and Continual Improvement',
+  qsp6: 'QSP6 - Analysis of Data & Preventive Action',
+  qsp7: 'QSP7 - Customer Feedback Analysis',
+  qsp8: 'QSP8 - Risk Management',
+};
+
+
+const groupedByDocName = {};
+
+qspRecordList.forEach((item) => {
+  if (!groupedByDocName[item.docName] || groupedByDocName[item.docName].revisionNo < item.revisionNo) {
+    groupedByDocName[item.docName] = item;
+  }
+});
+
+const maxRevisionRecords = Object.values(groupedByDocName);
+
+
+const reversedMaxRevisionRecords = [...maxRevisionRecords].reverse();
+
+const mapQspData = reversedMaxRevisionRecords.map((item, index) => ({
+  qsp: documentNameMapping[item.docName] || '-', // Get document name from the mapping
+  description: item.description || '-',
+  from: index + 1 < reversedMaxRevisionRecords.length
+    ? 'I' + reversedMaxRevisionRecords[index + 1].issueNo + '-R' + reversedMaxRevisionRecords[index + 1].revisionNo
+    : '--',
+  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+  status: item.statusCode || '--',
+  action: (
+    <div>
+                {getDocPDFQSP('', item)}
+    </div>
+  ),
+}));
+
+
 
 const mappedDataQM = qmRecordList.map((item, index) => ({
   sn: index + 1,
@@ -1019,7 +1056,6 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
   ),
 }));
 
-//console.log('filteredScheduleList Data:', JSON.stringify(filteredScheduleList, null, 2));
 
   return (
     <div className="dashboard-body">
@@ -1043,7 +1079,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
           >
 
 {/************************************ HEADER START ***************************************/}
-<div className="page-header row mb-3">
+<div className="page-header row mb-4">
   {/* Column for the heading like welcome something*/}
   <div className="col-md-6 d-flex align-items-center">
     <h5 className="mb-0">
@@ -1450,10 +1486,10 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
             {showQSPModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
+              <div className="modal-dialog modal-lg modal-xl-custom" style={{ maxWidth: '80%' }}>
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">QSP </h5>
+                    <h5 className="modal-title">QSP</h5>
                     <button type="button" className="btn btn-danger" onClick={handleQSPClose} aria-label="Close">
                       <span aria-hidden="true">&times;</span>
                     </button>
@@ -1461,27 +1497,9 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
 
                   <div className="modal-body model-max-height">
                  
-                  <table className="table table-bordered table-hover">
-                      <thead>
-                       <tr>
-                          <th className='width25'>QSP</th>
-                          <th className='width10'>Issue From</th>
-                          <th className='width10'>Issue To</th>
-                          <th className='width10'>DOR</th>
-                          <th className='width10'>Print</th>
-                       </tr>
-                       </thead> 
-                       <tbody>
-                          <tr>
-                              <td className='width25'></td>
-                              <td className='width10 text-start'></td>
-                              <td className='width10 text-start'></td>
-                              <td className='width10'></td>
-                              <td className='width10'></td>
-                          </tr>
-                        </tbody>
-                    </table>
-
+                  <div id="card-body customized-card">
+                    <Datatable columns={columnsQSP} data={mapQspData} />
+                  </div>
 
                   </div>
                 </div>

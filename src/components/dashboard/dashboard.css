@@ -497,7 +497,7 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 /********************simple counter end*****************************/
 .common-graphs-card{
   background-color:transparent;
-  margin-top:10px!important;
+  margin-top:40px!important;
   min-height:350px!important;
 }
 
