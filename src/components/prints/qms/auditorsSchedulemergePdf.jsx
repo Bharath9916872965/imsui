@@ -121,7 +121,7 @@ const GenerateCombinedPDF = async (
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [40, 10, 40, 60],
+      pageMargins: [40, 10, 40, 25],
       content: [
         // First Header: Audit Schedule Section (Part of page content)
         {

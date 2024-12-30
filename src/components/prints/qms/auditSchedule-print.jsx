@@ -100,7 +100,7 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [40, 120, 40, 50],
+      pageMargins: [40, 120, 40, 25],
  header: (currentPage) => {
         return {
           stack: [
