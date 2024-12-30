@@ -659,7 +659,7 @@ const columns = [
                                 <Field
                                   name="reviewedBy"
                                   as={TextField}
-                                  label="ReviewedBy By"
+                                  label="Reviewed By"
                                   size="small"
                                   margin="normal"
                                   value={

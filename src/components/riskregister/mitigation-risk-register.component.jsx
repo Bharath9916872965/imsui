@@ -196,12 +196,8 @@ const MitigationRiskRegisterComponent = ({router }) =>{
             <div className="card-body text-center">
                   <h3>{riskRegisterData.docType.toUpperCase()} - {riskRegisterData.divisionCode} : Mitigation Risk Register</h3><br/>
                   <div className="row">
-                    <div className="col-md-1"> 
-                       <strong>Risk Description : </strong> 
-                    </div>
-
-                    <div className="col-md-10" style={{ textAlign: 'start', fontWeight: 'bold',color:'blue' }}>
-                        {riskRegisterData.riskDescription}
+                    <div className="col-md-12" style={{ textAlign: 'start',color:'blue' }}>
+                    <span style={{color:'black',fontWeight: 'bold'}}>Risk Description :</span> {riskRegisterData.riskDescription}
                     </div>
                   </div><br/>
                   <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema}  onSubmit={(values) => {handleSubmit(values, actionValue);}}>
