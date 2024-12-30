@@ -111,6 +111,33 @@ export const getAllVersionRecordDtoList = async (qmsDocTypeDto) => {
 }
 
 
+export const getIqaDtoListForDahboard = async () => {
+    
+    try {
+        return (await axios.post(`${API_URL}iqa-list-for-dashboard`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getIqaDtoListForDahboard', error);
+        throw error; 
+    }
+    
+};
+
+
+export const getAllActiveDwpRecordList = async () => {
+    try {
+        return (await axios.post(`${API_URL}dwp-revision-list-for-dashboard`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getAllActiveDwpRecordList', error);
+        throw error;
+    }
+}
+
+
+
 
 
 

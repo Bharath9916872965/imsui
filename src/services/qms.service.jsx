@@ -253,7 +253,6 @@ export const getDwpVersionRecordDtoList = async (qmsDocTypeDto) => {
 
 export const getDwpAllChapters = async (qmsDocTypeDto) => {
     try {
-        console.log('qmsDocTypeDto-----', qmsDocTypeDto)
         return (await axios.post(`${API_URL}get-all-dwp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getDwpAllChapters', error);
@@ -391,6 +390,17 @@ export const getDwpDocSummarybyId = async (documentId) => {
     
     }
 }
+
+export const getDwpProjectList = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-dwp-project-list/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpProjectList', error);
+        throw error; 
+    }
+    
+};
 
 
 export const getDwpDivisionList = async (imsFormRoleId, empId) => {

@@ -34,7 +34,9 @@ import CorrectiveActionList from 'components/audit/scheduler/check-list/correcti
 import DWPRevisionTransactionComponent from 'components/qms/dwp/dwp-revision-transaction';
 import QspComponent from 'components/qms/qsp/qsp.component';
 import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qsp-add-doc-content.component';
+import CorrectiveActionReport from 'components/audit/scheduler/check-list/corrective-action/corrective-action-report';
 import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
+import ApprovalAuthorityListComponent from 'components/admin/approvalAuthorityList';
 
 function App() {
   return (
@@ -49,6 +51,7 @@ function App() {
         {/* Admin */}
         <Route path="/user-manager-list" element={<UserManagerComponent />} />
         <Route path="/form-role-access" element={<FormRoleAccess />} />
+        <Route path="/approval-authority" element={<ApprovalAuthorityListComponent />} />
         
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
@@ -74,6 +77,7 @@ function App() {
         <Route path="/check-list-master" element={<CheckListMasterComponent />} />
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
         <Route path="/car-master" element={<CorrectiveActionList />} />
+        <Route path="/car-report" element={<CorrectiveActionReport />} />
 
         {/* KPI */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />

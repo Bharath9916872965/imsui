@@ -243,7 +243,7 @@ const RiskRegisterComponent = ({ router }) => {
                 <div className="modal-dialog modal-lg modal-lg-custom" style={{ maxWidth: "50%", width: "50%" }}>
                   <div className="modal-content modal-content-custom" >
                     <div className="modal-header bg-secondary d-flex justify-content-between text-white modal-header-custom">
-                      <h5 className="modal-title">Risk Register</h5>
+                      <h5 className="modal-title">Risk Register {actionFrom} </h5>
                       <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
                         &times;
                       </button>

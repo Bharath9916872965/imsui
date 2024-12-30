@@ -1071,7 +1071,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
               className="btn add"
               onClick={() => { setOpenAddIssueDialog(true) }}
             >
-              Add Issue (V1-R0)
+              Add Issue (I1-R0)
             </button>
           )}
         </div>

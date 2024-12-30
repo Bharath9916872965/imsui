@@ -697,6 +697,26 @@ export const insertCorrectiveAction = async (values)=>{
         return (await axios.post(`${API_URL}mostFrequent-Nc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in mostFrequent-Nc-list:', error);
+    }
+}
+
+  export const updateCorrectiveAction = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}update-corrective-action`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in updateCorrectiveAction:', error);
+        throw error;
+    }
+  }
+
+  export const uploadCarAttachment = async (attachment,file)=>{
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('ad', JSON.stringify(attachment));
+        return (await axios.post(`${API_URL}upload-car-attachment`,formData,{headers : { 'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in uploadCarAttachment:', error);
         throw error;
     }
 }
