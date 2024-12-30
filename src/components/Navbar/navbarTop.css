@@ -2,6 +2,18 @@
 
 
 /* -------------------------------- */
+.notification-count {
+  position: absolute;
+  top: -1px;  /* Adjust as needed */
+  right: -10px; /* Adjust as needed */
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 5px;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
 
 .nav-item.dropdown:hover .dropdown-menu {
   display: block;

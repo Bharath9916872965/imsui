@@ -208,3 +208,30 @@ export const UpdateApprovalAuthority = async(values) =>{
       throw error;
   }
 }
+
+export const getNotifiList= async () => {
+  try {
+      return (await axios.post(`${API_URL}get-notification`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in getNotifiList:', error);
+      throw error;
+  }
+};
+
+export const getNotifiCount= async () => {
+  try {
+      return (await axios.post(`${API_URL}get-notification-count`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in getNotifiCount:', error);
+      throw error;
+  }
+};
+
+export const  updatenotification= async (notiId) => {
+  try {
+      return (await axios.post(`${API_URL}update-notification`,notiId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in updatenotification:', error);
+      throw error;
+  }
+};

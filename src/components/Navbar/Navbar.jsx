@@ -4,8 +4,12 @@ import { logout } from "../../services/auth.service";
 import "./navbarTop.css"
 import "../../static/buttons.css"
 import { useEffect, useState } from "react";
-import { getHeaderModuleDetailList, getHeaderModuleList,changePassword } from "../../services/admin.serive";
-import { getLoginEmployeeDetails } from "services/header.service";
+import { getHeaderModuleDetailList, getHeaderModuleList,changePassword,getNotifiList,getNotifiCount,updatenotification  } from "../../services/admin.serive";
+import { getLoginEmployeeDetails} from "services/header.service";
+
+
+
+
 
 const Navbar = (props) => {
 
@@ -15,6 +19,10 @@ const Navbar = (props) => {
   const [title, setTitle] = useState('');
   const [designation, setDesignation] = useState('');
   const [formRoleName, setFormRoleName] = useState('');
+  const [notifiCount, setNotifiCount] = useState(0);
+  const [notifiList, setNotifiList] = useState([]);
+  
+
 
   useEffect(() => {
     const fetchData = async () => {
@@ -40,6 +48,18 @@ const Navbar = (props) => {
     fetchData();
 
   }, []);
+
+  const gotoNoti = async (event, item) => {
+    event.preventDefault(); 
+    const response = await updatenotification(item.notificationid);
+    props.router.navigate(item.notificationurl);
+    if (response > 0) {
+      const notifiCount = await getNotifiCount();
+      const notifiList = await getNotifiList();
+      setNotifiCount(notifiCount);
+      setNotifiList(notifiList);
+    }
+  };
 
   const handleLogout = (e) => {
     e.preventDefault();
@@ -138,8 +158,10 @@ const Navbar = (props) => {
             );
           })}
 
-
+     
         <li className="nav-item dropdown">
+
+
             <a href="/dashboard" className="nav-link nav-animate">
               <i className="material-icons" style={{ fontSize: '20px' }}>help</i> Help
             </a>
@@ -160,6 +182,8 @@ const Navbar = (props) => {
               </ul>
           </li>
 
+
+
           {/* <li className="nav-item dropdown">
             <a href="#" className="nav-link dropdown-toggle" data-bs-toggle="dropdown" aria-expanded="false">
               <i className="material-icons" style={{ fontSize: '20px' }}>checklist_rtl</i> Audit
@@ -173,6 +197,22 @@ const Navbar = (props) => {
         <i className="material-icons" style={{ fontSize: '20px' }}>checklist_rtl</i> Audit
       </a>
     </li> */}
+          <li className="nav-item dropdown" >
+               <a href="/dashboard" className="nav-link nav-animate">
+              <i className="material-icons" style={{ fontSize: '20px' }}>notifications</i> 
+              <span className='notification-count'>{Number(notifiCount)}</span>
+            </a>
+            <ul className="dropdown-menu">
+            {notifiList.length > 0 ? (
+                notifiList.map((item, index) => (
+                  <a  className="dropdown-item" key={index} onClick={(event) => gotoNoti(event, item)}>{item.notificationmessage}</a>
+                ))
+              ) : (
+                <a  className="dropdown-item" href="" onClick={(event) => event.preventDefault()}>No Notifications</a>
+              )}
+              </ul>
+            </li> 
+
           <li className="nav-item dropdown" >
             <a href="#" onClick={handleLogout} className="nav-link nav-animate">
               <i className="material-icons" style={{ fontSize: '20px' }}>logout</i> Logout
