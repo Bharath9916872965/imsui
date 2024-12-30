@@ -26,11 +26,11 @@ const NcReport = ({ router }) => {
   // Columns for the data table
   const columns = [
     { name: "SN", selector: (row) => row.sn, sortable: true, width: "3%" },
-    { name: 'Division/ Group/ Project', selector: (row) => row.divisionName, sortable: true, grow: 2, align: 'text-left', width: '11%'  },
-    { name: "Auditee", selector: (row) => row.auditee, sortable: true, align: 'text-left',width: "17%" },
-    { name: "NC", selector: (row) => row.ncCount, sortable: true, width: "7%" },
-    { name: "OBS", selector: (row) => row.obsCount, sortable: true, width: "15%" },
-    { name: "OFI", selector: (row) => row.ofiCount, sortable: true, width: "5%" },
+    { name: 'Division/ Group/ Project', selector: (row) => row.divisionName, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
+    { name: "Auditee", selector: (row) => row.auditee, sortable: true, align: 'text-left',width: "30%" },
+    { name: "NC", selector: (row) => row.ncCount, sortable: true, width: "10%" },
+    { name: "OBS", selector: (row) => row.obsCount, sortable: true, width: "10%" },
+    { name: "OFI", selector: (row) => row.ofiCount, sortable: true, width: "10%" },
     // { name: "Action", selector: (row) => row.action, sortable: false, width: "8%" },
   ];
 

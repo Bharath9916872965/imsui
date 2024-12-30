@@ -85,7 +85,7 @@ const InternalAuditorTeamsPrint = async (filAuditTeamDtoList, teamMembersGrouped
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
-      pageMargins: [50, 120, 40, 50],
+      pageMargins: [50, 120, 40, 25],
   
       header: (currentPage) => {
         return {

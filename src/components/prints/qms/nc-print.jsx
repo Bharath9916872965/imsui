@@ -1,8 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
-import React from 'react';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
-const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
+const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
 
   try {
 
@@ -31,52 +30,26 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     let tableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Date :Time (Hrs)', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Division/Group', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Project', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Auditee', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Team', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Section No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
+       
        ],
     ];
 
-    // Add rows to the table body based on data
-    function parseDate(dateString) {
-      if (!dateString) return null; // Handle null or undefined dates
-      const [datePart, timePart] = dateString.split(' ');
-      const [day, month, year] = datePart.split('-');
-      return new Date(`${year}-${month}-${day}T${timePart}`);
-    }
-    
-    data.forEach((item, index) => {
-      if (item && Object.keys(item).length > 0) { // Ensure item is not null or empty
-        let formattedDate = '-';
-        if (item.date) {
-          const parsedDate = parseDate(item.date);
-          if (!isNaN(parsedDate)) {
-            formattedDate = new Intl.DateTimeFormat('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }).format(parsedDate);
-          }
-        }
-    
-        tableBody.push([
-          { text: index + 1, style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
-          { text: formattedDate || '-', style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
-          { text: item.divisionCode || '-', style: 'normal', alignment: 'left', margin: [0, 5, 0, 0] },
-          { text: item.project || '-', style: 'normal', alignment: 'left', margin: [2, 0, 2, 0] },
-          { text: item.auditee || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
-          { text: item.team || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
-        ]);
-        
-      }
-    
 
-    });
+    data.forEach((item, index) => {
+        if (item && Object.keys(item).length > 0) {
+          tableBody.push([
+            { text: index + 1, style: 'normal', alignment: 'center' },
+            { text: item.sectionNo || 'N/A', style: 'normal', alignment: 'center' },
+            { text: item.clauseNo || 'N/A', style: 'normal', alignment: 'left' },
+            { text: item.description || 'N/A', style: 'normal', alignment: 'left' },
+            { text: item.auditorRemarks || 'N/A', style: 'normal', alignment: 'left' },
+          ]);
+        }
+      });
     
     
     
@@ -96,7 +69,7 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     // Define the document structure and styles
     const docDefinition = {
       info: {
-        title: 'Audit Schedule Print',
+        title: `NC Print`,
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -133,7 +106,7 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
                       margin: [0, 0, 0, 6],
                     },
                     {
-                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}AUDIT SCHEDULE (${formattedFromDate} - ${formattedToDate})`,
+                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}NC - Non-Complied  (${formattedFromDate} - ${formattedToDate})`,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
@@ -204,4 +177,4 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
   }
 };
 
-export default AuditSchedulePrint;
+export default NcPrint;
