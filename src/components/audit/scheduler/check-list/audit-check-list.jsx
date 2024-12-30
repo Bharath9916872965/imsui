@@ -66,12 +66,8 @@ const AuditCheckListComponent = ({router}) => {
 
      setRoleId(role)
       const eleData = router.location.state?.element;
-      console.log('eleData------- ',eleData)
       const scDate = eleData.scheduleDate;
       const [datePart] = scDate.split(" ")
-      console.log('new Date(datePart)------- ',new Date(datePart))
-      console.log('new Date------- ',new Date())
-      console.log('new Date------- ',new Date(datePart) <= new Date())
       
 
       setSchduleDate(new Date(datePart));
