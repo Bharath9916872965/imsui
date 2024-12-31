@@ -11,7 +11,7 @@ try {
         const chList    = await getAuditCheckList(data.scheduleId);
         const imgSource = await getCheckListimg(data);
                 let filChapters = [];
-       if(chList.length === 0 || data.scheduleStatus !== 'ARS'){
+       if(chList.length === 0 ){
               filChapters = chapters.filter(data => data.isActive == 1 && data.isForCheckList == 'Y');
            }else{
             filChapters = chList;
@@ -345,7 +345,18 @@ const tables = mainChapter.map((chapter) => {
                     body: [
                       [
                         { text: '1.  Auditee Group:', style: 'headerNames', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
-                        { text: data.divisionName, style: 'headerNames', alignment: 'left', border: [false, false, false, false], fontSize: 9 , margin: [-50, 0, 0, 0]},
+                        {
+                          text: 
+                            (data.divisionName === '' ? '' : data.divisionName) +
+                            (data.groupName === '' ? '' : ' ' + data.groupName) +
+                            (data.projectName === '' ? '' : ' ' + data.projectName),
+                          style: 'headerNames',
+                          alignment: 'left',
+                          border: [false, false, false, false],
+                          fontSize: 9,
+                          margin: [-50, 0, 0, 0],
+                        },
+                        
                         { text: '2.  Auditors Name:', style: 'headerNames', alignment: 'left', border: [false, false, false, false], fontSize: 9 },
                         { text: data.teamCode, style: 'headerNames', alignment: 'left', border: [false, false, false, false], fontSize: 9 ,margin: [-50, 0, 0, 0]},
                       ],

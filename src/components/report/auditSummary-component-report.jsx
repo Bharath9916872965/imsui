@@ -6,25 +6,29 @@ import Datatable from "../datatable/Datatable";
 import { getScheduleList,getTeamList } from "../../services/audit.service";
 import internalAuditorTeamsPrint from "components/prints/qms/internalAduitor-teams-print";
 import AuditSchedulePrint from "components/prints/qms/auditSchedule-print";
+import NcPrint from "components/prints/qms/nc-print";
+import OBSPrint from "components/prints/qms/obs-print";
+import OFIPrint from "components/prints/qms/ofi-print";
 import mergePdf from"components/prints/qms/auditorsSchedulemergePdf";
 import dayjs from 'dayjs';
 import { format } from "date-fns";
 const AuditSummaryReport = () => {
-  const [auditTeamDtoList, setAuditTeamDtoList] = useState([]);
-  const [filAuditTeamDtoList, setFilAuditTeamDtoList] = useState([]);
-  const [auditTeamMemberDtoList, setAuditTeamMemberDtoList] = useState([]);
-   const [iqaId, setIqaId] = useState('');
-  const [iqaOptions, setIqaOptions] = useState([]);
-  const [iqaNo, setIqaNo] = useState('');
-  const [iqaFullList, setIqaFullList] = useState([])
-
-      const [filScheduleList,setFilScheduleList] = useState([]);
-      const [PrintList1,setPrintList1] = useState([]);
+      const [auditTeamDtoList, setAuditTeamDtoList] = useState([]);
+      const [filAuditTeamDtoList, setFilAuditTeamDtoList] = useState([]);
+      const [auditTeamMemberDtoList, setAuditTeamMemberDtoList] = useState([]);
+      const [iqaId, setIqaId] = useState('');
+      const [iqaOptions, setIqaOptions] = useState([]);
+      const [iqaNo, setIqaNo] = useState('');
+      const [iqaFullList, setIqaFullList] = useState([])
       const [scheduleList,setScheduleList] = useState([]);
+      const [filScheduleList,setFilScheduleList] = useState([]);
       const [isReady, setIsReady] = useState(false);
       const [iqaFromDate,setIqaFromDate] = useState(dayjs(new Date()));
       const [iqaToDate,setIqaToDate] = useState(dayjs(new Date()));
       const [fullchListByObsIds,setfullchListByObsIds]=useState([]);
+      const [filNc,setfilNc]=useState([]);
+      const [filObs,setfilObs]=useState([]);
+      const [filOfi,setfilOfi]=useState([]);
       const [selectedOption, setSelectedOption] = useState("A");
   
 
@@ -32,13 +36,10 @@ const AuditSummaryReport = () => {
          try {
            const scdList        = await getScheduleList();
            const iqaList        = await getIqaDtoList();
-         
-       
-            const chListByObsIds= await getAuditCheckListbyObs();
-            console.log('chByObsIds@@@@@@',chListByObsIds);
-    
-        
-           setfullchListByObsIds(chListByObsIds);
+          const chListByObsIds= await getAuditCheckListbyObs();
+      
+
+            setfullchListByObsIds(chListByObsIds);
            setIqaFullList(iqaList);
            setScheduleList(scdList);
            const iqaData = iqaList.map(data => ({
@@ -52,7 +53,14 @@ const AuditSummaryReport = () => {
               setIqaFromDate(dayjs(new Date(iqa.fromDate)))
              setIqaToDate(dayjs(new Date(iqa.toDate)))
             const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
-             setDataTable(scList);
+            setDataTable(scList);
+            const ncList = chListByObsIds.filter(data => data.iqaId === iqa.iqaId && data.auditObsId ===2)
+            const obsList = chListByObsIds.filter(data => data.iqaId === iqa.iqaId && data.auditObsId ===3)
+            const ofiList = chListByObsIds.filter(data => data.iqaId === iqa.iqaId && data.auditObsId ===4)
+            setNc(ncList);
+            setObs(obsList);
+            setOfi(ofiList);
+           
            }
            setIqaOptions(iqaData)
           setIsReady(true);
@@ -72,14 +80,10 @@ const AuditSummaryReport = () => {
         });
         return acc;
       }, {});
-      const handleRadioChange = (event) => {
-        setSelectedOption(event.target.value);
-     // Add any additional logic here
-      };
+
       const auditTeamList = async () => {
         try {
           const [AuditTeamDtoList, IqaList] = await Promise.all([getAuditeeTeamDtoList(), getIqaDtoList()]);
-    
           setIqaFullList(IqaList)
           const iqaData = IqaList.map(data => ({
             value: data.iqaId,
@@ -101,8 +105,7 @@ const AuditSummaryReport = () => {
     
       const latestData = async () => {
         const [AuditTeamDtoList, AuditorList, TeamMemberList, AuditTeamMemberList, IqaList] = await Promise.all([getAuditeeTeamDtoList(), getAuditorIsActiveList(), getTeamMemberIsActiveList(), getAuditTeamMemberList(), getIqaDtoList()]);
-      
-           setAuditTeamMemberDtoList(AuditTeamMemberList);
+            setAuditTeamMemberDtoList(AuditTeamMemberList);
             setAuditTeamDtoList(AuditTeamDtoList);
           if (IqaList.length > 0) {
           setFilAuditTeamDtoList(AuditTeamDtoList.filter(data => data.iqaId === (iqaId === '' ? IqaList[0].iqaId : iqaId)));
@@ -145,14 +148,12 @@ const AuditSummaryReport = () => {
           filAuditTeamDtoList.forEach((team, index) => {
               const teamMembers = teamMembersGrouped[team.teamId] || [];
               const auditors = teamMembers.map((member) => member.name);
-          
-              // Add SN and Teams columns
+            // Add SN and Teams columns
               const row = [
                   index + 1, // SN
                   team.teamCode || '-', // Teams
               ];
-          
-              // Add auditor names to the row
+            // Add auditor names to the row
               for (let i = 0; i < maxAuditors; i++) {
                   row.push(auditors[i] || '-');
               }
@@ -162,21 +163,17 @@ const AuditSummaryReport = () => {
        
           const ncColumns = [
             { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-            { name: 'ClauseNo', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
-            { name: 'Description', selector: (row) => row.divisionCode, sortable: true, grow: 2, align: 'text-left', width: '15%'  },
+            { name: 'SectionNo', selector: (row) => row.sectionNo, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
+            { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
+            { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
+            { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
           ];
-           
-    
-       useEffect(() => {
+    useEffect(() => {
          fetchData();
        }, [isReady]);
-     
-
-  useEffect(() => {
+      useEffect(() => {
     auditTeamList();
   }, []);
-
-
 
     const onIqaChange = (value)=>{
       //for auitor teams on change
@@ -191,14 +188,23 @@ const AuditSummaryReport = () => {
         setIqaFromDate(dayjs(new Date(selectedIqa.fromDate)))
         setIqaToDate(dayjs(new Date(selectedIqa.toDate)))
      }
-      setIqaId(value);
+     
     const scList = scheduleList.filter(data => data.iqaId === value)
       setDataTable(scList)
      
-      
-      const fillchListByObsIds =fullchListByObsIds.filter(data=> data.iqaId === value);
+      //for NC On change
+      const fillnc =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===2);
+      const fillobs =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===3);
+      const fillofi =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===4);
 
+      setNc(fillnc);
+      setObs(fillobs);
+      setOfi(fillofi);
     }
+    const handleRadioChange = (event) => {
+      setSelectedOption(event.target.value);
+    
+    };
   const setDataTable = (list)=>{
     if (!list || list.length === 0) {
       setFilScheduleList([{ message: "No data available." }]);
@@ -217,10 +223,47 @@ const AuditSummaryReport = () => {
 }      
     });
 setFilScheduleList(mappedData);
+  }
 
-   }
+  const setNc = (list)=>{
+    if (!list || list.length === 0) {
+      setfilNc([{ message: "No data available." }]);
+      return;
+    }
+    const mappedData = list.map((item,index)=>({
+      sn: index + 1,
+      sectionNo: item.sectionNo || '-',
+      clauseNo: item.clauseNo || '-',
+      description: item.description || '-',
+      auditorRemarks: item.auditorRemarks || '-'
+    }));
+        setfilNc(mappedData);
+    
+}
+const setObs = (list)=>{
+    const mappedData = list.map((item,index)=>({
+    sn: index + 1,
+    sectionNo: item.sectionNo || '-',
+    clauseNo: item.clauseNo || '-',
+    description: item.description || '-',
+    auditorRemarks: item.auditorRemarks || '-'
+  }));
 
-
+  setfilObs(mappedData);
+  
+}
+const setOfi = (list)=>{
+    const mappedData = list.map((item,index)=>({
+    sn: index + 1,
+    sectionNo: item.sectionNo || '-',
+    clauseNo: item.clauseNo || '-',
+    description: item.description || '-',
+    auditorRemarks: item.auditorRemarks || '-'
+  }));
+    setfilOfi(mappedData);
+  
+}
+// Example usage for different auditObsId values
   
   return (
     <div>
@@ -262,52 +305,55 @@ setFilScheduleList(mappedData);
           </div><br />
           <div className="row">    
   <div style={{ padding: '10px' }}>
-  <input type="radio" id="auditorTeams" name="auditOption" value="A"  checked={selectedOption === "A"} onChange={handleRadioChange} /> <label htmlFor="auditorTeams" style={{ fontWeight: 'bold' }}>Auditors </label>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-  <input type="radio" id="scheduleList" name="auditOption" value="S"  checked={selectedOption === "S"} onChange={handleRadioChange} /> <label htmlFor="scheduleList" style={{ fontWeight: 'bold' }}>Schedule List</label>&nbsp;&nbsp;&nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;
-  
+  <input type="radio" id="auditorTeams" name="auditOption" value="A"  checked={selectedOption === "A"} onChange={handleRadioChange} /> <label htmlFor="auditorTeams" style={{ fontWeight: 'bold' }}>Auditors </label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="radio" id="scheduleList" name="auditOption" value="S"  checked={selectedOption === "S"} onChange={handleRadioChange} /> <label htmlFor="scheduleList" style={{ fontWeight: 'bold' }}>Schedule List</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="radio" id="nc" name="auditOption" value="N"  checked={selectedOption === "N"} onChange={handleRadioChange} /> <label htmlFor="nc" style={{ fontWeight: 'bold' }}>NC</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="radio" id="obc" name="auditOption" value="B"  checked={selectedOption === "B"} onChange={handleRadioChange} /> <label htmlFor="obc" style={{ fontWeight: 'bold' }}>OBS</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+  <input type="radio" id="ofi" name="auditOption" value="O"  checked={selectedOption === "O"} onChange={handleRadioChange} /> <label htmlFor="ofi" style={{ fontWeight: 'bold' }}>OFI</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
  
  &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp; &nbsp;&nbsp; &nbsp; &nbsp; &nbsp;
   {selectedOption === 'A' && (
-    <button
-      onClick={() => internalAuditorTeamsPrint(filAuditTeamDtoList, teamMembersGrouped, iqaNo)}
-      title="Print"
-      aria-label="Print checklist"
-    >
+    <button onClick={() => internalAuditorTeamsPrint(filAuditTeamDtoList, teamMembersGrouped, iqaNo)}title="Print" aria-label="Print checklist">
  <i className="material-icons">print</i> Auditors Print
     </button>
   )}
-
-  {selectedOption === 'S' && (
-    <button
-      onClick={() => AuditSchedulePrint(filScheduleList, iqaNo, iqaFromDate, iqaToDate)}
-      title="Print"
-      aria-label="Print AuditSchedule"
-    >
+{selectedOption === 'S' && (
+    <button onClick={() => AuditSchedulePrint(filScheduleList, iqaNo, iqaFromDate, iqaToDate)} title="Print" aria-label="Print AuditSchedule" >
       <i className="material-icons">print</i>Audit Schedule
     </button>
   )}
-
-
+  {selectedOption === 'N' && (
+    <button onClick={() => NcPrint(filNc, iqaNo, iqaFromDate, iqaToDate)} title="Print" aria-label="Print AuditSchedule" >
+      <i className="material-icons">print</i>NC
+    </button>
+  )}
+  {selectedOption === 'B' && (
+    <button onClick={() => OBSPrint(filObs, iqaNo, iqaFromDate, iqaToDate)} title="Print" aria-label="Print AuditSchedule" >
+      <i className="material-icons">print</i>OBS
+    </button>
+  )}
+  {selectedOption === 'O' && (
+    <button onClick={() => OFIPrint(filOfi, iqaNo, iqaFromDate, iqaToDate)} title="Print" aria-label="Print AuditSchedule" >
+      <i className="material-icons">print</i>OFI
+    </button>
+  )}
 
 </div>
 </div>
-
-           
-          <div className="team-list">
+<div className="team-list">
   {/* Auditor Teams Section */}
   
-  
-{/* {<Datatable columns={columns} data={filScheduleList} /> } */}
+  {/* {<Datatable columns={columns} data={filScheduleList} /> } */}
 {selectedOption === 'A' ? (
   <Datatable columns={InAuditorTeamscolumns} data={auditorsList} />
 ) : selectedOption === 'S' ? (
   <Datatable columns={auditorcolumns} data={filScheduleList} />
 ) : selectedOption === 'N' ? (
-  <Datatable columns={ncColumns} data={filScheduleList} />
+  <Datatable columns={ncColumns} data={filNc} />
 ) : selectedOption === 'B' ? (
-  <Datatable columns={ncColumns} data={filScheduleList} />
+  <Datatable columns={ncColumns} data={filObs} />
 ) : selectedOption === 'O' ? (
-  <Datatable columns={ncColumns} data={filScheduleList} />
+  <Datatable columns={ncColumns} data={filOfi} />
 
 ) : null}
 
