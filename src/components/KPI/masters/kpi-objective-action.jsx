@@ -160,7 +160,9 @@ const KpiObjectiveAction = ({router}) => {
   const onRevisionChange = (value)=>{
     setRevisionId(value);
     const revRow = revisionOptions.filter(data => Number(data.value) === Number(value));
-    setDivisionName(revRow[0].label)
+    if(revRow && revRow.length > 0){
+      setDivisionName(revRow[0].label)
+    }
     if(iqaOptions.length > 0){
       if(kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(value) && iqaId === item.iqaId).length > 0){
         setIsAddMode(false)
@@ -182,7 +184,9 @@ const KpiObjectiveAction = ({router}) => {
   const onIqaChange = (value)=>{
     setIqaId(value);
     const iqaData = iqaList.filter(item =>item.iqaId === value);
-    setIqaNo(iqaData[0].iqaNo)
+    if(iqaData && iqaData.length > 0){
+      setIqaNo(iqaData[0].iqaNo)
+    }
 
     if(kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(revisionId) && value === item.iqaId).length > 0){
       setIsAddMode(false)

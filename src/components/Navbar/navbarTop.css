@@ -72,6 +72,11 @@
 .width13{
   width: 13%;
 }
+
+.width14{
+  width: 14%;
+}
+
 .width15{
   width: 15%;
 }
@@ -116,8 +121,16 @@
   width: 50%;
 }
 
+.width59{
+  width: 59%;
+}
+
 .width60{
   width: 60%;
+}
+
+.width61{
+  width: 61%;
 }
 
 .width67{
@@ -219,7 +232,7 @@
 }
 
 .mg-l-10{
-  margin-left: 10px;
+  margin-left: 10px !important;
 }
 
 .mg-l-5{
@@ -345,7 +358,19 @@
   margin-top: 17px !important;
 }
 
+.align-top {
+  vertical-align: top !important;
+}
 
+.top-5-rel{
+  position: relative;
+  top: 5px;
+}
 
+.attachment{
+  text-decoration: underline;
+  color: royalblue !important;
+  cursor: pointer;
+}
 
   
