@@ -70,6 +70,14 @@ export  class CheckListImgDto{
         this.iqaId              = iqaId;
     }
 }
+export class MostFqNCDescDto{
+  
+    constructor(auditObsId,scheduleId,iqaId){
+        this.iqaId=iqaId;
+        this.scheduleId=scheduleId;
+        this.auditObsId=auditObsId;
+    }
+};
 
 
 export const givePreview = (EXT, data, name) => {
@@ -765,7 +773,18 @@ export const getAssignedData = async ()=>{
         throw error;
     }
 }
-  
+
+  export const getMostFqNCDesc = async (auditObsId, scheduleId, iqaId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}mostFqNc-Description-list/${auditObsId}/${scheduleId}/${iqaId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in mostFqNc-Description-list', error);
+        throw error; 
+    }
+    
+};
+
 
   export const downloadCarFile = async (attachment,reqNo)=>{
     try {
