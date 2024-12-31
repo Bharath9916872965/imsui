@@ -755,6 +755,25 @@ export const insertCorrectiveAction = async (values)=>{
     }
 }
 
+
+export const getQmrcList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-qmrc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getQmrcList:', error);
+        throw error;
+    }
+}
+
+export const getAssignedData = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-qmrc-action-assign-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getAssignedData:', error);
+        throw error;
+    }
+}
+
   export const getMostFqNCDesc = async (auditObsId, scheduleId, iqaId) => {
     
     try {
@@ -765,6 +784,7 @@ export const insertCorrectiveAction = async (values)=>{
     }
     
 };
+
 
   export const downloadCarFile = async (attachment,reqNo)=>{
     try {
