@@ -76,7 +76,8 @@ const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   }, [isReady]);
 
 
-
+  const sortedData = qmRevisionRecordList.filter(a => a.statusCode === 'APD');
+  const latestRecord = sortedData[0];
 
   const setImagesWidth = (htmlString, width) => {
     const container = document.createElement('div');
@@ -317,7 +318,6 @@ function generateRotatedTextImage(text) {
     const latestRevisionData = [...qmRevisionRecordList].sort(
       (a, b) => a.revisionRecordId - b.revisionRecordId
     );
-    console.log("latestRevisionData", latestRevisionData);
     for (let i = 0; i < latestRevisionData.length; i++) {
     var value = [
       { text: latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center' },
@@ -363,7 +363,9 @@ function generateRotatedTextImage(text) {
     }
 
     function getQmTransaction(empId,status) {
-      const data = qmTransactionList.find(e => e.empId === empId && e.statusCode === status);
+      const data = qmTransactionList
+       .filter(e => e.empId === empId && e.statusCode === status)
+       .sort((a, b) => (b.qmTransactionId - a.qmTransactionId))[0];
       if (data) {
           return `${data.transactionDate}`;
       }
@@ -516,8 +518,17 @@ function generateRotatedTextImage(text) {
         }
       },
 
-      watermark: { text: revisionRecordData.statusCode === 'APD' ? '' : 'DRAFT', opacity: 0.1, bold: true, italics: false, fontSize: 150,  },
-
+      watermark: {
+        text: revisionRecordData.statusCode === 'APD' 
+          ? (latestRecord.statusCode === 'APD' ? (latestRecord.revisionNo <= revisionRecordData.revisionNo ? 'APPROVED' : 'OBSOLETE') : 'DRAFT') 
+          : 'DRAFT',
+        opacity: 0.1,
+        bold: true,
+        italics: false,
+        fontSize: 150,
+      },
+      
+      
       background: function (currentPage) {
         return [
           {

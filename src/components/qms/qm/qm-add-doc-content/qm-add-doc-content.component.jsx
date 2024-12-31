@@ -15,6 +15,7 @@ import AlertConfirmation from "../../../../common/AlertConfirmation.component";
 import QmAddSectionDialog from "./qm-add-section-dialog";
 import QmDocPrint from "../../../prints/qms/qm-doc-print";
 import QmAddAbbreviationDialog from "./qm-add-abbreviation-dialog";
+import AbbreviationModal from "./add-abbreviation-dialog";
 
 const QmAddDocContentComponent = ({ router }) => {
 
@@ -61,9 +62,11 @@ const QmAddDocContentComponent = ({ router }) => {
   const [content, setContent] = useState('Enter something.....');
   const [openDialog, setOpenDialog] = useState(false);
   const [openDialog2, setOpenDialog2] = useState(false);
-
+  const [openDialog3, setOpenDialog3] = useState(false);
   const [isPagebreakAfter, setIsPagebreakAfter] = useState(false);
   const [isLandscape, setIsLandscape] = useState(false);
+  const [status, setStatus] = useState('');
+  const [revisionData, setRevisionData] = useState('');
 
   useEffect(() => {
 
@@ -492,7 +495,15 @@ const QmAddDocContentComponent = ({ router }) => {
     return <QmDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
   }
 
+  const abbreviationModal = () =>{
+    setStatus('abbreviation');
+    setRevisionData(revisionElements);
+  };
 
+  switch(status){
+     case 'abbreviation' :
+         return <AbbreviationModal revisionData={revisionData} docType={'QM'}></AbbreviationModal>;
+  }
   return (
       <div sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowX: 'hidden' }}>
           <Helmet>
@@ -510,6 +521,7 @@ const QmAddDocContentComponent = ({ router }) => {
                   <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
                       <div align='left' className="d-flex flex-column flex-md-row gap-1">
                       <button className='btn topButtons' onClick={()=>setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button>
+                      <button className='btn topButtons' onClick={abbreviationModal}>Abbreviation New<i className="material-icons" >text_fields</i></button>
                       </div>
                       <div className="d-flex flex-column flex-md-row gap-1">
                           {/* <div className="doc-name">
