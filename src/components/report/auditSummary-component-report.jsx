@@ -38,7 +38,7 @@ const AuditSummaryReport = () => {
            const iqaList        = await getIqaDtoList();
           const chListByObsIds= await getAuditCheckListbyObs();
       
-console.log('chListByObsIds',chListByObsIds);
+
             setfullchListByObsIds(chListByObsIds);
            setIqaFullList(iqaList);
            setScheduleList(scdList);

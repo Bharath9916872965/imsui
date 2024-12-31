@@ -20,7 +20,10 @@ const NcReport = ({ router }) => {
   const [iqaNo, setIqaNo] = useState("");
   const [iqaId, setIqaId] = useState("");
   const [ModalData, setModalData] = useState("");
-  
+  const [divName,setDivName]=useState("");
+  const [Auditnam,setAuditName]=useState("");
+
+ 
 
   // Columns for the data table
   const columns = [
@@ -65,53 +68,83 @@ if (iqaList.length > 0) {
 
   // Map data for the data table
   const mapDataForTable = (list) => {
-
-    return list.map((item, index) => ({
-      sn: index + 1,
-      divisionName: 
-      (item.divisionName === '' ? '' : item.divisionName) +
-      (item.groupName === '' ? '' : ' ' + item.groupName) +
-      (item.projectName === '' ? '' : ' ' + item.projectName),
-      ncCount: item.countOfNC !== "0" && item.countOfNC !== 0 ? (
-        <button style={{ background: "linear-gradient(45deg, #e95081, #974686)",border: "none", color: "white", padding: "8px 12px",borderRadius: "4px",cursor: "pointer",}}  onClick={() => toggleModal(item.scheduleId, item.iqaId, 2)} >
-          {item.countOfNC}
+   
+    return list.map((item, index) => {
+      // Construct divisionName dynamically with fallback values
+      const divisionName = [
+        item.divisionName,
+        item.groupName,
+        item.projectName,
+      ]
+        .filter((name) => name && name !== "")
+        .join(" ");
+  
+      // Helper function for creating styled buttons
+      const createButton = (label, colorGradient, onClick) => (
+        <button
+          style={{
+            background: `linear-gradient(45deg, ${colorGradient})`,
+            border: "none",
+            color: "white",
+            padding: "8px 12px",
+            borderRadius: "4px",
+            cursor: "pointer",
+          }}
+          onClick={onClick}
+        >
+          {label}
         </button>
-      ) : (
-        "-"
-      ),
-           
-      obsCount: (
-        item.countOfOBS > 0 ? (
-          <button style={{  background: "linear-gradient(45deg, rgb(184, 142, 252), rgb(104, 119, 244))", border: "none", color: "white",  padding: "8px 12px", borderRadius: "4px", cursor: "pointer",  }}onClick={() => toggleModal(item.scheduleId, item.iqaId, 3)}>
-            {item.countOfOBS}
-          </button>
-        ) : (
-          "-"
-        )
-      ),
-      ofiCount: (
-        item.countOfOFI > 0 ? (
-          <button style={{ background: "linear-gradient(45deg, rgb(255, 148, 85), rgb(248, 94, 4))", border: "none",color: "white", padding: "8px 12px",borderRadius: "4px",cursor: "pointer",}}
-            onClick={() => toggleModal(item.scheduleId, item.iqaId, 4)}>
-            {item.countOfOFI}
-          </button>
-        ) : (
-          "-"
-        )
-      ),
-      
-      
-          auditee: item.auditeeEmpName || "-",
-      }));
+      );
+  
+      return {
+        sn: index + 1,
+        divisionName: divisionName || "-",
+        ncCount:
+          item.countOfNC && item.countOfNC !== "0" ? (
+            createButton(
+              item.countOfNC,
+              "#e95081, #974686",
+              () => toggleModal(item.scheduleId, item.iqaId, 2, divisionName,item.auditeeEmpName)
+            )
+          ) : (
+            "-"
+          ),
+        obsCount:
+          item.countOfOBS > 0 ? (
+            createButton(
+              item.countOfOBS,
+              "rgb(184, 142, 252), rgb(104, 119, 244)",
+              () => toggleModal(item.scheduleId, item.iqaId, 3,divisionName,item.auditeeEmpName)
+            )
+          ) : (
+            "-"
+          ),
+        ofiCount:
+          item.countOfOFI > 0 ? (
+            createButton(
+              item.countOfOFI,
+              "rgb(255, 148, 85), rgb(248, 94, 4)",
+              () => toggleModal(item.scheduleId, item.iqaId, 4,divisionName,item.auditeeEmpName)
+            )
+          ) : (
+            "-"
+          ),
+        auditee: item.auditeeEmpName || "-",
+      };
+    });
   };
+  
    useEffect(() => {
         if (!showModal) {
             setModalVisible(false);
         }
     }, [showModal]);
 
-  const toggleModal = async (scheduleId, iqa, id) => {
+  const toggleModal = async (scheduleId, iqa, id,divisionName,auditName) => {
     try {
+
+      setDivName(divisionName);
+      setAuditName(auditName);
         const geNctdes = await getMostFqNCDesc(id, scheduleId, iqa);
              if (geNctdes && geNctdes.length > 0) {
             // Map through all the items and prepare the data
@@ -194,10 +227,15 @@ if (iqaList.length > 0) {
       role="dialog"
     >
       <div className="modal-dialog modal-lg modal-xl-custom">
-        <div className="modal-content modal-content-custom">
+        <div className="modal-content modal-content-custom"> 
           {/* Modal Header */}
           <div className="modal-header d-flex justify-content-between bg-secondary text-white modal-header-custom">
-            <h5 className="modal-title text-center">Description</h5>
+          <h5 className="modal-title text-center">
+  {iqaNo} <span style={{ margin: "0 10px" }}> - </span> 
+  {divName} <span style={{ margin: "0 10px" }}> - </span> 
+  {Auditnam}
+</h5>
+
             <button
               type="button"
               className="btn btn-danger modal-header-danger-custom"
@@ -210,6 +248,7 @@ if (iqaList.length > 0) {
 {/* Modal Body */}
      {/* Modal Body */}
      <div className="modal-body">
+      
   {ModalData.length > 0 ? (
     <table style={{width: "100%", borderCollapse: "collapse", marginTop: "10px",}}>
       <thead>
@@ -251,6 +290,7 @@ if (iqaList.length > 0) {
         </tr>
       </thead>
       <tbody>
+        
         {ModalData.map((item, index) => (
           <tr
             key={index}
