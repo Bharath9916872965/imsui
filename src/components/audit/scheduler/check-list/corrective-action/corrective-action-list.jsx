@@ -11,6 +11,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { format } from "date-fns";
+import CarMasterPrint from "components/prints/qms/carmaster-list-print";
 
 
 const CorrectiveActionList = ({router}) => {
@@ -349,6 +350,10 @@ const CorrectiveActionList = ({router}) => {
                </table>
                { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
                  <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
+
+<button onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)} title="Print" aria-label="Print AuditSchedule" >
+      <i className="material-icons">print</i>
+    </button>
               </CardContent>
              </Card>
             </Grid>
