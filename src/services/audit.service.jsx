@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { authHeader } from './auth.header';
 import  config  from "../environment/config";
+import saveAs from 'file-saver'
 
 const API_URL=config.API_URL;
 
@@ -69,6 +70,31 @@ export  class CheckListImgDto{
         this.iqaId              = iqaId;
     }
 }
+
+
+export const givePreview = (EXT, data, name) => {
+    let blob;
+  
+    if (EXT.toLowerCase() === 'pdf') {
+    blob = new Blob([data], { type: 'application/pdf' });
+    const blobUrl = window.URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+
+    } else if (['jpg', 'jpeg', 'png'].includes(EXT.toLowerCase())) {
+      blob = new Blob([data], { type: 'image/jpeg' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } else {
+      const MIME_TYPES = {
+        txt: 'text/plain',
+        doc: 'application/msword',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      };
+  
+      const mimeType = MIME_TYPES[EXT.toLowerCase()] || 'application/octet-stream';
+      saveAs(new Blob([data], { type: mimeType }), name);
+    }
+};
 
 export const getAuditorDtoList = async () => {
     
@@ -296,7 +322,7 @@ export const reScheduleSubmit = async (values)=>{
         console.error('Error occurred in forwardSchedule:', error);
         throw error;
     }
-}
+  }
 
 export const scheduleMailSend = async (values)=>{
     try {
@@ -712,4 +738,25 @@ export const insertCorrectiveAction = async (values)=>{
         console.error('Error occurred in uploadCarAttachment:', error);
         throw error;
     }
-}
+  }
+
+  export const downloadCarFile = async (attachment,reqNo)=>{
+    try {
+        const params = {fileName: attachment,reqNo: reqNo};
+        const response = await axios.get(`${API_URL}car-download`, {
+            params: params,headers: {'Content-Type': 'application/json', ...authHeader(),},responseType: 'arraybuffer',});
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred in downloadCarFile:', error);
+        throw error;
+    }
+  }
+
+  export const forwardCar = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}forward-car`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in forwardCar:', error);
+        throw error;
+    }
+  }
