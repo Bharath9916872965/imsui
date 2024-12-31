@@ -37,6 +37,7 @@ import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qs
 import CorrectiveActionReport from 'components/audit/scheduler/check-list/corrective-action/corrective-action-report';
 import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
 import ApprovalAuthorityListComponent from 'components/admin/approvalAuthorityList';
+import QmrcListComponent from 'components/audit/qmrc-list.component';
 
 function App() {
   return (
@@ -69,6 +70,7 @@ function App() {
         <Route path="/auditee-list" element={<AuditeeListComponent />} />
         <Route path="/audit-team-list" element={<AuditTeamListComponent />} />
         <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
+        <Route path="/qmrc-list" element={<QmrcListComponent />}/>
 
         {/* Schedule */}
         <Route path="/schedule-list" element={<ScheduleListComponent />} />
