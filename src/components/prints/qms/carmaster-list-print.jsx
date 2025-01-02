@@ -1,7 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
-const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
+const CarMasterPrint = async (data,iqaNo,auditeeName,schFromDate,schToDate) => {
 
   try {
 
@@ -9,10 +9,20 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     const logoImg = await getLogoImage();
     const drdoLogo = await getDrdoLogo();
 
+    function formatDateToDDMMMYYYY(date) {
+        if (!date) return 'N/A'; // Handle empty or invalid dates
+        const d = new Date(date);
+        const day = String(d.getDate()).padStart(2, '0'); // Day with leading zero
+        const month = d.toLocaleString('default', { month: 'short' }); // Short month name
+        const year = d.getFullYear(); // Full year
+      
+        return `${day}-${month}-${year}`;
+      }
 
+    const formattedschFromDate = dayjs(schFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
+     const formattedschToDate = dayjs(schToDate).format('DD-MMM YYYY'); 
+ 
 
-    const formattedFromDate = dayjs(iqaFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
-    const formattedToDate = dayjs(iqaToDate).format('DD-MMM YYYY'); 
     const getFormattedDate = () => {
       const date = new Date();
       const weekday = date.toLocaleString('en-IN', { weekday: 'short' });
@@ -30,10 +40,11 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     let tableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'CAR Ref No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Action Plan', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Responsibility', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Target Date', bold: true, alignment: 'center', style: 'superheader' },
        
        ],
     ];
@@ -43,14 +54,14 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
         if (item && Object.keys(item).length > 0) {
           tableBody.push([
             { text: index + 1, style: 'normal', alignment: 'center' },
-            { text: item.carRefNo || '-', style: 'normal', alignment: 'center' },
-            { text: item.clauseNo || '-', style: 'normal', alignment: 'left' },
-            { text: item.description || '-', style: 'normal', alignment: 'left' },
-            { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left' },
+            { text: item.carRefNo || 'N/A', style: 'normal', alignment: 'center' },
+            { text: item.carDescription || 'N/A', style: 'normal', alignment: 'left' },
+            { text: item.actionPlan || 'N/A', style: 'normal', alignment: 'left' },
+            { text: item.executiveName || 'N/A', style: 'normal', alignment: 'left' },
+            { text: formatDateToDDMMMYYYY(item.targetDate), style: 'normal', alignment: 'left' }, // Format targetDate
           ]);
         }
       });
-    
     
     
 
@@ -59,7 +70,7 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
       {
         style: 'tableExample',
         table: {
-          widths: [20, 120, 100, 250, 150],
+          widths: [40, 120, 140, 170, 160, 80],
           body: tableBody,
         },
         margin: [10, 10, 0, 10],
@@ -69,7 +80,7 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     // Define the document structure and styles
     const docDefinition = {
       info: {
-        title: `NC Print`,
+        title: `Master List of CAR Print`,
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -99,14 +110,14 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
                       margin: [0, 0, 0, 4],
                     },
                     {
-                      text: `Audit Summary`,
+                      text: ``,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
                       margin: [0, 0, 0, 6],
                     },
                     {
-                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}NC - Non-Complied  (${formattedFromDate} - ${formattedToDate})`,
+                        text: `Master List of CAR - ${iqaNo}  -${auditeeName} - ${formattedschFromDate} - ${formattedschToDate}`,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
@@ -177,4 +188,4 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
   }
 };
 
-export default NcPrint;
+export default CarMasterPrint;

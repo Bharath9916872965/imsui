@@ -116,3 +116,9 @@
     width: 1.3em;
     height: 1.3em;
   }
+
+.abbreclass:hover{ 
+    background-color: dimgray;
+    color: white;
+    padding: 5px;
+}

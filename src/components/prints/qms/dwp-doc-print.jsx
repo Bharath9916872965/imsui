@@ -1,8 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import pdfMake from 'pdfmake/build/pdfmake';
-import pdfFonts from 'pdfmake/build/vfs_fonts';
+import pdfMake from "pdfmake/build/pdfmake";
+import pdfFonts from "pdfmake/build/vfs_fonts";
 import htmlToPdfmake from 'html-to-pdfmake';
-import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage } from 'services/qms.service';
+import { dwprevisionTran, getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getDwpVersionRecordDtoList, getLabDetails, getLogoImage } from 'services/qms.service';
+import { getEmployeesList } from 'services/header.service';
+import { format } from 'date-fns';
 
 
 const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
@@ -18,8 +20,9 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [docAbbreviationsResponse, setDocAbbreviationsResponse] = useState([]);
   const [ApprovedVersionReleaseList, setApprovedVersionReleaseList] = useState([]);
   const [isReady, setIsReady] = useState(false);
-
-
+  const [revisionRecordData, setRevisionRecordData] = useState([]);
+  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [dwpTransactionList, setDwpTransactionList] = useState([]);
 
   useEffect(() => {
 
@@ -31,8 +34,8 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
     const fetchData = async () => {
       try {
         const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
-
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes]) => {
+        setRevisionRecordData(revision);
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
@@ -40,6 +43,9 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);
+          setApprovedVersionReleaseList(dwpRevisionRecordData);
+          setEmployeeDetails(employeeData);
+          setDwpTransactionList(dwpTransactionData);
           setIsReady(true);
         });
       } catch (error) {
@@ -57,7 +63,6 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   }, [triggerEffect]);
 
 
-
   const changeTriggerEffect = () => {
     setTriggerEffect(true);
     setIsReady(false);
@@ -72,7 +77,8 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   }, [isReady]);
 
 
-
+  const sortedData = ApprovedVersionReleaseList.filter(a => a.statusCode === 'APG');
+  const latestRecord = sortedData[0];
 
   const setImagesWidth = (htmlString, width) => {
     const container = document.createElement('div');
@@ -337,35 +343,107 @@ function generateRotatedTextImage(text) {
     var DocVersionRelease = [];
     DocVersionRelease.push(header1);
     DocVersionRelease.push(header2);
-    for (let i = 0; i < ApprovedVersionReleaseList.length; i++) {
+    // for (let i = 0; i < ApprovedVersionReleaseList.length; i++) {
 
-      let datePart = '--'
+    //   let datePart = '--'
 
-      if (ApprovedVersionReleaseList[i][13] !== null && ApprovedVersionReleaseList[i][13] !== '' && ApprovedVersionReleaseList[i][13] !== undefined) {
-        let dateTimeString = ApprovedVersionReleaseList[i][13].toString();
-        let parts = dateTimeString.split(' ');
+    //   if (ApprovedVersionReleaseList[i][13] !== null && ApprovedVersionReleaseList[i][13] !== '' && ApprovedVersionReleaseList[i][13] !== undefined) {
+    //     let dateTimeString = ApprovedVersionReleaseList[i][13].toString();
+    //     let parts = dateTimeString.split(' ');
 
-        datePart = parts[0] + ' ' + parts[1] + ' ' + parts[2];
-      }
+    //     datePart = parts[0] + ' ' + parts[1] + ' ' + parts[2];
+    //   }
 
 
 
+    //   var value = [
+
+    //     { text: i, style: 'tdData', alignment: 'center' },
+    //     { text: ApprovedVersionReleaseList[i][3], style: 'tdData' },
+    //     { text: i > 0 ? 'V' + ApprovedVersionReleaseList[i - 1][5] + '-R' + ApprovedVersionReleaseList[i - 1][6] : '--', style: 'tdData', alignment: 'center', },
+    //     { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
+    //     { text: datePart, alignment: 'center', style: 'tdData' },
+    //     { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
+    //   ];
+
+    //   DocVersionRelease.push(value);
+    // }
+      const latestRevisionData = [...ApprovedVersionReleaseList].sort(
+        (a, b) => a.revisionRecordId - b.revisionRecordId
+      );
+      for (let i = 0; i < latestRevisionData.length; i++) {
       var value = [
-
-        { text: i, style: 'tdData', alignment: 'center' },
-        { text: ApprovedVersionReleaseList[i][3], style: 'tdData' },
-        { text: i > 0 ? 'V' + ApprovedVersionReleaseList[i - 1][5] + '-R' + ApprovedVersionReleaseList[i - 1][6] : '--', style: 'tdData', alignment: 'center', },
-        { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
-        { text: datePart, alignment: 'center', style: 'tdData' },
-        { text: 'V' + ApprovedVersionReleaseList[i][5] + '-R' + ApprovedVersionReleaseList[i][6], style: 'tdData', alignment: 'center', },
+        { text: latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center' },
+        { text: latestRevisionData[i].description, style: 'tdData' },
+        { text: i > 0 ? 'I' + latestRevisionData[i - 1].issueNo + '-R' + latestRevisionData[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
+        { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
+        { text: format(new Date(latestRevisionData[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
+        { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
       ];
-
-      DocVersionRelease.push(value);
-    }
+  
+        DocVersionRelease.push(value);
+      }
+    
 
     // ----------revision table start----------------
 
     // ----------Document summary table start----------------
+
+    let approvedBy = '';
+    let reviewedBy = '';
+    let initiatedBy = '';
+    let approvedDate = '';
+    let reviewedDate = '';
+    let initiatedDate = '';
+    
+    function getEmployeeDetails(empId) {
+        const data = employeeDetails.find(e => e.empId === empId);
+        if (data) {
+            const titleOrSalutation = data.title ?? data.salutation ?? '';
+            return `${titleOrSalutation}${data.empName}, ${data.empDesigName}`;
+        }
+        return '';
+    }
+
+    function getDwpTransaction(empId, status) {
+      const data = dwpTransactionList
+          .filter(e => e.empId === empId && e.statusCode === status)
+          .sort((a, b) => (b.dwpTransactionId - a.dwpTransactionId))[0];
+    
+      if (data) {
+          return `${data.transactionDate}`;
+      }
+      return '';
+  }
+  
+
+    const dwpFormatDate = (date) => {
+    if (!date || isNaN(new Date(date).getTime())) {
+      return '';
+    }
+    const options = {
+      day: '2-digit',
+      month: 'long',
+      year: 'numeric',
+      hour: '2-digit',
+      minute: '2-digit',
+      hour12: true,
+    };
+    return new Intl.DateTimeFormat('en-GB', options).format(new Date(date));
+  };
+    
+    if (revisionRecordData.approvedBy) {
+        approvedBy = getEmployeeDetails(revisionRecordData.approvedBy);
+        approvedDate = getDwpTransaction(revisionRecordData.approvedBy,'APG');
+    }
+    if (revisionRecordData.reviewedBy) {
+        reviewedBy = getEmployeeDetails(revisionRecordData.reviewedBy);
+        reviewedDate = getDwpTransaction(revisionRecordData.reviewedBy,'RWD');
+    }
+    if (revisionRecordData.initiatedBy) {
+        initiatedBy = getEmployeeDetails(revisionRecordData.initiatedBy);
+        initiatedDate = getDwpTransaction(revisionRecordData.initiatedBy,'FWD');
+    }
 
     var docSummary = [];
 
@@ -380,8 +458,9 @@ function generateRotatedTextImage(text) {
     docSummary.push([{stack :[{text: [{text  : ' 12. Organization and address : ' , style  : ' tableLabel'}, {text : labDetails.labName + ' (' + labDetails.labCode + '), '+'Government of India, Ministry of Defence ' + 'Defence Research Development Organization '+labDetails[4] + ', ' + labDetails[5] + ' PIN-' + labDetails[6]}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 13. Distribution : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.distribution !== null && DocumentSummaryDto.distribution !== undefined ? DocumentSummaryDto.distribution: ''}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 14. Revision : ' , style  : ' tableLabel'}, {text : 'Issue ' + revisionElements.issueNo + '-Rev ' + revisionElements.revisionNo}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text  : ' 15. Reviewed by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
-    docSummary.push([{stack :[{text: [{text  : ' 16. Approved by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
+    docSummary.push([{stack: [{ text: '15. Prepared by: ', style: 'tableLabel', alignment: 'left' },{text: initiatedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{text: dwpFormatDate(initiatedDate), color: 'blue', alignment: 'center'}], colSpan: 2}, {}]);
+    docSummary.push([{stack: [{ text: '16. Reviewed by: ', style: 'tableLabel', alignment: 'left' },{text: reviewedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{ text: dwpFormatDate(reviewedDate), color: 'blue', alignment: 'center' }],colSpan: 2},{}]);
+    docSummary.push([{stack: [{ text: '17. Approved by: ', style: 'tableLabel', alignment: 'left' },{text: approvedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{text: dwpFormatDate(approvedDate), color: 'blue', alignment: 'center'}], colSpan: 2},{}]);
 
     // ----------Document summary table end----------------
 
@@ -477,7 +556,15 @@ function generateRotatedTextImage(text) {
         }
       },
 
-      watermark: { text: 'DRAFT', opacity: 0.1, bold: true, italics: false, fontSize: 150,  },
+      watermark: {
+        text: revisionRecordData.statusCode === 'APG' 
+          ? (latestRecord.statusCode === 'APG' ? (latestRecord.revisionNo <= revisionRecordData.revisionNo ? 'APPROVED' : 'OBSOLETE') : 'DRAFT') 
+          : 'DRAFT',
+        opacity: 0.1,
+        bold: true,
+        italics: false,
+        fontSize: 150,
+      },
 
       background: function (currentPage) {
         return [

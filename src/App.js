@@ -38,6 +38,10 @@ import CorrectiveActionReport from 'components/audit/scheduler/check-list/correc
 import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
 import ApprovalAuthorityListComponent from 'components/admin/approvalAuthorityList';
 import CarReportTransactionComponent from 'components/audit/scheduler/check-list/corrective-action/car-report-transaction';
+import QmrcListComponent from 'components/audit/qmrc-list.component';
+import DivisionComponent from 'components/admin/division.component';
+import DivisionGroupComponent from 'components/admin/divisionGroup.component';
+import ProjectComponent from 'components/admin/project.component';
 
 function App() {
   return (
@@ -53,6 +57,9 @@ function App() {
         <Route path="/user-manager-list" element={<UserManagerComponent />} />
         <Route path="/form-role-access" element={<FormRoleAccess />} />
         <Route path="/approval-authority" element={<ApprovalAuthorityListComponent />} />
+        <Route path="/division" element={<DivisionComponent />} />
+        <Route path="/division-group" element={<DivisionGroupComponent />} />
+        <Route path="/project" element={<ProjectComponent />} />
         
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
@@ -70,6 +77,7 @@ function App() {
         <Route path="/auditee-list" element={<AuditeeListComponent />} />
         <Route path="/audit-team-list" element={<AuditTeamListComponent />} />
         <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
+        <Route path="/qmrc-list" element={<QmrcListComponent />}/>
 
         {/* Schedule */}
         <Route path="/schedule-list" element={<ScheduleListComponent />} />

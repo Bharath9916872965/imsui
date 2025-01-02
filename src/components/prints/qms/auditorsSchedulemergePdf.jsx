@@ -8,9 +8,12 @@ const GenerateCombinedPDF = async (
   iqaFromDate,
   iqaToDate,
   filAuditTeamDtoList,
-  teamMembersGrouped
+  teamMembersGrouped,
+  ncData,
+  obsData,
+  ofiData,
 ) => {
-  try {
+    try {
         const labDetails = await getLabDetails();
         const logoImg = await getLogoImage();
         const drdoLogo = await getDrdoLogo();
@@ -52,6 +55,72 @@ const GenerateCombinedPDF = async (
         { text: item.team || '-', style: 'normal', alignment: 'left',margin:[0, 5, 0, 0] },
       ]);
     });
+    //generate NC 
+    let ncTableBody = [
+      [
+        { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
+       
+       ],
+    ];
+
+    ncData.forEach((item, index) => {
+      ncTableBody.push([
+        { text: index + 1, style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.carRefNo || '-', style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.clauseNo || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        { text: item.description || '-', style: 'normal', alignment: 'left' ,margin: [0, 0, 0, 0]},
+        { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        
+      ]);
+    });
+    //for OBS
+    let obsTableBody = [
+      [
+        { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
+       
+       ],
+    ];
+
+    obsData.forEach((item, index) => {
+      obsTableBody.push([
+        { text: index + 1, style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.carRefNo || '-', style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.clauseNo || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        { text: item.description || '-', style: 'normal', alignment: 'left' ,margin: [0, 0, 0, 0]},
+        { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        
+      ]);
+    });
+    //ofi
+    let ofiTableBody = [
+      [
+        { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
+       
+       ],
+    ];
+
+    ofiData.forEach((item, index) => {
+      ofiTableBody.push([
+        { text: index + 1, style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.carRefNo || '-', style: 'normal', alignment: 'center',margin: [0, 0, 0, 0] },
+        { text: item.clauseNo || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        { text: item.description || '-', style: 'normal', alignment: 'left' ,margin: [0, 0, 0, 0]},
+        { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
+        
+      ]);
+    });
 
     const auditContent = {
       style: 'tableExample',
@@ -61,6 +130,32 @@ const GenerateCombinedPDF = async (
       },
       margin: [10, 10, 0, 10],
     };
+
+    const ncContent = {
+      style: 'tableExample',
+      table: {
+        widths: [20, 120, 100, 250, 150],
+        body: ncTableBody,
+      },
+      margin: [10, 10, 0, 10],
+    };
+    const obsContent = {
+      style: 'tableExample',
+      table: {
+        widths: [20, 120, 100, 250, 150],
+        body: obsTableBody,
+      },
+      margin: [10, 10, 0, 10],
+    };
+    const ofiContent = {
+      style: 'tableExample',
+      table: {
+        widths: [20, 120, 100, 250, 150],
+        body: ofiTableBody,
+      },
+      margin: [10, 10, 0, 10],
+    };
+
 
     // Generate Internal Auditor Teams Content
     const maxAuditors = Math.max(
@@ -180,9 +275,7 @@ const GenerateCombinedPDF = async (
  // The content for the Audit Schedule
         { text: '', pageBreak: 'before' }, // Ensure a page break for the next section
         
-        // Second Header: Internal Auditor Teams Section (Part of page content)
- // The content for the Internal Auditor Teams
-
+//for SC
 
         {
           stack: [
@@ -237,6 +330,174 @@ const GenerateCombinedPDF = async (
           margin: [0, 0, 0, 10], // Margin for the top section
         },
         auditContent,
+        { text: '', pageBreak: 'before' },
+        //nc 
+        
+        {
+          stack: [
+            {
+              columns: [
+                {
+                  image: logoImg
+                    ? `data:image/png;base64,${logoImg}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'left',
+                  margin: [35, 15, 0, 10],
+                },
+                {
+                  stack: [
+                    {
+                      text: `Electronics and Radar Development Establishment, CV Raman Nagar, Bangalore-560093`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `Audit Summary`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}NC - Non-Complied  (${formattedFromDate} - ${formattedToDate})`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                    },
+                  ],
+                  margin: [0, 20, 20, 10],
+                },
+                {
+                  image: drdoLogo
+                    ? `data:image/png;base64,${drdoLogo}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'right',
+                  margin: [0, 15, 20, 10],
+                },
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 10], // Margin for the top section
+        },
+        ncContent,
+        { text: '', pageBreak: 'before' },
+        //for obs
+        {
+          stack: [
+            {
+              columns: [
+                {
+                  image: logoImg
+                    ? `data:image/png;base64,${logoImg}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'left',
+                  margin: [35, 15, 0, 10],
+                },
+                {
+                  stack: [
+                    {
+                      text: `Electronics and Radar Development Establishment, CV Raman Nagar, Bangalore-560093`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `Audit Summary`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}OBS - Observation (${formattedFromDate} - ${formattedToDate})`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                    },
+                  ],
+                  margin: [0, 20, 20, 10],
+                },
+                {
+                  image: drdoLogo
+                    ? `data:image/png;base64,${drdoLogo}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'right',
+                  margin: [0, 15, 20, 10],
+                },
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 10], // Margin for the top section
+        },
+        obsContent,
+        { text: '', pageBreak: 'before' },
+
+        //for ofi
+        {
+          stack: [
+            {
+              columns: [
+                {
+                  image: logoImg
+                    ? `data:image/png;base64,${logoImg}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'left',
+                  margin: [35, 15, 0, 10],
+                },
+                {
+                  stack: [
+                    {
+                      text: `Electronics and Radar Development Establishment, CV Raman Nagar, Bangalore-560093`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `Audit Summary`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                      margin: [0, 0, 0, 6],
+                    },
+                    {
+                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}OFI - Opportunity for Improvement  (${formattedFromDate} - ${formattedToDate})`,
+                      style: 'superheader',
+                      fontSize: 14,
+                      alignment: 'center',
+                    },
+                  ],
+                  margin: [0, 20, 20, 10],
+                },
+                {
+                  image: drdoLogo
+                    ? `data:image/png;base64,${drdoLogo}`
+                    : 'data:image/png;base64,...',
+                  width: 30,
+                  height: 30,
+                  alignment: 'right',
+                  margin: [0, 15, 20, 10],
+                },
+              ],
+            },
+          ],
+          margin: [0, 0, 0, 10], // Margin for the top section
+        },
+        ofiContent,
+       
       ],
       footer: (currentPage, pageCount) => {
         const currentDate = getFormattedDate();

@@ -31,7 +31,7 @@ const OFIPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     let tableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Section No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
@@ -45,10 +45,10 @@ const OFIPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
         if (item && Object.keys(item).length > 0) {
           tableBody.push([
             { text: index + 1, style: 'normal', alignment: 'center' },
-            { text: item.sectionNo || 'N/A', style: 'normal', alignment: 'center' },
-            { text: item.clauseNo || 'N/A', style: 'normal', alignment: 'left' },
-            { text: item.description || 'N/A', style: 'normal', alignment: 'left' },
-            { text: item.auditorRemarks || 'N/A', style: 'normal', alignment: 'left' },
+            { text: item.carRefNo || '-', style: 'normal', alignment: 'center' },
+            { text: item.clauseNo || '-', style: 'normal', alignment: 'left' },
+            { text: item.description || '-', style: 'normal', alignment: 'left' },
+            { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left' },
           ]);
         }
       });
@@ -61,7 +61,7 @@ const OFIPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
       {
         style: 'tableExample',
         table: {
-          widths: [40, 120, 140, 170, 160, 80],
+          widths: [20, 120, 100, 250, 150],
           body: tableBody,
         },
         margin: [10, 10, 0, 10],
