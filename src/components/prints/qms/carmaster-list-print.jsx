@@ -9,16 +9,16 @@ const CarMasterPrint = async (data,iqaNo,auditeeName,schFromDate,schToDate) => {
     const logoImg = await getLogoImage();
     const drdoLogo = await getDrdoLogo();
 
-    function formatDateToDDMMMYYYY(date) {
-        if (!date) return 'N/A'; // Handle empty or invalid dates
-        const d = new Date(date);
-        const day = String(d.getDate()).padStart(2, '0'); // Day with leading zero
-        const month = d.toLocaleString('default', { month: 'short' }); // Short month name
-        const year = d.getFullYear(); // Full year
-      
-        return `${day}-${month}-${year}`;
-      }
-
+    function formatDateToDDMMYY(date) {
+      if (!date) return '-'; // Handle empty or invalid dates
+      const d = new Date(date);
+      const day = String(d.getDate()).padStart(2, '0'); // Day with leading zero
+      const month = String(d.getMonth() + 1).padStart(2, '0'); // Month with leading zero
+      const year = String(d.getFullYear()).slice(-2); // Last two digits of the year
+  
+      return `${day}-${month}-${year}`;
+  }
+  
     const formattedschFromDate = dayjs(schFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
      const formattedschToDate = dayjs(schToDate).format('DD-MMM YYYY'); 
  
@@ -54,11 +54,11 @@ const CarMasterPrint = async (data,iqaNo,auditeeName,schFromDate,schToDate) => {
         if (item && Object.keys(item).length > 0) {
           tableBody.push([
             { text: index + 1, style: 'normal', alignment: 'center' },
-            { text: item.carRefNo || 'N/A', style: 'normal', alignment: 'center' },
-            { text: item.carDescription || 'N/A', style: 'normal', alignment: 'left' },
-            { text: item.actionPlan || 'N/A', style: 'normal', alignment: 'left' },
-            { text: item.executiveName || 'N/A', style: 'normal', alignment: 'left' },
-            { text: formatDateToDDMMMYYYY(item.targetDate), style: 'normal', alignment: 'left' }, // Format targetDate
+            { text: item.carRefNo || '-', style: 'normal', alignment: 'center' },
+            { text: item.carDescription || '-', style: 'normal', alignment: 'left' },
+            { text: item.actionPlan || '-', style: 'normal', alignment: 'left' },
+            { text: item.executiveName || '-', style: 'normal', alignment: 'left' },
+            { text: formatDateToDDMMYY(item.targetDate), style: 'normal', alignment: 'left' }, // Format targetDate
           ]);
         }
       });
@@ -70,7 +70,7 @@ const CarMasterPrint = async (data,iqaNo,auditeeName,schFromDate,schToDate) => {
       {
         style: 'tableExample',
         table: {
-          widths: [40, 120, 140, 170, 160, 80],
+          widths: [20, 120, 190, 170, 160, 50],
           body: tableBody,
         },
         margin: [10, 10, 0, 10],
