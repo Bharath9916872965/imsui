@@ -37,6 +37,7 @@ import QspAddDocContentComponent from 'components/qms/qsp/qsp-add-doc-content/qs
 import CorrectiveActionReport from 'components/audit/scheduler/check-list/corrective-action/corrective-action-report';
 import QSPRevisionTransactionComponent from 'components/qms/qsp/qsp-revision-transaction';
 import ApprovalAuthorityListComponent from 'components/admin/approvalAuthorityList';
+import CarReportTransactionComponent from 'components/audit/scheduler/check-list/corrective-action/car-report-transaction';
 import QmrcListComponent from 'components/audit/qmrc-list.component';
 import DivisionComponent from 'components/admin/division.component';
 import DivisionGroupComponent from 'components/admin/divisionGroup.component';
@@ -86,6 +87,7 @@ function App() {
         <Route path="/audit-check-list" element={<AuditCheckListComponent />} />
         <Route path="/car-master" element={<CorrectiveActionList />} />
         <Route path="/car-report" element={<CorrectiveActionReport />} />
+        <Route path="/car-report-tran" element={<CarReportTransactionComponent />} />
 
         {/* KPI */}
         <Route path="/kpi-objective" element={<KpiObjectiveMaster />} />

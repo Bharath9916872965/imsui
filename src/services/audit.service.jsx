@@ -79,6 +79,13 @@ export class MostFqNCDescDto{
     }
 };
 
+export class AuditTransDto{
+    constructor(id,auditType){
+        this.id = id;
+        this.auditType = auditType;
+    }
+}
+
 
 export const givePreview = (EXT, data, name) => {
     let blob;
@@ -462,9 +469,10 @@ export const getScheduleRemarks = async ()=>{
     }
 }
 
-export const scheduleTran = async (scheduleId)=>{
+export const scheduleTran = async (values)=>{
     try {
-        return (await axios.post(`${API_URL}schedule-tran`,scheduleId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+        console.log('values----- ',values)
+        return (await axios.post(`${API_URL}schedule-tran`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in scheduleTran:', error);
         throw error;
@@ -806,3 +814,21 @@ export const getAssignedData = async ()=>{
         throw error;
     }
   }
+
+  export const carApproveEmpData = async (carId)=>{
+    try {
+        return (await axios.post(`${API_URL}car-approve-emp-data`,carId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in carApproveEmpData:', error);
+        throw error;
+    }
+  }
+
+  export const returnCarReport = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}return-car-report`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in returnCarReport:', error);
+        throw error;
+    }
+ }
