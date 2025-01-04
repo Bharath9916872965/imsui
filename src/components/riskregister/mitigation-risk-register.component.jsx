@@ -50,7 +50,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
           return 'green'; // Green for riskNo 1-4
       } else if (riskNo > 4 && riskNo <= 10) {
           return 'yellow'; // Yellow for riskNo 5-10
-      } else if (riskNo > 10 && riskNo <= 20) {
+      } else if (riskNo > 10 && riskNo <= 25) {
           return 'red'; // Red for riskNo 11-20
       }
       return 'inherit'; // Default background color if not in the ranges
