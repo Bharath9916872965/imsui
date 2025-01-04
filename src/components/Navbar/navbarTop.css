@@ -205,6 +205,10 @@
   color: green !important;
 }
 
+.bg-green{
+  background-color: green !important;
+}
+
 .lead-auditee{
   color: #641cd6;
 }
@@ -354,12 +358,20 @@
   height: 60px;
 }
 
+.hi-80{
+  height: 80px;
+}
+
 .completionDate{
   margin-top: 17px !important;
 }
 
 .align-top {
   vertical-align: top !important;
+}
+
+.align-bottom {
+  vertical-align: bottom !important;
 }
 
 .top-5-rel{

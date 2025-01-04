@@ -30,7 +30,7 @@ const OBSPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
     let tableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'OBS No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },

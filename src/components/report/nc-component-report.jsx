@@ -6,11 +6,11 @@ import SelectPicker from "../selectpicker/selectPicker";
 import withRouter from "common/with-router";
 import { getCheckListByObservation } from "services/dashboard.service";
 import { getIqaDtoList,getMostFqNCDesc } from "services/audit.service";
+import '../audit/qmrc-list.component.css'; 
+
 
 const NcReport = ({ router }) => {
-
-
-  // State management
+// State management
   const [modalVisible, setModalVisible] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [checkListBasedOnObs, setCheckListBasedOnObs] = useState([]);
@@ -22,10 +22,9 @@ const NcReport = ({ router }) => {
   const [ModalData, setModalData] = useState("");
   const [divName,setDivName]=useState("");
   const [Auditnam,setAuditName]=useState("");
-
- 
-
-  // Columns for the data table
+  const [obsId,setObsId]=useState("");
+  
+// Columns for the data table
   const columns = [
     { name: "SN", selector: (row) => row.sn, sortable: true, width: "3%" },
     { name: 'Division/ Group/ Project', selector: (row) => row.divisionName, sortable: true, grow: 2, align: 'text-left', width: '30%'  },
@@ -33,7 +32,7 @@ const NcReport = ({ router }) => {
     { name: "NC", selector: (row) => row.ncCount, sortable: true, width: "10%" },
     { name: "OBS", selector: (row) => row.obsCount, sortable: true, width: "10%" },
     { name: "OFI", selector: (row) => row.ofiCount, sortable: true, width: "10%" },
-    // { name: "Action", selector: (row) => row.action, sortable: false, width: "8%" },
+    ,
   ];
 
   // Fetching data
@@ -145,6 +144,7 @@ if (iqaList.length > 0) {
 
       setDivName(divisionName);
       setAuditName(auditName);
+      setObsId(id);
         const geNctdes = await getMostFqNCDesc(id, scheduleId, iqa);
              if (geNctdes && geNctdes.length > 0) {
             // Map through all the items and prepare the data
@@ -185,15 +185,14 @@ if (iqaList.length > 0) {
   useEffect(() => {
     fetchData();
   }, []);
-
-  return (
+return (
     <div>
       <Navbar />
       <div className="card">
         <div className="card-body">
           <Box display="flex" alignItems="center" gap="10px" className="mg-down-10">
             <Box flex="80%" textAlign="center">
-              <h3>{iqaNo} : NC List</h3>
+              <h3>{iqaNo} : NC List </h3>
             </Box>
             <Box flex="20%">
               <SelectPicker
@@ -231,64 +230,39 @@ if (iqaList.length > 0) {
           {/* Modal Header */}
           <div className="modal-header d-flex justify-content-between bg-secondary text-white modal-header-custom">
           <h5 className="modal-title text-center">
-  {iqaNo} <span style={{ margin: "0 10px" }}> - </span> 
-  {divName} <span style={{ margin: "0 10px" }}> - </span> 
-  {Auditnam}
-</h5>
-
-            <button
-              type="button"
-              className="btn btn-danger modal-header-danger-custom"
-              onClick={() => setShowModal(false)} // Close modal when clicking close button
-              aria-label="Close"
+              {iqaNo} <span style={{ margin: "0 10px" }}> - </span> 
+             {divName} <span style={{ margin: "0 10px" }}> - </span> 
+             {Auditnam} 
+          </h5>
+            <button type="button" className="btn btn-danger modal-header-danger-custom"onClick={() => setShowModal(false)} // Close modal when clicking close button aria-label="Close"
             >
-              <span aria-hidden="true">&times;</span>
+            <span aria-hidden="true">&times;</span>
             </button>
           </div>
-{/* Modal Body */}
-     {/* Modal Body */}
+
      <div className="modal-body">
-      
-  {ModalData.length > 0 ? (
+        {ModalData.length > 0 ? (
     <table style={{width: "100%", borderCollapse: "collapse", marginTop: "10px",}}>
-      <thead>
-        <tr>
-       
-          <th
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px",
-              backgroundColor: "#f2f2f2",
-              fontWeight: "bold",
-              textAlign: "left",
-            }}
-          >
-            Clause No
-          </th>
-          <th
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px",
-              backgroundColor: "#f2f2f2",
-              fontWeight: "bold",
-              textAlign: "left",
-            }}
-          >
-           NC No
-          </th>
-          <th
-            style={{
-              border: "1px solid #ddd",
-              padding: "8px",
-              backgroundColor: "#f2f2f2",
-              fontWeight: "bold",
-              textAlign: "left",
-            }}
-          >
-            Description
-          </th>
-        </tr>
-      </thead>
+<thead>
+  <tr>
+    <th
+     className="table-header"
+    >
+      Clause No
+    </th>
+
+    {String(obsId) === "2" && <th  sclassName="table-header">NC No</th>}
+    {String(obsId) === "3" && <th  className="table-header">OBS No</th>}
+    {String(obsId) === "4" && <th className="table-header">OFI No</th>}
+
+    <th
+    className="table-header"
+    >
+      Description
+    </th>
+  </tr>
+</thead>
+
       <tbody>
         
         {ModalData.map((item, index) => (

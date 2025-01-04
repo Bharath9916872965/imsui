@@ -349,11 +349,14 @@ const CorrectiveActionList = ({router}) => {
                 </tbody>
                </table>
                { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
-                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
-
-<button onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)} title="Print" aria-label="Print AuditSchedule" >
+                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button>
+              <button onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)} title="Print" aria-label="Print AuditSchedule" style={{ marginLeft: '60px' }} >
       <i className="material-icons">print</i>
     </button>
+                 
+                 </div>)}
+
+
               </CardContent>
              </Card>
             </Grid>

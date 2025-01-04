@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState,useEffect } from 'react';
 import { Box,TextField,Button } from '@mui/material';
 import './Login.css';
 
@@ -7,6 +7,11 @@ const ReturnDialog = ({ open, onClose, onConfirm,heading }) => {
   const handleClose = () => {
     if (onClose) onClose();
   };
+
+   useEffect(() => {
+    setInputValue('');
+   },[])
+
 
   const handleConfirm = () => {
     if (onConfirm) onConfirm(inputValue);
