@@ -242,3 +242,41 @@ export const  updateNotification= async (notificationId) => {
       throw error;
   }
 };
+export const getDivisionMasterList = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}division-master-list`,
+      { headers: authHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error occurred in getDivisionMasterList:', error);
+    throw error;
+  }
+};
+
+export const getDivisionGroupMasterList = async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}division-group-master-list`,
+      { headers: authHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error occurred in getDivisionGroupMasterList:', error);
+    throw error;
+  }
+};
+
+export const getProjectMasterList= async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}project-master-active-list`,
+      { headers: authHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error occurred in getProjectMasterList:', error);
+    throw error;
+  }
+};

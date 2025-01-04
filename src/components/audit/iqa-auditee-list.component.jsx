@@ -1,7 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import Navbar from "../Navbar/Navbar";
 import Swal from 'sweetalert2';
-import { getAuditeeDtoList, getIqaAuditeeList, getIqaDtoList, insertIqaAuditee } from "services/audit.service";
+import { getAuditeeDtoList, getIqaAuditeeList, getIqaDtoList, insertIqaAuditee, getScheduleList } from "services/audit.service";
 import SelectPicker from "components/selectpicker/selectPicker";
 import AlertConfirmation from "common/AlertConfirmation.component"
 import { useLocation } from "react-router-dom";
@@ -19,6 +19,8 @@ const IqaAuditeeListComponent = () =>{
     const [selectedIds, setSelectedIds] = useState([]);
     const [isReady, setIsReady] = useState(false);
     const [iqaIdSelFromDahboard, setIqaIdSelFromDahboard] = useState(''); 
+    const [scheduleList,setScheduleList] = useState([]);
+    const [filScheduleList,setFilScheduleList] = useState([]);
 
     useEffect(() => {
         fetchIqaAuditeeList();
@@ -27,7 +29,10 @@ const IqaAuditeeListComponent = () =>{
 
       const fetchIqaAuditeeList = async () => {
         try {
-          const [auditeeData, iqaData] = await Promise.all([getAuditeeDtoList(), getIqaDtoList()]);
+          const [auditeeData, iqaData,scdList] = await Promise.all([getAuditeeDtoList(), getIqaDtoList(),getScheduleList()]);
+          setScheduleList(scdList)
+          
+
           const formattedIqaOptions = iqaData.map(data => ({
             value: data.iqaId,
             label: data.iqaNo
@@ -40,6 +45,8 @@ const IqaAuditeeListComponent = () =>{
             setIqaNo(iqaData[0].iqaNo);
             setIqaId(iqaData[0].iqaId);
             changedata(iqaData[0].iqaId, auditeeData);
+            const filSchList = scdList.filter(data => data.iqaId === iqaData[0].iqaId).map(item => item.auditeeId);
+            setFilScheduleList(filSchList)
           }
 
 
@@ -87,6 +94,7 @@ const IqaAuditeeListComponent = () =>{
             const allAuditees = auditeeData.map(auditee => auditee.auditeeId);
             setSelectedIds(allAuditees);
         } else {
+         
             const selectedAuditees = auditeeData
                 .filter(auditee => iqaAuditeeData.some(iqa => iqa.auditeeId === auditee.auditeeId))
                 .map(auditee => auditee.auditeeId);
@@ -104,8 +112,10 @@ const IqaAuditeeListComponent = () =>{
         const selectedIqa = iqaFullList.find(data => data.iqaId === iqaId);
         setIqaId(iqaId);
         setIqaNo(selectedIqa?.iqaNo || '');
-        const updatedAuditeeList = await getIqaAuditeeList(iqaId);
-        changedata(iqaId,selauditeeData);
+        const updatedAuditeeList = await getIqaAuditeeList(value);
+        changedata(value,selauditeeData);
+        const filSchList = scheduleList.filter(data => data.iqaId === value).map(item => item.auditeeId);
+        setFilScheduleList(filSchList)
        }
       };
 
@@ -143,6 +153,15 @@ const IqaAuditeeListComponent = () =>{
       };
 
       const handleSubmit = async () => {
+        if(auditeeList.length !== 0){
+          const missingAuditee = filScheduleList.find(value => !selectedIds.includes(value));
+          if(missingAuditee){
+            const auditee = scheduleList.filter(data => data.auditeeId === missingAuditee)?.[0];
+            if(auditee){
+              return Swal.fire("Warning", auditee.auditeeEmpName+" Already Present in Audit Schedule!", "warning");
+            }
+          }
+        }
         if (selectedIds.length === 0) {
             return Swal.fire("Warning", "Please Select Atleast One Employee!", "warning");
           }

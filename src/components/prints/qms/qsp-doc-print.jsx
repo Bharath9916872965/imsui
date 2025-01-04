@@ -1,8 +1,9 @@
 import React, { useEffect, useState } from 'react';
 import pdfMake from 'pdfmake/build/pdfmake';
 import htmlToPdfmake from 'html-to-pdfmake';
-import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage, getQspAllChapters, getQspDocSummarybyId, getQspRevistionRecordById, qspDocumentList } from 'services/qms.service';
+import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage, getQspAllChapters, getQspDocSummarybyId, getQspRevistionRecordById, qspDocumentList, qspRevisionTran } from 'services/qms.service';
 import { format } from 'date-fns';
+import { getEmployeesList } from 'services/header.service';
 
 
 const QspDocPrint = ({ action, revisionElements, buttonType }) => {
@@ -18,7 +19,9 @@ const QspDocPrint = ({ action, revisionElements, buttonType }) => {
   const [docAbbreviationsResponse, setDocAbbreviationsResponse] = useState([]);
   const [ApprovedVersionReleaseList, setApprovedVersionReleaseList] = useState([]);
   const [isReady, setIsReady] = useState(false);
-
+  const [revisionRecordData, setRevisionRecordData] = useState([]);
+  const [employeeDetails, setEmployeeDetails] = useState([]);
+  const [qspTransactionList, setQspTransactionList] = useState([]);
 
 
 
@@ -32,7 +35,8 @@ const QspDocPrint = ({ action, revisionElements, buttonType }) => {
     const fetchData = async () => {
       try {
         const revision = await getQspRevistionRecordById(revisionElements.revisionRecordId);
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQspAllChapters(qmsDocTypeDto), getQspDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(),qspDocumentList()]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, qspRevisionRecordDetails]) => {
+        setRevisionRecordData(revision);
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQspAllChapters(qmsDocTypeDto), getQspDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), qspDocumentList(), getEmployeesList(), qspRevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, qspRevisionRecordDetails, employeeData, qspTransactionData]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
@@ -43,6 +47,8 @@ const QspDocPrint = ({ action, revisionElements, buttonType }) => {
           setIsReady(true);
           const filteredDetails = qspRevisionRecordDetails.filter(a => a.docName === qmsDocTypeDto.docType);
           setApprovedVersionReleaseList(filteredDetails);
+          setEmployeeDetails(employeeData);
+          setQspTransactionList(qspTransactionData);
         });
       } catch (error) {
         console.error('Error in useEffect : ' , error);
@@ -72,7 +78,8 @@ const QspDocPrint = ({ action, revisionElements, buttonType }) => {
   }, [isReady]);
 
 
-
+  const sortedData = ApprovedVersionReleaseList.filter(a => a.statusCode === 'APD');
+  const latestRecord = sortedData[0];
 
   const setImagesWidth = (htmlString, width) => {
     const container = document.createElement('div');
@@ -347,26 +354,18 @@ function generateRotatedTextImage(text) {
     var DocVersionRelease = [];
     DocVersionRelease.push(header1);
     DocVersionRelease.push(header2);
-    for (let i = 0; i < ApprovedVersionReleaseList.length; i++) {
-
-      // let datePart = '--'
-      // if (ApprovedVersionReleaseList[i][13] !== null && ApprovedVersionReleaseList[i][13] !== '' && ApprovedVersionReleaseList[i][13] !== undefined) {
-      //   let dateTimeString = ApprovedVersionReleaseList[i][13].toString();
-      //   let parts = dateTimeString.split(' ');
-
-      //   datePart = parts[0] + ' ' + parts[1] + ' ' + parts[2];
-      // }
-
-
-      var value = [
-
-        { text: i, style: 'tdData', alignment: 'center' },
-        { text: ApprovedVersionReleaseList[i].description, style: 'tdData' },
-        { text: i > 0 ? 'V' + ApprovedVersionReleaseList[i - 1].issueNo + '-R' + ApprovedVersionReleaseList[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
-        { text: 'V' + ApprovedVersionReleaseList[i].issueNo + '-R' + ApprovedVersionReleaseList[i].revisionNo, style: 'tdData', alignment: 'center', },
-        { text: format(new Date(ApprovedVersionReleaseList[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
-        { text: 'V' + ApprovedVersionReleaseList[i].issueNo + '-R' + ApprovedVersionReleaseList[i].revisionNo, style: 'tdData', alignment: 'center', },
-      ];
+    const latestRevisionData = [...ApprovedVersionReleaseList].sort(
+      (a, b) => a.revisionRecordId - b.revisionRecordId
+    );
+    for (let i = 0; i < latestRevisionData.length; i++) {
+    var value = [
+      { text: latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center' },
+      { text: latestRevisionData[i].description, style: 'tdData' },
+      { text: i > 0 ? 'I' + latestRevisionData[i - 1].issueNo + '-R' + latestRevisionData[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
+      { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
+      { text: format(new Date(latestRevisionData[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
+      { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
+    ];
 
       DocVersionRelease.push(value);
     }
@@ -378,11 +377,66 @@ function generateRotatedTextImage(text) {
     const latestRow = [...ApprovedVersionReleaseList].sort(
       (a, b) => b.revisionRecordId - a.revisionRecordId
     )[0];
-
     documentNumber = labDetails.labCode + '/QMS/QSP/' + 'I' + latestRow.issueNo + '-R' + latestRow.revisionNo;
 
-    var docSummary = [];
+    let approvedBy = '';
+        let reviewedBy = '';
+        let initiatedBy = '';
+        let approvedDate = '';
+        let reviewedDate = '';
+        let initiatedDate = '';
+        
+        function getEmployeeDetails(empId) {
+            const data = employeeDetails.find(e => e.empId === empId);
+            if (data) {
+                const titleOrSalutation = data.title ?? data.salutation ?? '';
+                return `${titleOrSalutation}${data.empName}, ${data.empDesigName}`;
+            }
+            return '';
+        }
+    
+        function getQspTransaction(empId, status) {
+          const data = qspTransactionList
+              .filter(e => e.empId === empId && e.statusCode === status)
+              .sort((a, b) => (b.qspTransactionId - a.qspTransactionId))[0];
+  
+          if (data) {
+              return `${data.transactionDate}`;
+          }
+          return '';
+      }
+      
+    
+       const qspFormatDate = (date) => {
+        if (!date || isNaN(new Date(date).getTime())) {
+          return '';
+        }
+        const options = {
+          day: '2-digit',
+          month: 'long',
+          year: 'numeric',
+          hour: '2-digit',
+          minute: '2-digit',
+          hour12: true,
+        };
+        return new Intl.DateTimeFormat('en-GB', options).format(new Date(date));
+      };
+        
+        if (revisionRecordData.approvedBy) {
+            approvedBy = getEmployeeDetails(revisionRecordData.approvedBy);
+            approvedDate = getQspTransaction(revisionRecordData.approvedBy,'APD');
+        }
+        if (revisionRecordData.reviewedBy) {
+            reviewedBy = getEmployeeDetails(revisionRecordData.reviewedBy);
+            reviewedDate = getQspTransaction(revisionRecordData.reviewedBy,'RWD');
+        }
+        if (revisionRecordData.initiatedBy) {
+            initiatedBy = getEmployeeDetails(revisionRecordData.initiatedBy);
+            initiatedDate = getQspTransaction(revisionRecordData.initiatedBy,'FWD');
+        }
+    
 
+    var docSummary = [];
     docSummary.push([{stack :[{text: [{text  : ' 1. Title : ' , style  : ' tableLabel'}, {text  : documentTitle + ' ' + labDetails.labCode}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 2. Type of report : ' , style  : ' tableLabel'}, {text  : ' Process Document'}]}]}, {stack :[{text: [{text  : ' 3. Classification : ' , style  : ' tableLabel'}, {text  : ' RESTRICTED'}]}]}])
     docSummary.push([{stack :[{text: [{text  : ' 4. '+labDetails.labCode+' Document Number : ' , style  : ' tableLabel'}, {text : documentNumber}]}]}, {stack :[{text: [{text  : ' 5. Project Document Number: ', style  : ' tableLabel'}, {text  : ' NA'}]}]}])
@@ -394,8 +448,10 @@ function generateRotatedTextImage(text) {
     docSummary.push([{stack :[{text: [{text  : ' 12. Organization and address : ' , style  : ' tableLabel'}, {text : labDetails.labName + ' (' + labDetails.labCode + '), '+'Government of India, Ministry of Defence ' + 'Defence Research Development Organization '+labDetails[4] + ', ' + labDetails[5] + ' PIN-' + labDetails[6]}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 13. Distribution : ' , style  : ' tableLabel'}, {text : DocumentSummaryDto !== null && DocumentSummaryDto !== undefined && DocumentSummaryDto.distribution !== null && DocumentSummaryDto.distribution !== undefined ? DocumentSummaryDto.distribution: ''}]}], colSpan :2}, {}])
     docSummary.push([{stack :[{text: [{text  : ' 14. Revision : ' , style  : ' tableLabel'}, {text : 'Issue ' + revisionElements.issueNo + '-Rev ' + revisionElements.revisionNo}]}], colSpan :2}, {}])
-    docSummary.push([{stack :[{text: [{text  : ' 15. Reviewed by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
-    docSummary.push([{stack :[{text: [{text  : ' 16. Approved by : ' , style  : ' tableLabel'}, {text : datePart1}]}]}, {stack :[{text: ''}]}])
+    docSummary.push([{stack: [{ text: '15. Prepared by: ', style: 'tableLabel', alignment: 'left' },{text: initiatedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{text: qspFormatDate(initiatedDate), color: 'blue', alignment: 'center'}], colSpan: 2}, {}]);
+    docSummary.push([{stack: [{ text: '16. Reviewed by: ', style: 'tableLabel', alignment: 'left' },{text: reviewedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{ text: qspFormatDate(reviewedDate), color: 'blue', alignment: 'center' }],colSpan: 2},{}]);
+    docSummary.push([{stack: [{ text: '17. Approved by: ', style: 'tableLabel', alignment: 'left' },{text: approvedBy, style: 'tableName', alignment: 'center', margin: [0, 5, 0, 0]},{text: qspFormatDate(approvedDate), color: 'blue', alignment: 'center'}], colSpan: 2},{}]);
+     
 
     // ----------Document summary table end----------------
 
@@ -491,7 +547,15 @@ function generateRotatedTextImage(text) {
         }
       },
 
-      watermark: { text: 'DRAFT', opacity: 0.1, bold: true, italics: false, fontSize: 150,  },
+      watermark: {
+        text: revisionRecordData.statusCode === 'APD' 
+          ? (latestRecord.statusCode === 'APD' ? (latestRecord.revisionNo <= revisionRecordData.revisionNo ? 'APPROVED' : 'OBSOLETE') : 'DRAFT') 
+          : 'DRAFT',
+        opacity: 0.1,
+        bold: true,
+        italics: false,
+        fontSize: 150,
+      },
 
       background: function (currentPage) {
         return [
@@ -575,7 +639,7 @@ function generateRotatedTextImage(text) {
         {
           table: {
             widths: [ 260, 250],
-            heights: [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40],
+            heights: [40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40, 40],
             body: docSummary
           },
           pageBreak: 'after'

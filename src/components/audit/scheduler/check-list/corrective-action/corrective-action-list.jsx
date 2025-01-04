@@ -11,6 +11,7 @@ import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { format } from "date-fns";
+import CarMasterPrint from "components/prints/qms/carmaster-list-print";
 
 
 const CorrectiveActionList = ({router}) => {
@@ -37,7 +38,10 @@ const CorrectiveActionList = ({router}) => {
   const [employeeOptions,setEmployeeOptions] = useState([])
   const [totalEmployees,setTotalEmployees] = useState([])
   const [schFromDate,setSchFromDate] = useState(new Date())
-  const [schToDate,setSchToDate] = useState(new Date())
+  const [schToDate,setSchToDate] = useState(new Date());
+  const [loginRoleName,setLoginRoleName] = useState('')
+  const [loginEmpId,setLoginEmpId] = useState(0);
+  const [isAdmin,setIsAdmin] = useState(false)
 
   useEffect(() => {
     fetchData();
@@ -49,6 +53,12 @@ const CorrectiveActionList = ({router}) => {
       const auditee       = await getIqaAuditeelist();
       const totalCarList  = await getCarList();
       const emp           = await getEmployee();
+
+      const role = localStorage.getItem('roleName')
+      const empId = localStorage.getItem('empId')
+
+      setLoginRoleName(role)
+      setLoginEmpId(empId)
 
       setCarList(totalCarList)
       setIqaAuditeeList(auditee)
@@ -65,8 +75,10 @@ const CorrectiveActionList = ({router}) => {
       }));
       setIqaList(iqaList)
       setIqaOptions(iqaData)
+      let fiCarList = null;
+      let iqa = null;
       if(iqaList.length >0){
-        const iqa = iqaList[0];
+        iqa = iqaList[0];
         setIqaId(iqa.iqaId);
         setIqaNo(iqa.iqaNo);
         setSchFromDate(new Date(iqa.fromDate))
@@ -82,11 +94,20 @@ const CorrectiveActionList = ({router}) => {
           const audit =  filAuditee[0];
           setAuditeeId(filAuditee[0].auditeeId)
           setAuditeeName(audit.projectShortName !== ''?audit.projectShortName:audit.divisionName !== ''?audit.divisionName:audit.groupName)
-          const fiCarList = totalCarList.filter(data => data.iqaId === iqa.iqaId && data.auditeeId === filAuditee[0].auditeeId)
-          setFilCarList(fiCarList);
-          setInitiValues(fiCarList,emp,new Date(iqa.fromDate));
+           fiCarList = totalCarList.filter(data => data.iqaId === iqa.iqaId && data.auditeeId === filAuditee[0].auditeeId)
         }
       }
+      if(['Admin','Director','MR','MR Rep'].includes(String(role))){
+        setIsAdmin(true);
+        setFilCarList(fiCarList);
+        setInitiValues(fiCarList,emp,new Date(iqa.fromDate));
+       }else{
+        const filList = fiCarList.filter(item => Number(item.auditeeEmpId) === Number(empId));
+        setFilCarList(filList);
+        setInitiValues(filList,emp,new Date(iqa.fromDate));
+        setIsAdmin(false);
+
+       }
 
       setIsReady(true);
     } catch (error) {
@@ -135,11 +156,19 @@ const CorrectiveActionList = ({router}) => {
   const onAuditeeChange = (value)=>{
     setAuditeeId(value)
     const fiCarList = carList.filter(data => data.iqaId === iqaId && data.auditeeId === value)
-    setFilCarList(fiCarList)
-    setInitiValues(fiCarList,totalEmployees,schFromDate)
+    if(isAdmin){
+      setFilCarList(fiCarList)
+      setInitiValues(fiCarList,totalEmployees,schFromDate);
+    }else{
+      const filList = fiCarList.filter(item => Number(item.auditeeEmpId) === Number(loginEmpId));
+      setFilCarList(filList);
+      setInitiValues(filList,totalEmployees,schFromDate);
+    }
     setIsValidationActive(false)
     const audit = auditeeOptions.filter(data => Number(data.value) === Number(value));
-    setAuditeeName(audit[0].label)
+    if(audit && audit.length > 0){
+      setAuditeeName(audit[0].label)
+    }
 
   }
 
@@ -154,15 +183,22 @@ const CorrectiveActionList = ({router}) => {
     setAuditeeOptions(revisionData)
 
     const iqa = iqaList.filter(data => Number(data.iqaId) === Number(value));
-    setIqaNo(iqa[0].iqaNo)
-    setSchFromDate(new Date(iqa[0].fromDate))
-    setSchToDate(new Date(iqa[0].toDate))
-    const fiCarList = carList.filter(data => data.iqaId === value && data.auditeeId === auditeeId)
-    setFilCarList(fiCarList)
-    setInitiValues(fiCarList,totalEmployees,new Date(iqa[0].fromDate))
+    if(iqa && iqa.length > 0){
+      setIqaNo(iqa[0].iqaNo)
+      setSchFromDate(new Date(iqa[0].fromDate))
+      setSchToDate(new Date(iqa[0].toDate))
+      const fiCarList = carList.filter(data => data.iqaId === value && data.auditeeId === auditeeId)
+      if(isAdmin){
+        setFilCarList(fiCarList)
+        setInitiValues(fiCarList,totalEmployees,new Date(iqa[0].fromDate))
+      }else{
+        const filList = fiCarList.filter(item => Number(item.auditeeEmpId) === Number(loginEmpId));
+        setFilCarList(filList);
+        setInitiValues(filList,totalEmployees,new Date(iqa[0].fromDate));
+      }
+
+    }
     setIsValidationActive(false)
-
-
   }
 
 
@@ -313,7 +349,14 @@ const CorrectiveActionList = ({router}) => {
                 </tbody>
                </table>
                { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
-                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
+                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button>
+              <button onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)} title="Print" aria-label="Print AuditSchedule" style={{ marginLeft: '60px' }} >
+      <i className="material-icons">print</i>
+    </button>
+                 
+                 </div>)}
+
+
               </CardContent>
              </Card>
             </Grid>

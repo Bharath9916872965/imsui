@@ -45,9 +45,11 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
 
       for (let i = 0; i < ranges.length; i++) {
         for (let j = i + 1; j < ranges.length; j++) {
-          if ( ranges[i][0] <= ranges[j][1] &&  ranges[i][1] >= ranges[j][0]) {
+          if(!(Number(ranges[i][0]) === 0 && Number(ranges[j][1]) === 0 && Number(ranges[i][1]) === 0 && Number(ranges[j][0]) === 0 && i === 0 && j === 1)){
+            if ( ranges[i][0] <= ranges[j][1] &&  ranges[i][1] >= ranges[j][0]) {
               return false;
             }
+          }
         }
       }
       return true;

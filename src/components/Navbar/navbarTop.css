@@ -84,6 +84,11 @@
 .width13{
   width: 13%;
 }
+
+.width14{
+  width: 14%;
+}
+
 .width15{
   width: 15%;
 }
@@ -128,8 +133,16 @@
   width: 50%;
 }
 
+.width59{
+  width: 59%;
+}
+
 .width60{
   width: 60%;
+}
+
+.width61{
+  width: 61%;
 }
 
 .width67{
@@ -204,6 +217,10 @@
   color: green !important;
 }
 
+.bg-green{
+  background-color: green !important;
+}
+
 .lead-auditee{
   color: #641cd6;
 }
@@ -231,7 +248,7 @@
 }
 
 .mg-l-10{
-  margin-left: 10px;
+  margin-left: 10px !important;
 }
 
 .mg-l-5{
@@ -353,6 +370,10 @@
   height: 60px;
 }
 
+.hi-80{
+  height: 80px;
+}
+
 .completionDate{
   margin-top: 17px !important;
 }
@@ -363,7 +384,23 @@
   cursor: pointer!important;
 }
 
+.align-top {
+  vertical-align: top !important;
+}
 
+.align-bottom {
+  vertical-align: bottom !important;
+}
 
+.top-5-rel{
+  position: relative;
+  top: 5px;
+}
+
+.attachment{
+  text-decoration: underline;
+  color: royalblue !important;
+  cursor: pointer;
+}
 
   

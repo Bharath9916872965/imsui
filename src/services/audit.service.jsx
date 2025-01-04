@@ -1,6 +1,7 @@
 import axios from 'axios';
 import { authHeader } from './auth.header';
 import  config  from "../environment/config";
+import saveAs from 'file-saver'
 
 const API_URL=config.API_URL;
 
@@ -69,6 +70,46 @@ export  class CheckListImgDto{
         this.iqaId              = iqaId;
     }
 }
+export class MostFqNCDescDto{
+  
+    constructor(auditObsId,scheduleId,iqaId){
+        this.iqaId=iqaId;
+        this.scheduleId=scheduleId;
+        this.auditObsId=auditObsId;
+    }
+};
+
+export class AuditTransDto{
+    constructor(id,auditType){
+        this.id = id;
+        this.auditType = auditType;
+    }
+}
+
+
+export const givePreview = (EXT, data, name) => {
+    let blob;
+  
+    if (EXT.toLowerCase() === 'pdf') {
+    blob = new Blob([data], { type: 'application/pdf' });
+    const blobUrl = window.URL.createObjectURL(blob);
+    window.open(blobUrl, '_blank');
+
+    } else if (['jpg', 'jpeg', 'png'].includes(EXT.toLowerCase())) {
+      blob = new Blob([data], { type: 'image/jpeg' });
+      const blobUrl = window.URL.createObjectURL(blob);
+      window.open(blobUrl, '_blank');
+    } else {
+      const MIME_TYPES = {
+        txt: 'text/plain',
+        doc: 'application/msword',
+        docx: 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+      };
+  
+      const mimeType = MIME_TYPES[EXT.toLowerCase()] || 'application/octet-stream';
+      saveAs(new Blob([data], { type: mimeType }), name);
+    }
+};
 
 export const getAuditorDtoList = async () => {
     
@@ -296,7 +337,7 @@ export const reScheduleSubmit = async (values)=>{
         console.error('Error occurred in forwardSchedule:', error);
         throw error;
     }
-}
+  }
 
 export const scheduleMailSend = async (values)=>{
     try {
@@ -428,9 +469,10 @@ export const getScheduleRemarks = async ()=>{
     }
 }
 
-export const scheduleTran = async (scheduleId)=>{
+export const scheduleTran = async (values)=>{
     try {
-        return (await axios.post(`${API_URL}schedule-tran`,scheduleId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+        console.log('values----- ',values)
+        return (await axios.post(`${API_URL}schedule-tran`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in scheduleTran:', error);
         throw error;
@@ -720,3 +762,73 @@ export const insertCorrectiveAction = async (values)=>{
         throw error;
     }
 }
+
+
+export const getQmrcList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-qmrc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getQmrcList:', error);
+        throw error;
+    }
+}
+
+export const getAssignedData = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-qmrc-action-assign-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getAssignedData:', error);
+        throw error;
+    }
+}
+
+  export const getMostFqNCDesc = async (auditObsId, scheduleId, iqaId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}mostFqNc-Description-list/${auditObsId}/${scheduleId}/${iqaId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in mostFqNc-Description-list', error);
+        throw error; 
+    }
+    
+};
+
+
+  export const downloadCarFile = async (attachment,reqNo)=>{
+    try {
+        const params = {fileName: attachment,reqNo: reqNo};
+        const response = await axios.get(`${API_URL}car-download`, {
+            params: params,headers: {'Content-Type': 'application/json', ...authHeader(),},responseType: 'arraybuffer',});
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred in downloadCarFile:', error);
+        throw error;
+    }
+  }
+
+  export const forwardCar = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}forward-car`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in forwardCar:', error);
+        throw error;
+    }
+  }
+
+  export const carApproveEmpData = async (carId)=>{
+    try {
+        return (await axios.post(`${API_URL}car-approve-emp-data`,carId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in carApproveEmpData:', error);
+        throw error;
+    }
+  }
+
+  export const returnCarReport = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}return-car-report`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in returnCarReport:', error);
+        throw error;
+    }
+ }

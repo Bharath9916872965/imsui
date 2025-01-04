@@ -63,7 +63,7 @@ const ApprovalAuthorityListComponent = () => {
         const approvalAuthList = await getapprovalAuthorityList();
         const userManagerList = await getUserManagerList();
         const mrList = approvalAuthList.filter(data => data.mrType === 'MR')
-        const mrRepList = approvalAuthList.filter(data => data.mrType === 'MR Rep')
+        const mrRepList = approvalAuthList.filter(data => (data.mrType === 'MR Rep' || data.mrType === 'MR'))
         setselApprovalAuthorityMrList(mrList);
         setselApprovalAuthorityMrRepList(mrRepList);
         const { minDate: minMrFrom, maxDate: maxMrTo } = getMinMaxDates(mrList);
@@ -72,12 +72,13 @@ const ApprovalAuthorityListComponent = () => {
         setMaxMrDate(maxMrTo)
         setMinMrRepDate(minMrRepFrom)
         setMaxMrRepDate(maxMrRepTo)
+
         const filterMRRepList = userManagerList.filter(data => data.formRoleName === 'MR Rep');
         const filterMRList = userManagerList.filter(data => data.formRoleName === 'MR');
 
-       const repList = filterMRRepList.map((item) => ({
+       const repList = empdetails.map((item) => ({
             value: item.empId,
-            label: `${item.empName}, ${item.empDesig}`,
+            label: `${item.empName}, ${item.empDesigName}`,
         }))
         setMrRepList(repList);
         setFilMrRepList(repList)
@@ -331,7 +332,9 @@ const ApprovalAuthorityListComponent = () => {
                                                                     <Field name="mrFrom">
                                                                         {({ field, form }) => (
                                                                             <DatePicker
-                                                                                label="From Date" maxDate={form.values.mrTo ? dayjs(form.values.mrTo) : null}
+                                                                                label="From Date"
+                                                                                maxDate={dayjs()}
+                                                                               // maxDate={form.values.mrTo ? dayjs(form.values.mrTo) : null}
                                                                                 value={form.values.mrFrom ? dayjs(form.values.mrFrom) : null} views={['year', 'month', 'day']}
                                                                                 onChange={(date) => {form.setFieldValue('mrFrom', date ? date.format('YYYY-MM-DD') : '');filMrRep(form.values.mrType,date ? date.format('YYYY-MM-DD') : '',form.values.mrTo);}}
                                                                                 format="DD-MM-YYYY"
@@ -387,15 +390,15 @@ const ApprovalAuthorityListComponent = () => {
                                                                 {values.mrType === 'MR' && (
                                                                     <Field name="mrempId">
                                                                         {({ field, form }) => (
-                                                                            <Autocomplete options={mrList} getOptionLabel={option => option.empName + ", " + option.empDesig}
+                                                                            <Autocomplete options={employee} getOptionLabel={option => option.empName + ", " + option.empDesigName}
                                                                                 renderOption={(props, option) => {
                                                                                     return (
                                                                                         <CustomMenuItem {...props} key={option.empId}>
-                                                                                            <ListItemText primary={option.empName + ", " + option.empDesig} />
+                                                                                            <ListItemText primary={option.empName + ", " + option.empDesigName} />
                                                                                         </CustomMenuItem>
                                                                                     );
                                                                                 }}
-                                                                                value={mrList.find(emp => emp.empId === form.values.mrempId) || null}
+                                                                                value={employee.find(emp => emp.empId === form.values.mrempId) || null}
                                                                                 ListboxProps={{ sx: { maxHeight: 200, overflowY: 'auto' } }}
                                                                                 onChange={(event, newValue) => { setFieldValue("mrempId", newValue ? newValue.empId : ''); }}
                                                                                 renderInput={(params) => (<TextField {...params} label="MR" size="small" margin="normal" variant="outlined"

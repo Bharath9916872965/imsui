@@ -181,8 +181,22 @@ const AuditSummaryReport = () => {
        
           const ncColumns = [
             { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-            { name: 'SectionNo', selector: (row) => row.sectionNo, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-            { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '11%'  },
+            { name: 'NC No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
+            { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+            { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
+            { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
+          ];
+          const obsColumns = [
+            { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
+            { name: 'OBS No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
+            { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+            { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
+            { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
+          ];
+          const ofiColumns = [
+            { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
+            { name: 'Ofi No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
+            { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
             { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
             { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
           ];
@@ -258,7 +272,7 @@ setFilScheduleList(mappedData);
     }
     const mappedData = list.map((item,index)=>({
       sn: index + 1,
-      sectionNo: item.sectionNo || '-',
+      carRefNo: item.carRefNo || '-',
       clauseNo: item.clauseNo || '-',
       description: item.description || '-',
       auditorRemarks: item.auditorRemarks || '-'
@@ -314,7 +328,7 @@ const setOfi = (list)=>{
   <div style={{ textAlign: "center" }}>
   <button
     onClick={() =>
-      mergePdf(filScheduleList, iqaNo, iqaFromDate, iqaToDate, filAuditTeamDtoList, teamMembersGrouped)
+      mergePdf(filScheduleList, iqaNo, iqaFromDate, iqaToDate, filAuditTeamDtoList, teamMembersGrouped,filNc,filObs,filOfi)
     }
     title="All Print"
     aria-label="Print All AuditSchedule"
@@ -377,9 +391,9 @@ const setOfi = (list)=>{
 ) : selectedOption === 'N' ? (
   <Datatable columns={ncColumns} data={filNc} />
 ) : selectedOption === 'B' ? (
-  <Datatable columns={ncColumns} data={filObs} />
+  <Datatable columns={obsColumns} data={filObs} />
 ) : selectedOption === 'O' ? (
-  <Datatable columns={ncColumns} data={filOfi} />
+  <Datatable columns={ofiColumns} data={filOfi} />
 
 ) : null}
 
