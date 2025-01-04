@@ -169,3 +169,20 @@
 .fn-bold{
     font-weight: bolder;
 }
+
+.auditee-color{
+    color: #002CCD !important;
+    background-color: #fff !important;
+}
+
+.chapter-sty{
+    text-indent: -1.5em !important;
+    padding-left: 1.5em !important;
+    white-space: normal !important;
+}
+
+.attach-input{
+    display: flex !important;
+    align-items: center !important;
+    gap: 5px !important;
+}

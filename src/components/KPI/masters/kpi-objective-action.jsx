@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { insertKpiObjective,getKpiMasterList,getKpiRatingList,updateKpiObjective,getDwpRevisonList,getKpiObjRatingList,KpiObjDto,getKpiUnitList } from "services/kpi.service";
+import { insertKpiObjective,getKpiMasterList,getKpiRatingList,updateKpiObjective,getGroupDivisionList,getKpiObjRatingList,KpiObjDto,getKpiUnitList } from "services/kpi.service";
 import { getIqaDtoList } from "services/audit.service";
 import { Box, TextField,Grid,Card,CardContent,Tooltip} from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
@@ -19,8 +19,10 @@ const KpiObjectiveAction = ({router}) => {
   const [kpiRatingList,setKpiRatingList] = useState([]);
   const [isReady, setIsReady] = useState(false);
   const [isAddMode,setIsAddMode] = useState(true);
-  const [revisionOptions,setRevisionOptions] = useState([]);
-  const [revisionId,setRevisionId] = useState('');
+  const [grpDivOptions,setGrpDivOptions] = useState([]);
+  const [grpDivId,setGrpDivId] = useState('A');
+  const [grpDivType,setGrpDivType] = useState('C');
+  const [grpDivMainId,setGrpDivMainId] = useState('A');
   const [kpiObjRatingList,setKpiObjRatingList] = useState([])
   const [iqaOptions,setIqaOptions] = useState([])
   const [iqaId,setIqaId] = useState('');
@@ -33,18 +35,21 @@ const KpiObjectiveAction = ({router}) => {
   const [isValidationActive, setIsValidationActive] = useState(false);
   const [showModal, setShowModal] = useState(false);
   const [kpiUnitList,setKpiUnitList] = useState([])
-  const [revisionName,setRevisionName] = useState('A');
+  const [grpDivName,setGrpDivName] = useState('A');
   const [divisionName,setDivisionName] = useState('A');
   const [avgKpiRating,setAvgKpiRating] = useState(0)
+  const [groupDivisionList,setGroupDivisionList] = useState([])
   const [initialValues,setInitialValues] = useState({
       kpiId     : 0,
       objective : '',
       metrics   : '',
+      norms     : '',
       target    : '',
       kpiUnitId : 1,
-      revisionRecordId : '0',
+      groupDivisionId : '0',
+      kpiType : '',
       ratings   : [{ startValue : '', endValue : '',rating : '' }],
-  });
+    });
 
   const ratingColors = {
     '1' : 'text-center box-border trash-btn',
@@ -63,10 +68,12 @@ const KpiObjectiveAction = ({router}) => {
       const kpiMasterList = await getKpiMasterList();
       const kpiRatingList = await getKpiObjRatingList();
       const ratingList    = await getKpiRatingList();
-      const dwpList       = await getDwpRevisonList();
+      const grpDivList    = await getGroupDivisionList();
       const iqaList       = await getIqaDtoList();
       const unitList      = await getKpiUnitList();
 
+
+      setGroupDivisionList(grpDivList);
       const iqaData = iqaList.map(data => ({
         value : data.iqaId,
         label : data.iqaNo
@@ -80,22 +87,24 @@ const KpiObjectiveAction = ({router}) => {
       }
       setKpiUnitList(unitList)
       setKpiObjRatingList(kpiRatingList)
-      const revisionData = dwpList.map(data => ({
-        value : String(data.revisionRecordId),
-        label : data.docType === 'dwp'?'DWP - '+data.divisionMasterDto.divisionCode:'GWP - '+data.divisionGroupDto.groupCode
+      const grpDivData = grpDivList.map(data => ({
+        value : String(data.groupDivisionMainId),
+        label : data.groupDivisionCode,
       }));
 
-      if(dwpList && dwpList.length >0 && iqaList.length >0){
-        setRevisionId(String(dwpList[0].revisionRecordId))
-        setDivisionName(dwpList[0].description)
-        if(kpiRatingList.filter(item => item.revisionRecordId === dwpList[0].revisionRecordId && iqaList[0].iqaId === item.iqaId).length > 0){
+      if(grpDivList && grpDivList.length >0 && iqaList.length >0){
+        setGrpDivMainId(String(grpDivList[0].groupDivisionMainId))
+        setDivisionName(grpDivList[0].groupDivisionCode)
+        setGrpDivType(grpDivList[0].groupDivisionType)
+        setGrpDivId(grpDivList[0].groupDivisionId)
+        if(kpiRatingList.filter(item => item.groupDivisionId === grpDivList[0].groupDivisionId && grpDivList[0].groupDivisionType === item.kpiType && iqaList[0].iqaId === item.iqaId).length > 0){
           setIsAddMode(false)
-          const filrating = kpiRatingList.filter(item => item.revisionRecordId === dwpList[0].revisionRecordId && iqaList[0].iqaId === item.iqaId);
+          const filrating = kpiRatingList.filter(item => item.groupDivisionId === grpDivList[0].groupDivisionId && grpDivList[0].groupDivisionType === item.kpiType && iqaList[0].iqaId === item.iqaId);
           setInitiValues(filrating,'L')
           setFilKpiMasterList(filrating);
           getAvgRating(filrating)
         }else{
-          const filKpiMaster = kpiMasterList.filter(data => (Number(data.revisionRecordId) === Number(dwpList[0].revisionRecordId) || data.revisionRecordId === '0'));
+          const filKpiMaster = kpiMasterList.filter(data => ((Number(data.groupDivisionId) === Number(grpDivList[0].groupDivisionId) && grpDivList[0].groupDivisionType === data.kpiType) || data.groupDivisionId === 0));
           setInitiValues(filKpiMaster,'M')
           setFilKpiMasterList(filKpiMaster)
           setAvgKpiRating(0)
@@ -104,7 +113,7 @@ const KpiObjectiveAction = ({router}) => {
 
      // const filObjratingList = kpiRatingList.filter(item => item.kpiQuarter === 1 && item.kpiYear === Number(new Date().getFullYear())) 
 
-      setRevisionOptions(revisionData)
+      setGrpDivOptions(grpDivData)
       setKpiRatingList(ratingList)
       setKpiMasterList(kpiMasterList)
 
@@ -119,7 +128,7 @@ const KpiObjectiveAction = ({router}) => {
     list.forEach(element => {
       sum += element.kpiRating
     });
-    setAvgKpiRating(sum/list.length);
+    setAvgKpiRating((sum/list.length).toFixed(2));
   }
 
   const afterSubmit = async()=>{
@@ -127,7 +136,7 @@ const KpiObjectiveAction = ({router}) => {
 
     setKpiObjRatingList(kpiRatingList)
 
-    const filrating = kpiRatingList.filter(item => Number(item.revisionRecordId) === Number(revisionId) && Number(iqaId) === Number(item.iqaId));
+    const filrating = kpiRatingList.filter(item => Number(item.groupDivisionId) === Number(grpDivId) && grpDivType === item.kpiType && Number(iqaId) === Number(item.iqaId));
     setInitiValues(filrating,'L')
     getAvgRating(filrating)
     setFilKpiMasterList(filrating);
@@ -158,21 +167,23 @@ const KpiObjectiveAction = ({router}) => {
   }
 
   const onRevisionChange = (value)=>{
-    setRevisionId(value);
-    const revRow = revisionOptions.filter(data => Number(data.value) === Number(value));
-    if(revRow && revRow.length > 0){
-      setDivisionName(revRow[0].label)
+    setGrpDivMainId(value);
+    const divRow = groupDivisionList.filter(data => Number(data.groupDivisionMainId) === Number(value));
+    if(divRow && divRow.length > 0){
+      setDivisionName(divRow[0].groupDivisionCode)
+      setGrpDivType(divRow[0].groupDivisionType)
+      setGrpDivId(divRow[0].groupDivisionId)
     }
     if(iqaOptions.length > 0){
-      if(kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(value) && iqaId === item.iqaId).length > 0){
+      if(kpiObjRatingList.filter(item => Number(item.groupDivisionId) === Number(divRow[0].groupDivisionId)  && divRow[0].groupDivisionType === item.kpiType && iqaId === item.iqaId).length > 0){
         setIsAddMode(false)
-        const filrating = kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(value) && iqaId === item.iqaId);
+        const filrating = kpiObjRatingList.filter(item => Number(item.groupDivisionId) === Number(divRow[0].groupDivisionId)  && divRow[0].groupDivisionType === item.kpiType && iqaId === item.iqaId);
         setInitiValues(filrating,'L')
         getAvgRating(filrating)
         setFilKpiMasterList(filrating);
       }else{
         setIsAddMode(true)
-        const filKpiMaster = kpiMasterList.filter(data => (Number(data.revisionRecordId) === Number(value) || data.revisionRecordId === '0'));
+        const filKpiMaster = kpiMasterList.filter(data => ((Number(data.groupDivisionId) === Number(divRow[0].groupDivisionId) && divRow[0].groupDivisionType === data.kpiType) || data.groupDivisionId === 0));
         setInitiValues(filKpiMaster,'M')
         setFilKpiMasterList(filKpiMaster)
         setAvgKpiRating(0)
@@ -187,16 +198,15 @@ const KpiObjectiveAction = ({router}) => {
     if(iqaData && iqaData.length > 0){
       setIqaNo(iqaData[0].iqaNo)
     }
-
-    if(kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(revisionId) && value === item.iqaId).length > 0){
+    if(kpiObjRatingList.filter(item => Number(item.groupDivisionId) === Number(grpDivId) && grpDivType === item.kpiType && value === item.iqaId).length > 0){
       setIsAddMode(false)
-      const filrating = kpiObjRatingList.filter(item => Number(item.revisionRecordId) === Number(revisionId) && value === item.iqaId);
+      const filrating = kpiObjRatingList.filter(item => Number(item.groupDivisionId) === Number(grpDivId) && grpDivType === item.kpiType && value === item.iqaId);
       setInitiValues(filrating,'L')
       getAvgRating(filrating)
       setFilKpiMasterList(filrating);
     }else{
       setIsAddMode(true)
-      const filKpiMaster = kpiMasterList.filter(data => (Number(data.revisionRecordId) === Number(revisionId) || data.revisionRecordId === '0'));
+      const filKpiMaster = kpiMasterList.filter(data => ((Number(data.groupDivisionId) === Number(grpDivId) && grpDivType === data.kpiType) || data.groupDivisionId === 0));
       setInitiValues(filKpiMaster,'M')
       setFilKpiMasterList(filKpiMaster)
       setAvgKpiRating(0)
@@ -265,7 +275,7 @@ const KpiObjectiveAction = ({router}) => {
         if (result) {
           try {
               if(isAddMode){
-                const result = await insertKpiObjective(new KpiObjDto(mergedMap,iqaId,revisionId));
+                const result = await insertKpiObjective(new KpiObjDto(mergedMap,iqaId,grpDivId,grpDivType));
                 if (result.status === 'S') {
                   afterSubmit();
                   Swal.fire({
@@ -283,7 +293,7 @@ const KpiObjectiveAction = ({router}) => {
                   });
                 }
               }else{
-                const result = await updateKpiObjective(new KpiObjDto(mergedMap,iqaId,revisionId));
+                const result = await updateKpiObjective(new KpiObjDto(mergedMap,iqaId,grpDivId,grpDivType));
                 if (result.status === 'S') {
                   afterSubmit();
                   Swal.fire({
@@ -325,7 +335,7 @@ const KpiObjectiveAction = ({router}) => {
 
   const openRating =async(item)=>{
    const kpiRow =  kpiMasterList.filter(data => Number(data.kpiId) === Number(item.kpiId))
-   setRevisionName(kpiRow[0].groupDivisionCode+' - '+iqaNo)
+   setGrpDivName(kpiRow[0].groupDivisionCode+' - '+iqaNo)
     const ratingList = await getKpiRatingList();
     setKpiRatingList(ratingList);
     setInitialValues({
@@ -335,9 +345,10 @@ const KpiObjectiveAction = ({router}) => {
       norms     : item.kpiNorms,
       target    : item.kpiTarget,
       kpiUnitId : item.kpiUnitId,
-      revisionRecordId : item.revisionRecordId,
+      groupDivisionId : item.groupDivisionId,
+      kpiType : item.kpiType,
       ratings   : ratingList.filter(data => Number(data.kpiId) === Number(item.kpiId)).map(item => ({ startValue: item.startValue,endValue: item.endValue, rating: item.kpiRating.toString(),}))
-    
+   
     });
     setShowModal(true)
   }
@@ -355,8 +366,8 @@ const KpiObjectiveAction = ({router}) => {
              handleChange={(newValue) => {onIqaChange( newValue?.value) }}/>
           </Box>
           <Box flex="15%">
-            <SelectPicker options={revisionOptions} label="Division/Group" 
-            value={revisionOptions && revisionOptions.length >0 && revisionOptions.find(option => option.value === revisionId) || null}
+            <SelectPicker options={grpDivOptions} label="Division/Group" 
+            value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}
              handleChange={(newValue) => {onRevisionChange( newValue?.value) }}/>
           </Box>
          </Box>
@@ -413,7 +424,7 @@ const KpiObjectiveAction = ({router}) => {
          </div>
         </div>
       </div>
-      <KpiratingDialog open={showModal} onClose={handleKpiActionDialogClose} onConfirm={handleKpiActionDialogClose} isAddMode={isAddMode} kpiUnitList={kpiUnitList} revisionId={revisionId} initialValues={initialValues} revisionName = {revisionName} flag = 'L' />
+      <KpiratingDialog open={showModal} onClose={handleKpiActionDialogClose} onConfirm={handleKpiActionDialogClose} isAddMode={isAddMode} kpiUnitList={kpiUnitList} grpDivId={grpDivId} initialValues={initialValues} grpDivName = {grpDivName} flag = 'L' grpDivType = {grpDivType}/>
     </div>
   );
 

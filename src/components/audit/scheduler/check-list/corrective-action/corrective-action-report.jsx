@@ -455,7 +455,6 @@ const CorrectiveActionReport = ({router}) => {
     const openTran = (item)=>{
       item.iqaNo = iqaNo;
       item.divisionGroupCode = auditeeName;
-      console.log('item---- ',item)
       localStorage.setItem('scheduleData', JSON.stringify(item));
       window.open('/car-report-tran', '_blank');
     }

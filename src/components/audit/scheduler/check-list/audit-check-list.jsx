@@ -4,7 +4,7 @@ import Navbar from "components/Navbar/Navbar";
 import '../../auditor-list.component.css';
 import withRouter from "common/with-router";
 import { getMocTotalList,getObservation,AuditCheckList,addAuditCheckList,getAuditCheckList,uploadCheckListImage,CheckListImgDto,getCheckListimg,
-         addAuditeeRemarks,updateAuditeeRemarks} from "services/audit.service";
+         addAuditeeRemarks,updateAuditeeRemarks,givePreview,downloadCheckListFile} from "services/audit.service";
 import { format } from "date-fns";
 import SelectPicker from "components/selectpicker/selectPicker";
 import AlertConfirmation from "common/AlertConfirmation.component";
@@ -22,7 +22,10 @@ const AuditCheckListComponent = ({router}) => {
   const [observations, setObservations] = useState(new Map());
   const [auditorRemarks, setAuditorRemarks] = useState(new Map());
   const [auditeeRemarks, setAuditeeRemarks] = useState(new Map());
+  const [attachmentNames, setAttachmentNames] = useState(new Map());
   const [checkListIds, setCheckListIds] = useState(new Map());
+  const [attachments, setAttachments] = useState(new Map());
+  const [selectedFiles, setSelectedFiles] = useState([]);
   const [checkList,setCheckList] = useState([]);
   const [isAddMode,setIsAddMode] = useState(true);
   const [auditorSuccessBtns,setAuditorSuccessBtns] = useState([]);
@@ -33,6 +36,7 @@ const AuditCheckListComponent = ({router}) => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [fileError, setFileError] = useState('');
   const fileInputRef = useRef(null);
+  let    fileInputRefs = useRef([]);
   const [imgView, setimgView] = useState('');
   const [isValidationActive, setIsValidationActive] = useState(false);
   const [isAuditor,setIsAuditor] = useState(false);
@@ -80,6 +84,7 @@ const AuditCheckListComponent = ({router}) => {
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
 
+       console.log('chList----- ',chList)
        
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
@@ -174,6 +179,10 @@ const AuditCheckListComponent = ({router}) => {
       setInitialValues(mainClause,sectionOpenRef.current,masterChapters,chList,isAuditor,isAdmin,flag,element)
     }
     setIsValidationActive(false)
+    setSelectedFiles([]);
+    fileInputRefs.current.forEach(ref => {
+      if (ref) ref.value = ''; 
+  });
   }
 
   const getNextValue = (value) => {
@@ -196,6 +205,7 @@ const AuditCheckListComponent = ({router}) => {
     const initialAuditorRemarks = new Map();
     const initialAuditeeRemarks = new Map();
     const inticheckListIds      = new Map();
+    const initialAttachmentNames = new Map();
     if(chList.some(data => Number(data.sectionNo) === Number(secNo) && (data.clauseNo !== '8.3.1'))){
       chList.forEach((chapter) => {
         if (Number(chapter.sectionNo) === Number(secNo)) {
@@ -239,7 +249,9 @@ const AuditCheckListComponent = ({router}) => {
             setIsAddMode(false);
           }
           inticheckListIds.set(chapter.mocId,chapter.auditCheckListId);
+          inticheckListIds.set(chapter.mocId,chapter.auditCheckListId);
           initialAuditeeRemarks.set(chapter.mocId, chapter.auditeeRemarks);
+          initialAttachmentNames.set(chapter.mocId, chapter.attachmentName);
           //for only input tags
           if(chapter.auditeeRemarks !== 'NA'){
             setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter.mocId])]);
@@ -255,6 +267,7 @@ const AuditCheckListComponent = ({router}) => {
           initialObservations.set(chapter.mocId, 0);
           initialAuditorRemarks.set(chapter.mocId, 'NA');
           initialAuditeeRemarks.set(chapter.mocId, 'NA');
+          initialAttachmentNames.set(chapter.mocId, '');
           }
         }
         if (Number(chapter.sectionNo) === Number(secNo)) {
@@ -266,10 +279,14 @@ const AuditCheckListComponent = ({router}) => {
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
                   initialAuditeeRemarks.set(chapter1.mocId, '');
+                  initialAttachmentNames.set(chapter1.mocId, '');
+
                 }else{
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
                   initialAuditeeRemarks.set(chapter1.mocId, 'NA');
+                  initialAttachmentNames.set(chapter1.mocId, '');
+
                 }
               }
               //subChapters
@@ -277,6 +294,8 @@ const AuditCheckListComponent = ({router}) => {
                 initialObservations.set(chapter1.mocId, 0);
                 initialAuditorRemarks.set(chapter1.mocId, '');
                 initialAuditeeRemarks.set(chapter1.mocId, '');
+                initialAttachmentNames.set(chapter1.mocId, '');
+
               }
             })
           }
@@ -286,6 +305,8 @@ const AuditCheckListComponent = ({router}) => {
     setObservations(initialObservations);
     setAuditorRemarks(initialAuditorRemarks);
     setAuditeeRemarks(initialAuditeeRemarks);
+    console.log('initialAttachmentNames----- ',initialAttachmentNames)
+    setAttachmentNames(initialAttachmentNames);
     setIsValidationActive(false)
   }
 
@@ -427,7 +448,40 @@ const AuditCheckListComponent = ({router}) => {
     }
   }
 
+  const handleFileChange = (mocId, event) => {
+    const file = event.target.files[0];
+    if(file){
+      if(file.size>200485760){
+        removeAttachment(mocId)
+        Swal.fire({
+          icon: "warning",
+          title: 'Maximum file upload size is 200Mb !!!',
+          showConfirmButton: false,
+          timer: 2500
+        });
+      }else{
+        setSelectedFiles(prev => {
+          const updatedFiles = [...prev];
+          updatedFiles[mocId] = file;
+          return updatedFiles;
+        });
+        setAttachments((prev) => new Map(prev).set(mocId,file.name))
+      }
+    }else{
+      removeAttachment(mocId)
+    }
+  };
+
+  const removeAttachment = (mocId)=>{
+    setAttachments((prev) => {
+      const updatedMap = new Map(prev);
+      updatedMap.delete(mocId);
+      return updatedMap;
+    })
+  }
+
   const handleConfirm = async()=>{
+    console.log('element--- ',element)
     setIsValidationActive(true)
     auditorRemarksValid = false
     const mergedMap = new Map();
@@ -445,6 +499,7 @@ const AuditCheckListComponent = ({router}) => {
             auditorRemarks   : auditorRemarks.get(key) || '',
             auditeeRemarks   : auditeeRemarks.get(key) || '',
             auditCheckListId : checkListIds.get(key),
+            attachment       : attachments.get(key) || '',
           })
         }else{
           mergedMap.set(key,{
@@ -452,6 +507,7 @@ const AuditCheckListComponent = ({router}) => {
             auditorRemarks   : auditorRemarks.get(key) || '',
             auditeeRemarks   : auditeeRemarks.get(key) || '',
             auditCheckListId : checkListIds.get(key),
+            attachment       : attachments.get(key) || '',
           })
         }
       });
@@ -464,6 +520,7 @@ const AuditCheckListComponent = ({router}) => {
             auditorRemarks   : auditorRemarks.get(key) || '',
             auditeeRemarks   : value || '',
             auditCheckListId : 0,
+            attachment       : attachments.get(key) || '',
           })
         }else{
           mergedMap.set(key,{
@@ -471,6 +528,7 @@ const AuditCheckListComponent = ({router}) => {
             auditorRemarks   : auditorRemarks.get(key) || '',
             auditeeRemarks   : value || '',
             auditCheckListId : checkListIds.get(key),
+            attachment       : attachments.get(key) || '',
           })
         }
       });
@@ -499,9 +557,9 @@ const AuditCheckListComponent = ({router}) => {
             try {
              let response = '';
              if(((isAuditor && flag !== 'A') || (element.scheduleStatus === 'AES' && isAdmin) || (element.scheduleStatus === 'AES' && flag === 'L')) && (new Date(schduleDate) <= new Date())){
-              response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
+              response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo));
              }else{
-              response = await addAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
+              response = await addAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo),selectedFiles);
              }
       
             if(response.status === 'S'){
@@ -534,9 +592,9 @@ const AuditCheckListComponent = ({router}) => {
             try {
              let response = '';
              if(((isAuditor && flag !== 'A') || ((['ARS','RBA','AES'].includes(element.scheduleStatus)) && isAdmin) || (element.scheduleStatus === 'AES' && flag === 'L')) && (new Date(schduleDate) <= new Date())){
-              response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
+              response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo));
              }else{
-              response = await updateAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId));
+              response = await updateAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo),selectedFiles);
              }
             
             if(response.status === 'S'){
@@ -596,7 +654,7 @@ const AuditCheckListComponent = ({router}) => {
 
   const uploadImage = async()=>{
     if(selectedImage && selectedImage !=null){
-      const response = await uploadCheckListImage(new CheckListImgDto(attachMocId,element.scheduleId,selectedImage.name,element.iqaNo,element.iqaId),selectedImage);
+      const response = await uploadCheckListImage(element,selectedImage);
       if(response.message === 'Image successfully uploaded: null'){
         Swal.fire({
           icon: "success",
@@ -621,11 +679,14 @@ const AuditCheckListComponent = ({router}) => {
     } else {
         return true;
     }
-};
+  };
 
+  const downloadAtachment = async(docName)=>{
+          const EXT= docName.slice(docName.lastIndexOf('.')+1);
+          const response =   await downloadCheckListFile(docName,element.iqaNo,element.scheduleId);
+          givePreview(EXT,response,docName);
+  }
 
-
-    
 
   return (
     <div>
@@ -709,8 +770,11 @@ const AuditCheckListComponent = ({router}) => {
                                     <tr className="table-active box-border">
                                      <td className="text-left width60 box-border">
                                      <Box display="flex" alignItems="center" gap="10px">
-                                      <Box flex="70%">&nbsp;{toRoman(k)+'. '+chapter1.description}</Box>
-                                      <Box flex="30%">
+                                     <Box flex="50%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description}
+                                     {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}</Box>
+                                     <Box flex="10%" >
+                                     <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  /></Box>
+                                      <Box flex="40%">
                                         <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
                                          InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly :  (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
@@ -752,10 +816,13 @@ const AuditCheckListComponent = ({router}) => {
                               l++;
                               return(
                                <tr  className="table-active box-border">
-                                <td className="text-left width60 box-border">
-                                 <Box display="flex" alignItems="center" gap="10px">
-                                    <Box flex="70%">&emsp;&nbsp;&nbsp;{toLetter(l-1)+'. '+chapter1.description}</Box>
-                                    <Box flex="30%">
+                                <td className="text-left width65 box-border">
+                                 <Box display="flex" alignItems="center" justifyContent="space-between" gap="10px">
+                                 <Box flex="50%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description}
+                                 {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}</Box>
+                                    <Box flex="10%">
+                                      <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  /></Box>
+                                    <Box flex="40%">
                                       <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
                                          InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
@@ -774,7 +841,7 @@ const AuditCheckListComponent = ({router}) => {
     {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions} value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
                                  readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}
                                 </td>
-                                <td className="width25 box-border">
+                                <td className="width20 box-border">
     {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
                                    inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || Number(roleId) === 6 && !flag === 'L'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                     InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}

@@ -5,10 +5,11 @@ import  config  from "../environment/config";
 const API_URL=config.API_URL;
 
 export class KpiObjDto {
-    constructor(ratingList,iqaId,revisionRecordId){
+    constructor(ratingList,iqaId,groupDivisionId,kpiType){
         this.ratingList       = ratingList;
         this.iqaId            = iqaId;
-        this.revisionRecordId = revisionRecordId;
+        this.groupDivisionId  = groupDivisionId;
+        this.kpiType          = kpiType;
     }
 }
 
@@ -99,11 +100,11 @@ export const getKpiRatingList = async ()=>{
     }
 }
 
-export const getDwpRevisonList = async ()=>{
+export const getGroupDivisionList = async ()=>{
     try {
-        return (await axios.post(`${API_URL}get-dwp-revision-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        return (await axios.post(`${API_URL}get-group-division-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
-        console.error('Error occurred in getDwpRevisonList:', error);
+        console.error('Error occurred in getGroupDivisionList:', error);
         throw error;
     }
 }
