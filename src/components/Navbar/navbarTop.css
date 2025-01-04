@@ -357,6 +357,12 @@
   margin-top: 17px !important;
 }
 
+.dropdown-menu-left{
+  left: auto!important;
+  right: 0!important;
+  cursor: pointer!important;
+}
+
 
 
 

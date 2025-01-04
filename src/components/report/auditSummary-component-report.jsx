@@ -12,6 +12,7 @@ import OFIPrint from "components/prints/qms/ofi-print";
 import mergePdf from"components/prints/qms/auditorsSchedulemergePdf";
 import dayjs from 'dayjs';
 import { format } from "date-fns";
+import { useLocation } from "react-router-dom";
 const AuditSummaryReport = () => {
       const [auditTeamDtoList, setAuditTeamDtoList] = useState([]);
       const [filAuditTeamDtoList, setFilAuditTeamDtoList] = useState([]);
@@ -30,6 +31,9 @@ const AuditSummaryReport = () => {
       const [filObs,setfilObs]=useState([]);
       const [filOfi,setfilOfi]=useState([]);
       const [selectedOption, setSelectedOption] = useState("A");
+
+      const location = useLocation();
+ 
   
 
       const fetchData = async () => {
@@ -39,7 +43,7 @@ const AuditSummaryReport = () => {
           const chListByObsIds= await getAuditCheckListbyObs();
       
 
-            setfullchListByObsIds(chListByObsIds);
+           setfullchListByObsIds(chListByObsIds);
            setIqaFullList(iqaList);
            setScheduleList(scdList);
            const iqaData = iqaList.map(data => ({
@@ -63,7 +67,20 @@ const AuditSummaryReport = () => {
            
            }
            setIqaOptions(iqaData)
+     
+          ////////////code to access audit summary from dashboard start////////////
+          const queryParams = new URLSearchParams(location.search);
+          const iqaIdSelFromDahboard = queryParams.get('iqaIdSel') || '';
+          const obsTypeSelFromDahboard = queryParams.get('obsTypeSel') || '';
           setIsReady(true);
+          if (isReady && ["N", "B", "O"].includes(obsTypeSelFromDahboard)) {
+            onIqaChange(iqaIdSelFromDahboard);
+            // Programmatically trigger the radio button change
+            handleRadioChange({ target: { value: obsTypeSelFromDahboard } });
+          }
+
+
+          ////////////code to access audit summary from dashboard end////////////
      
          } catch (error) {
            console.error("Error fetching data:", error);
@@ -89,6 +106,7 @@ const AuditSummaryReport = () => {
             value: data.iqaId,
             label: data.iqaNo
           }));
+         
           if (IqaList.length > 0) {
             setIqaNo(IqaList[0].iqaNo)
             setIqaId(IqaList[0].iqaId)
@@ -175,33 +193,41 @@ const AuditSummaryReport = () => {
     auditTeamList();
   }, []);
 
+
     const onIqaChange = (value)=>{
-      //for auitor teams on change
-   const iqa = iqaFullList.filter(data => data.iqaId === value);
-    setFilAuditTeamDtoList(auditTeamDtoList.filter(data => data.iqaId === value));
-    setIqaId(value);
+      const iqaId = Number(value); 
+   const iqa = iqaFullList.filter(data => data.iqaId === iqaId);
+
+    setFilAuditTeamDtoList(auditTeamDtoList.filter(data => data.iqaId === iqaId));
+    setIqaId(iqaId);
     setIqaNo(iqa && iqa.length > 0 && iqa[0].iqaNo)
-            //for schedule on change
-      const selectedIqa = iqaFullList.find(data => data.iqaId === value);
+
+     //for schedule on change
+      const selectedIqa = iqaFullList.find(data => data.iqaId === iqaId);
       if(selectedIqa){
         setIqaNo(selectedIqa.iqaNo)
         setIqaFromDate(dayjs(new Date(selectedIqa.fromDate)))
         setIqaToDate(dayjs(new Date(selectedIqa.toDate)))
      }
      
-    const scList = scheduleList.filter(data => data.iqaId === value)
+    const scList = scheduleList.filter(data => data.iqaId === iqaId)
       setDataTable(scList)
      
       //for NC On change
-      const fillnc =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===2);
-      const fillobs =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===3);
-      const fillofi =fullchListByObsIds.filter(data=> data.iqaId === value && data.auditObsId ===4);
+      const fillnc =fullchListByObsIds.filter(data=> data.iqaId === iqaId && data.auditObsId ===2);
+      const fillobs =fullchListByObsIds.filter(data=> data.iqaId === iqaId && data.auditObsId ===3);
+      const fillofi =fullchListByObsIds.filter(data=> data.iqaId === iqaId && data.auditObsId ===4);
 
       setNc(fillnc);
       setObs(fillobs);
       setOfi(fillofi);
     }
+
+
     const handleRadioChange = (event) => {
+      console.log("Event object:", event);
+      console.log("Event target:", event.target);
+      console.log("Event target value:", event.target.value);
       setSelectedOption(event.target.value);
     
     };

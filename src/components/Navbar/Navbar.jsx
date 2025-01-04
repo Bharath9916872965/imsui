@@ -4,7 +4,7 @@ import { logout } from "../../services/auth.service";
 import "./navbarTop.css"
 import "../../static/buttons.css"
 import { useEffect, useState } from "react";
-import { getHeaderModuleDetailList, getHeaderModuleList,changePassword,getNotifiList,getNotifiCount,updatenotification  } from "../../services/admin.serive";
+import { getHeaderModuleDetailList, getHeaderModuleList,changePassword,getNotifiList,getNotifiCount,updateNotification  } from "../../services/admin.serive";
 import { getLoginEmployeeDetails} from "services/header.service";
 
 
@@ -34,7 +34,6 @@ const Navbar = (props) => {
         setDesignation(designation);
         setFormRoleName(formRoleName);
         setTitle(title);
-        // const imsFormRoleId = 2;
         if(imsFormRoleId){
           fetchHeaderModuleList(imsFormRoleId);
           fetchHeaderModuleDetailList(imsFormRoleId);
@@ -51,8 +50,8 @@ const Navbar = (props) => {
 
   const gotoNoti = async (event, item) => {
     event.preventDefault(); 
-    const response = await updatenotification(item.notificationid);
-    props.router.navigate(item.notificationurl);
+    const response = await updateNotification(item.notificationId);
+    props.router.navigate(item.notificationUrl);
     if (response > 0) {
       const notifiCount = await getNotifiCount();
       const notifiList = await getNotifiList();
@@ -78,8 +77,15 @@ const Navbar = (props) => {
 
   const fetchHeaderModuleDetailList = async (imsFormRoleId) => {
     try {
+      console.log('dsdsds count'+await getNotifiCount());
+      console.log('dsdsds list'+JSON.stringify(await getNotifiList()));
       const moduleDetailListResponse = await getHeaderModuleDetailList(imsFormRoleId);
       setHeaderModuleDetailList(moduleDetailListResponse);
+      const notifiCount = await getNotifiCount();
+      const notifiList = await getNotifiList();
+      setNotifiCount(notifiCount);
+      setNotifiList(notifiList);
+
     } catch (error) {
       console.error('Error fetching Header Module Detail list:', error);
     }
@@ -202,13 +208,19 @@ const Navbar = (props) => {
               <i className="material-icons" style={{ fontSize: '20px' }}>notifications</i> 
               <span className='notification-count'>{Number(notifiCount)}</span>
             </a>
-            <ul className="dropdown-menu">
+            <ul className="dropdown-menu dropdown-menu-left" >
             {notifiList.length > 0 ? (
+
                 notifiList.map((item, index) => (
-                  <a  className="dropdown-item" key={index} onClick={(event) => gotoNoti(event, item)}>{item.notificationmessage}</a>
+                  <li key={index}>
+                  <a  className="dropdown-item" key={index} onClick={(event) => gotoNoti(event, item)}>{item.notificationMessage}</a>
+                 </li>
                 ))
+             
               ) : (
-                <a  className="dropdown-item" href="" onClick={(event) => event.preventDefault()}>No Notifications</a>
+                <li>
+                <a  className="dropdown-item"  onClick={(event) => event.preventDefault()}>No Notifications</a>
+               </li>
               )}
               </ul>
             </li> 

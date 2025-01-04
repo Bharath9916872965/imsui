@@ -320,20 +320,20 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
         const filteredEmployeeList = employee.filter(emp => emp.divisionId === groupDivisionId);
         const filteredDivisionEmployeeList = DivisionEmployee.filter(divemp => divemp.divisionId === groupDivisionId);
         const mergerList = new Set([...filteredEmployeeList.map(data => data.empId), ...filteredDivisionEmployeeList.map(data => data.empId)])
-        fileteredApproveList(mergerList, employee);
+        fileteredApproveList(mergerList, employee,versionRecorList[0]);
         const finalDivisionalMrList = filteredDivsionalMrList.filter(list => list.divisionId === groupDivisionId);
         setFilteredDivisionalMrList(finalDivisionalMrList);
-        filterDivMrList(finalDivisionalMrList, empIdAsNumber);
+        filterDivMrList(finalDivisionalMrList, empIdAsNumber,versionRecorList[0]);
       } else {
         const seldivisionList = await getDivisionList();
         const fileterdDivisionList = seldivisionList.filter(div => div.groupId === groupDivisionId).map(item => item.divisionId);
         const filEmpIds = employee.filter(data => fileterdDivisionList.includes(data.divisionId)).map(item => item.empId);
         const filDivEmpIds = DivisionEmployee.filter(data => fileterdDivisionList.includes(data.divisionId)).map(item => item.empId);
         const mergerList = new Set([...filEmpIds, ...filDivEmpIds])
-        fileteredApproveList(mergerList, employee);
+        fileteredApproveList(mergerList, employee,versionRecorList[0]);
         const divisionalMrList = filteredDivsionalMrList.filter(data => fileterdDivisionList.includes(data.divisionId));
         setFilteredDivisionalMrList(divisionalMrList);
-        filterDivMrList(divisionalMrList, empIdAsNumber);
+        filterDivMrList(divisionalMrList, empIdAsNumber,versionRecorList[0]);
       }
       setFilteredMrList(filteredMrList);
       setStatusCode(versionRecorList.length > 0 ? versionRecorList[0].statusCode : "");
@@ -346,23 +346,27 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
     }
   };
 
-  const fileteredApproveList = (list, employee) => {
+  const fileteredApproveList = (list, employee,versionRecorList) => {
     const filtEmpByDiv = employee.filter(data => list.has(data.empId))
     setDwpGwpList(filtEmpByDiv);
     if (filtEmpByDiv && filtEmpByDiv.length > 0) {
       setInitialValues(prev => ({
         ...prev,
-        approvedBy: filtEmpByDiv[0].empId
-      }))
+        approvedBy: versionRecorList && versionRecorList.approvedBy
+          ? versionRecorList.approvedBy  // Access the first item in versionRecorList
+          : filtEmpByDiv && filtEmpByDiv.length > 0 ? filtEmpByDiv[0].empId : ''  // Fallback to first empId in filtEmpByDiv
+      }));
     }
   }
 
-  const filterDivMrList = (list, selempId) => {
+  const filterDivMrList = (list, selempId,versionRecorList) => {
     if (list && list.length > 0) {
       const matchedEmployee = list.find(item => item.empId === selempId); // Check for a match
       setInitialValues(prev => ({
         ...prev,
-        initiatedBy: matchedEmployee ? matchedEmployee.empId : list[0].empId // Use matched empId or fallback
+        initiatedBy: versionRecorList &&  versionRecorList.initiatedBy
+          ? versionRecorList.initiatedBy  // Access the first item in versionRecorList
+          : matchedEmployee ? matchedEmployee.empId : list[0].empId  // Use matched empId or fallback to first item in list
       }));
     }
   };

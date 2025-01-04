@@ -209,14 +209,6 @@ export const UpdateApprovalAuthority = async(values) =>{
   }
 }
 
-export const getNotifiList= async () => {
-  try {
-      return (await axios.post(`${API_URL}get-notification`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
-  } catch (error) {
-      console.error('Error occurred in getNotifiList:', error);
-      throw error;
-  }
-};
 
 export const getNotifiCount= async () => {
   try {
@@ -227,11 +219,26 @@ export const getNotifiCount= async () => {
   }
 };
 
-export const  updatenotification= async (notiId) => {
+
+export const getNotifiList= async () => {
   try {
-      return (await axios.post(`${API_URL}update-notification`,notiId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+      return (await axios.post(`${API_URL}get-notification-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
   } catch (error) {
-      console.error('Error occurred in updatenotification:', error);
+      console.error('Error occurred in getNotifiList:', error);
+      throw error;
+  }
+};
+
+
+
+
+
+export const  updateNotification= async (notificationId) => {
+  console.log("notificationId", notificationId);
+  try {
+      return (await axios.post(`${API_URL}update-notification`,notificationId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in updateNotification:', error);
       throw error;
   }
 };
