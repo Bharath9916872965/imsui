@@ -43,7 +43,6 @@ const DwpAddDocContentComponent = ({ router }) => {
     const [qmsDocTypeDto, setQmsDocTypeDto] = useState(null);
 
 
-    console.log('revisionElements132314',revisionElements);
     const [level, setLevel] = useState(0);
     const [refreshChapterId, setRefreshChapterId] = useState(0);
     const [addChapterLevel, setAddChapterLevel] = useState(0);
