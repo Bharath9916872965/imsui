@@ -2,6 +2,7 @@ import axios from 'axios';
 import { authHeader } from './auth.header';
 import  config  from "../environment/config";
 import saveAs from 'file-saver'
+import environment from 'environment/environment.dev';
 
 const API_URL=config.API_URL;
 
@@ -756,18 +757,22 @@ export const insertCorrectiveAction = async (values)=>{
 }
 
 
-export const getQmrcList = async ()=>{
+export const getCommitteeScheduleList = async (committeeType)=>{
     try {
-        return (await axios.post(`${API_URL}get-qmrc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const data = { committeeType };
+        return (await axios.post(`${API_URL}get-committee-schedule-list`,
+            data,
+            {headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
-        console.error('Error occurred in getQmrcList:', error);
+        console.error('Error occurred in getCommitteeScheduleList:', error);
         throw error;
     }
 }
 
-export const getAssignedData = async ()=>{
+export const getAssignedData = async (committeeType)=>{
     try {
-        return (await axios.post(`${API_URL}get-qmrc-action-assign-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const data = { committeeType };
+        return (await axios.post(`${API_URL}get-schedule-action-assign-list`,data,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in getAssignedData:', error);
         throw error;
@@ -806,3 +811,31 @@ export const getAssignedData = async ()=>{
         throw error;
     }
   }
+
+
+  export const OpenMoMDocument = async (scheduleId,labcode) =>{
+    try {
+        const response = await axios({
+          method: 'get',
+          url: `${environment.MOM_URL   }`,  // Backend endpoint
+          params: {
+            committeescheduleid: scheduleId,  // Pass scheduleId to backend
+            labcode: labcode,  // Pass labCode if necessary
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
+          },
+          responseType: 'blob',  // To handle the PDF as binary data (blob)
+        });
+    
+        // Create a Blob URL from the binary data
+        const pdfURL = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    
+        // Open the PDF in a new tab
+        window.open(pdfURL, '_blank');  // Open PDF in a new tab
+      } catch (error) {
+        console.error('Error while fetching the PDF:', error);
+      }
+  }
+  

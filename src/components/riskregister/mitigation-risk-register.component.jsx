@@ -37,14 +37,24 @@ const MitigationRiskRegisterComponent = ({router }) =>{
         { name: 'Revision No', selector: (row) => row.revisionNo, sortable: true, grow: 2, align: 'text-center',width: '5%'},
         { name: 'Doc Type', selector: (row) => row.docType, sortable: true, grow: 2, align: 'text-center',width: '5%' },
         { name: 'Probability', selector: (row) => row.probability, sortable: true, grow: 2, align: 'text-center',width: '5%' },
-        { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '5%' },
-        { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '5%' },
-        { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center', width: '5%'},
-        { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '5%' },
-        { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '5%' },
+        { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '5%',bgColor : 'lightgrey' },
+        { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '5%',bgColor : 'lightgrey' },
+        { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center', width: '5%',bgColor : 'lightgrey'},
+        { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '5%',bgColor : 'lightgrey' },
+        { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '5%' ,bgColor: (row) => getBackgroundColorForRiskNo(row.riskNo)},
        
     ];
 
+    const getBackgroundColorForRiskNo = (riskNo) => {
+      if (riskNo >= 1 && riskNo <= 4) {
+          return 'green'; // Green for riskNo 1-4
+      } else if (riskNo > 4 && riskNo <= 10) {
+          return 'yellow'; // Yellow for riskNo 5-10
+      } else if (riskNo > 10 && riskNo <= 20) {
+          return 'red'; // Red for riskNo 11-20
+      }
+      return 'inherit'; // Default background color if not in the ranges
+  };
     const validationSchema = Yup.object().shape({
       mitigationApproach: Yup.string().required("Mitigation Approach required"),
       technicalPerformance: Yup.number().required("Technical Performance required").min(1, "Must be at least 1"),

@@ -222,7 +222,7 @@ const Datatable = ({ columns, data }) => {
                         paginatedData.map((row, rowIndex) => (
                             <tr key={rowIndex}>
                                 {columns.map((column, colIndex) => (
-                                    <td key={colIndex} className={column.align || ''}style={{ width: column.width }}>
+                                    <td key={colIndex} className={column.align || ''}style={{ width: column.width, backgroundColor: typeof column.bgColor === 'function' ? column.bgColor(row) : column.bgColor || 'inherit'}}>
                                         {column.selector(row)}
                                     </td>
                                 ))}
