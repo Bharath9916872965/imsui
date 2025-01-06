@@ -4,11 +4,12 @@ import Swal from 'sweetalert2';
 import { getAuditeeDtoList, getIqaAuditeeList, getIqaDtoList, insertIqaAuditee, getScheduleList } from "services/audit.service";
 import SelectPicker from "components/selectpicker/selectPicker";
 import AlertConfirmation from "common/AlertConfirmation.component"
+import { useLocation } from "react-router-dom";
 
 
 
 const IqaAuditeeListComponent = () =>{
-
+   const location = useLocation();
     const [iqaId, setIqaId] = useState('');
     const [iqaOptions, setIqaOptions] = useState([]);
     const [iqaNo, setIqaNo] = useState('');
@@ -16,6 +17,8 @@ const IqaAuditeeListComponent = () =>{
     const [selauditeeData,setAuditeeData]=useState([]);
     const [auditeeList, setAuditeeList] = useState([]);
     const [selectedIds, setSelectedIds] = useState([]);
+    const [isReady, setIsReady] = useState(false);
+    const [iqaIdSelFromDahboard, setIqaIdSelFromDahboard] = useState(''); 
     const [scheduleList,setScheduleList] = useState([]);
     const [filScheduleList,setFilScheduleList] = useState([]);
 
@@ -45,10 +48,30 @@ const IqaAuditeeListComponent = () =>{
             const filSchList = scdList.filter(data => data.iqaId === iqaData[0].iqaId).map(item => item.auditeeId);
             setFilScheduleList(filSchList)
           }
+
+
+          ////////////code to access auditee list from dashboard start////////////
+      const queryParams = new URLSearchParams(location.search);
+      const iqaIdSelFromDahboard = queryParams.get('iqaIdSel') || '';
+      setIqaIdSelFromDahboard(iqaIdSelFromDahboard); 
+      setIsReady(true); 
+          ////////////code to access auditee list from dashboard end////////////
+
         } catch (error) {
           Swal.fire('Error', 'Failed to fetch data. Please try again later.', 'error');
         }
       };
+
+ 
+      // The below useEffect runs only when either isReady or iqaIdSelFromDahboard changes
+  useEffect(() => {
+    if (isReady && iqaIdSelFromDahboard) {
+      console.log('now it is ready to call it ' + isReady + ' sdsc ' + iqaIdSelFromDahboard);
+      onIqaChange(iqaIdSelFromDahboard); 
+    }
+  }, [isReady, iqaIdSelFromDahboard]);
+
+
 
       const reloaddata = () =>{
         const formattedIqaOptions = iqaFullList.map(data => ({
@@ -81,9 +104,13 @@ const IqaAuditeeListComponent = () =>{
     
 
       const onIqaChange = async (value) => {
-       if(value){
-        const selectedIqa = iqaFullList.find(data => data.iqaId === value);
-        setIqaId(value);
+        const iqaId = Number(value); 
+        console.log('iqaIddd'+iqaId);
+        console.log("iqa change in auditee list:", JSON.stringify(iqaFullList, null, 2));
+       if(iqaId){
+        console.log("iqa change in auditee list:", iqaFullList.find(data => data.iqaId === iqaId))
+        const selectedIqa = iqaFullList.find(data => data.iqaId === iqaId);
+        setIqaId(iqaId);
         setIqaNo(selectedIqa?.iqaNo || '');
         const updatedAuditeeList = await getIqaAuditeeList(value);
         changedata(value,selauditeeData);

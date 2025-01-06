@@ -524,7 +524,7 @@ const DwpAddDocContentComponent = ({ router }) => {
                         </div>
                         <div className=" text-md-end mt-2 mt-md-0">
                             <div className="doc-name">
-                                Division Work Procedure (DWP)
+                               {revisionElements.docType && revisionElements.docType==='dwp' ? 'Division Work Procedure (DWP)' : ' Group Work Procedure (GWP)'}
                             </div>
                         </div>
                     </div>

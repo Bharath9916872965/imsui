@@ -147,8 +147,11 @@ const fetchQspRevisionRecordList = async () => {
   );
   
   if (filteredMrRepList && filteredMrRepList.length > 0) {
+    const latestInitiatedBy = filteredDetails && filteredDetails.length > 0 && filteredDetails[0].initiatedBy
+    ? filteredDetails[0].initiatedBy
+    : filteredMrRepList[0].empId;
     setInitialValues({
-      initiatedBy: filteredMrRepList[0].empId
+      initiatedBy: latestInitiatedBy
     })
   }
   
