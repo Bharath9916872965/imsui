@@ -7,7 +7,7 @@ import * as Yup from "yup";
 import AlertConfirmation from "common/AlertConfirmation.component";
 import { CustomMenuItem } from "services/auth.header";
 
-const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisionId,initialValues,revisionName,flag }) => {
+const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,grpDivId,initialValues,grpDivName,flag,grpDivType }) => {
   const handleClose = () => {
     if (onClose) onClose();
   };
@@ -65,7 +65,8 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
     if (result) {
       try {
           if(isAddMode){
-            values.revisionRecordId = revisionId === 'A'?'0':revisionId;
+            values.groupDivisionId = grpDivId === 'A'?'0':grpDivId;
+            values.kpiType         = grpDivType;
             const result =await insertKpi(values);
             handleConfirm();
             if (result.status === 'S') {
@@ -117,7 +118,7 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,revisi
         <div className="modal-dialog modal-lg modal-xl-custom">
           <div className="modal-content" >
            <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-            <h5 className="modal-title">{flag === 'L'?'KPI Ratings - '+revisionName:(isAddMode?'KPI Add - '+revisionName:'KPI Edit - '+revisionName)}  </h5>
+            <h5 className="modal-title">{flag === 'L'?'KPI Ratings - '+grpDivName:(isAddMode?'KPI Add - '+grpDivName:'KPI Edit - '+grpDivName)}  </h5>
             <button type="button" className="btn btn-danger" onClick={handleClose} aria-label="Close">
               <span aria-hidden="true">&times;</span>
             </button>

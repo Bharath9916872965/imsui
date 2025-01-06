@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getKpiUnitList,getKpiMasterList,getKpiRatingList,getDwpRevisonList } from "services/kpi.service";
+import { getKpiUnitList,getKpiMasterList,getKpiRatingList,getGroupDivisionList } from "services/kpi.service";
 import Datatable from "../../datatable/Datatable";
 import { Box } from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
@@ -21,11 +21,13 @@ const KpiObjectiveMaster = ({router}) => {
   const [isAddMode,setIsAddMode] = useState(true);
   const [kpiUnitList,setKpiUnitList] = useState([])
   const [isMr,setIsMr] = useState(true);
-  const [revisionOptions,setRevisionOptions] = useState([]);
-  const [revisionId,setRevisionId] = useState('A');
-  const [revisionName,setRevisionName] = useState('A');
+  const [grpDivOptions,setGrpDivOptions] = useState([]);
+  const [grpDivId,setGrpDivId] = useState('A');
+  const [grpDivType,setGrpDivType] = useState('C');
+  const [grpDivMainId,setGrpDivMainId] = useState('A');
+  const [grpDivName,setGrpDivName] = useState('A');
   const [dwpData,setDwpData] = useState('')
-  const [dwpRevisionList,setDwpRevisionList] = useState([])
+  const [groupDivisionList,setGroupDivisionList] = useState([])
 
     const [initialValues,setInitialValues] = useState({
       kpiId     : 0,
@@ -34,7 +36,8 @@ const KpiObjectiveMaster = ({router}) => {
       norms     : '',
       target    : '',
       kpiUnitId : 1,
-      revisionRecordId : '0',
+      groupDivisionId : '0',
+      kpiType : '',
       ratings   : [{ startValue : '', endValue : '',rating : '' }],
     });
 
@@ -55,30 +58,33 @@ const KpiObjectiveMaster = ({router}) => {
     try {
       const kpiMasterList  = await getKpiMasterList();
       const unitList = await getKpiUnitList();
-      const dwpList = await getDwpRevisonList();
+      const grpDivList = await getGroupDivisionList();
 
-      setDwpRevisionList(dwpList)
+      setGroupDivisionList(grpDivList)
       setIsMr(true)
       const dwpData = router.location.state?.dwpGwp;
-      const revisionData = dwpList.map(data => ({
-        value : String(data.revisionRecordId),
-        label : data.docType === 'dwp'?'DWP - '+data.divisionMasterDto.divisionCode:'GWP - '+data.divisionGroupDto.groupCode
+      const grpDivData = grpDivList.map(data => ({
+        value : String(data.groupDivisionMainId),
+        label : data.groupDivisionCode,
       }));
       const iniLsit = [{value : 'A', label : 'ALL'},{value : '0', label : 'COMMON LAB KPI'}]
 
-      setRevisionOptions([...iniLsit,...revisionData])
+      setGrpDivOptions([...iniLsit,...grpDivData])
       setKpiUnitList(unitList)
       setKpiMasterList(kpiMasterList)
       if(dwpData){
-        setRevisionId(String(dwpData.revisionRecordId))
+        setGrpDivMainId(String(dwpData.revisionRecordId))
         setDwpData(dwpData)
         setIsMr(false);
         setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
       }else{
-        if(revisionId === 'A'){
+        if(grpDivId === 'A'){
           setDataTable(kpiMasterList)
+        }else if(grpDivId === '0'){
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === 0))
         }else{
-          setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(revisionId)))
+          const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(grpDivMainId));
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType))
         }
       }
       setIsReady(true);
@@ -130,11 +136,11 @@ const KpiObjectiveMaster = ({router}) => {
    }
 
   const kpiAdd = ()=>{
-    if(revisionId === 'A' || Number(revisionId) === 0){
-      setRevisionName('COMMON')
+    if(grpDivId === 'A' || Number(grpDivId) === 0){
+      setGrpDivName('COMMON')
     }else{
-     const revData = dwpRevisionList.filter(item => item.revisionRecordId === Number(revisionId));
-     setRevisionName(revData[0].docType === 'dwp'?'- '+revData[0].divisionMasterDto.divisionCode:'- '+revData[0].divisionGroupDto.groupCode)
+      const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(grpDivId));
+      setGrpDivName(divData.groupDivisionCode);
     }
     setIsAddMode(true);
     setInitialValues({
@@ -144,7 +150,8 @@ const KpiObjectiveMaster = ({router}) => {
       norms     : '',
       target    : '',
       kpiUnitId : 1,
-      revisionRecordId : '0',
+      groupDivisionId : '0',
+      kpiType : '',
       ratings   : Array.from({length : 5},(_,index) => ({startValue : '', endValue : '',rating : index+1  }))
    
     });
@@ -154,7 +161,7 @@ const KpiObjectiveMaster = ({router}) => {
 
   const editKpi = async (item)=>{
 
-    setRevisionName(item.groupDivisionCode)
+    setGrpDivName(item.groupDivisionCode)
     setIsAddMode(false);
     const ratingList = await getKpiRatingList();
     setInitialValues({
@@ -164,20 +171,29 @@ const KpiObjectiveMaster = ({router}) => {
       norms     : item.kpiNorms,
       target    : item.kpiTarget,
       kpiUnitId : item.kpiUnitId,
-      revisionRecordId : item.revisionRecordId,
+      groupDivisionId : item.groupDivisionId,
+      kpiType : item.kpiType,
       ratings   : ratingList.filter(data => Number(data.kpiId) === Number(item.kpiId)).map(item => ({ startValue: item.startValue,endValue: item.endValue, rating: item.kpiRating.toString(),}))
    
     });
     setShowModal(true);
   }
 
-  const onRevisionChange = (value)=>{
-    setRevisionId(value);
+  const onGrpDivChange = (value)=>{
+    setGrpDivMainId(value)
     if(value === 'A'){
-      setDataTable(kpiMasterList)
+      setDataTable(kpiMasterList);
+      setGrpDivId(value);
+      setGrpDivType('C');
+    }else if(value === '0'){
+      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value)))
+      setGrpDivId(value);
+      setGrpDivType('C');
     }else{
-
-      setDataTable(kpiMasterList.filter(data => data.revisionRecordId === value))
+      const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(value));
+      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value) && divData.groupDivisionType === data.kpiType))
+      setGrpDivId(divData.groupDivisionId);
+      setGrpDivType(divData.groupDivisionType);
     }
   }
 
@@ -206,9 +222,9 @@ const KpiObjectiveMaster = ({router}) => {
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
           <Box flex="80%" className='text-center'><h3>Key Process Indicator</h3></Box>
           <Box flex="20%">
-            <SelectPicker options={revisionOptions} label="Division/Group" readOnly = {!isMr} 
-            value={revisionOptions && revisionOptions.length >0 && revisionOptions.find(option => option.value === revisionId) || null}
-             handleChange={(newValue) => {onRevisionChange( newValue?.value) }}/>
+            <SelectPicker options={grpDivOptions} label="Division/Group" readOnly = {!isMr} 
+            value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}
+             handleChange={(newValue) => {onGrpDivChange( newValue?.value) }}/>
           </Box>
          </Box>
           <div id="card-body customized-card">
@@ -220,7 +236,7 @@ const KpiObjectiveMaster = ({router}) => {
           </div>
         </div>
       </div>
-      <KpiratingDialog open={showModal} onClose={handleKpiActionDialogClose} onConfirm={handleKpiActionDialogConfirm} isAddMode={isAddMode} kpiUnitList={kpiUnitList} revisionId={revisionId} initialValues={initialValues} revisionName = {revisionName} flag = 'M' />
+      <KpiratingDialog open={showModal} onClose={handleKpiActionDialogClose} onConfirm={handleKpiActionDialogConfirm} isAddMode={isAddMode} kpiUnitList={kpiUnitList} grpDivId={grpDivId} initialValues={initialValues} grpDivName = {grpDivName} flag = 'M' grpDivType = {grpDivType} />
     </div>
   );
 

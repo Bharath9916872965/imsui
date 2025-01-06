@@ -160,7 +160,7 @@ const ScheduleListComponent = ({router}) => {
     setAssignedAuditeeCount(list.length)
     //setPendingAuditeeCount(Number(totalAuditeeCount)-Number(list.length))
     const mappedData = list.map((item,index)=>{
-      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':'acknowledge')}`;
+      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':['AES'].includes(item.scheduleStatus)?'aditee-sub-clr':['ARS'].includes(item.scheduleStatus)?'aditor-sub-clr':'acknowledge')}`;
       return{
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',

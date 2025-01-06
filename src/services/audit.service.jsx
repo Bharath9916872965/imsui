@@ -54,10 +54,11 @@ export class IqaAuditeeDto{
 }
 
 export class AuditCheckList{
-    constructor(checkListMap,scheduleId,iqaId){
+    constructor(checkListMap,scheduleId,iqaId,iqaNo){
         this.checkListMap = checkListMap;
         this.scheduleId   = scheduleId;
         this.iqaId        = iqaId;
+        this.iqaNo        = iqaNo;
     }
 }
 
@@ -604,26 +605,53 @@ export const getIqaAuditeeList = async (iqaId) => {
     }
   }
 
-  export const addAuditeeRemarks = async (values)=>{
+  export const addAuditeeRemarks = async (values,files)=>{
     try {
         const valuesToSend = {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
-        return (await axios.post(`${API_URL}add-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const formData = new FormData();
+        if(files.length > 0){
+            files.forEach((file) => {
+                if (file) {
+                  formData.append('files', file, file.name);
+                } else {
+                  formData.append('files', new Blob());
+                }
+              });
+        }else{
+            formData.append('files', new Blob());
+        }
+        formData.append('auditCheckListDTO', JSON.stringify(valuesToSend));
+          
+        return (await axios.post(`${API_URL}add-auditee-remarks`,formData,{headers : {'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in addAuditeeRemarks:', error);
         throw error;
     }
   }
 
-  export const updateAuditeeRemarks = async (values)=>{
+  export const updateAuditeeRemarks = async (values,files)=>{
     try {
         const valuesToSend = {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
-        return (await axios.post(`${API_URL}update-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const formData = new FormData();
+        if(files.length > 0){
+            files.forEach((file) => {
+                if (file) {
+                  formData.append('files', file, file.name);
+                } else {
+                  formData.append('files', new Blob());
+                }
+              });
+        }else{
+            formData.append('files', new Blob());
+        }
+        formData.append('auditCheckListDTO', JSON.stringify(valuesToSend));
+        return (await axios.post(`${API_URL}update-auditee-remarks`,formData,{headers : {'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in updateAuditeeRemarks:', error);
         throw error;
@@ -832,3 +860,16 @@ export const getAssignedData = async ()=>{
         throw error;
     }
  }
+
+
+ export const downloadCheckListFile = async (attachment,iqaNo,scheduleId)=>{
+    try {
+        const params = {fileName: attachment,iqaNo: iqaNo,scheduleId:scheduleId};
+        const response = await axios.get(`${API_URL}check-list-file-download`, {
+            params: params,headers: {'Content-Type': 'application/json', ...authHeader(),},responseType: 'arraybuffer',});
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred in downloadCheckListFile:', error);
+        throw error;
+    }
+  }

@@ -133,6 +133,10 @@
   width: 61%;
 }
 
+.width65{
+  width: 65%;
+}
+
 .width67{
   width: 67%;
 }
@@ -195,6 +199,14 @@
 }
 .reschedule{
   color: #F96302 !important;
+}
+
+.aditee-sub-clr{
+  color : #b91cd6 !important;
+}
+
+.aditor-sub-clr{
+  color : #641cd6 !important;
 }
 
 .rating-4{
