@@ -107,7 +107,7 @@ const CorrectiveActionReport = ({router}) => {
       }));
       setIqaList(iqaList)
       setIqaOptions(iqaData)
-      let fiCarList = null;
+      let fiCarList = [];
       let iqa = null;
       if(iqaList.length >0){
          iqa = iqaList[0];
@@ -134,7 +134,6 @@ const CorrectiveActionReport = ({router}) => {
           //setInitiValues(fiCarList,emp,new Date(iqa.fromDate));
         }
       }
-      console.log('fiCarList--------- ',fiCarList)
       if(['Admin','Director','MR','MR Rep'].includes(String(role))){
         setIsAdmin(true);
         setFilCarList(fiCarList);
@@ -420,7 +419,6 @@ const CorrectiveActionReport = ({router}) => {
   }
 
   const forwardCarReport = async ()=>{
-    console.log('element----- ',element.auditStatus)
     element.headId = Number(headId);
       await AlertConfirmation({
         title: element.auditStatus === 'FWD'?'Are you sure Recommend CAR Report ?':element.auditStatus === 'CRM'?'Are you sure Approve CAR Report ?':'Are you sure Forward CAR Report ?' ,
@@ -494,7 +492,7 @@ const CorrectiveActionReport = ({router}) => {
                   </tr>
                 </thead>
                <tbody >
-                {filCarList.length > 0? filCarList.map((obj, i) => {
+                {filCarList && filCarList !== null && filCarList.length > 0? filCarList.map((obj, i) => {
                   return(  
                     <>              
                     <tr  className="table-active box-border">

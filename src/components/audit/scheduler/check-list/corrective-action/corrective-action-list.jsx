@@ -75,7 +75,7 @@ const CorrectiveActionList = ({router}) => {
       }));
       setIqaList(iqaList)
       setIqaOptions(iqaData)
-      let fiCarList = null;
+      let fiCarList = [];
       let iqa = null;
       if(iqaList.length >0){
         iqa = iqaList[0];
@@ -129,7 +129,7 @@ const CorrectiveActionList = ({router}) => {
     const initialAction = new Map();
     const initialEmployee = new Map();
     const initialDates = new Map();
-    if(list.length > 0){
+    if(list && list.length > 0){
       if(list[0].actionPlan === ''){
         list.forEach(element => {
           setActionValueValidation(prev => [...new Set([...prev,String(element.correctiveActionId)])])
@@ -317,7 +317,7 @@ const CorrectiveActionList = ({router}) => {
                   </tr>
                 </thead>
                <tbody >
-                {filCarList.length > 0? filCarList.map((obj, i) => {
+                {filCarList && filCarList !=null && filCarList.length > 0? filCarList.map((obj, i) => {
                   return(                 
                     <tr  className="table-active box-border">
                       <td  className="text-left  box-border"><span className="fn-bold">{obj.carRefNo}</span></td>

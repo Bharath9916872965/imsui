@@ -130,7 +130,7 @@ const ScheduleListComponent = ({router}) => {
         const auditees = scList.map(data => data.auditeeId);
         setFilAuditeeList(auditList.filter(data => !auditees.includes(data.auditeeId)))
         setPendingAuditeeCount(filList.length - scList.length)
-        setDataTable(scList);
+        setDataTable(scList,filList.length);
       }
       setIqaOptions(iqaData)
       setTeamList(team)
@@ -150,9 +150,9 @@ const ScheduleListComponent = ({router}) => {
     fetchData();
   }, [isReady]);
 
-  const setDataTable = (list)=>{
+  const setDataTable = (list,auditeeCount)=>{
     setFilFullScheduleList(list)
-    if(list.length >0 && list[0].scheduleStatus === 'INI' && (Number(totalAuditeeCount)-Number(list.length)) === 0){
+    if(list.length >0 && list[0].scheduleStatus === 'INI' && (Number(auditeeCount)-Number(list.length)) === 0){
       setForwardFlag(true)
     }else{
       setForwardFlag(false)
@@ -315,12 +315,12 @@ const ScheduleListComponent = ({router}) => {
     const scdList   = await getScheduleList();
     const auditList = await getIqaAuditeelist();
     const scList = scdList.filter(data => data.iqaId === iqaId)
-    setDataTable(scList)
     setScheduleList(scdList)
     setFullAuditeeList(auditList)
     const filList = auditList.filter(data => data.iqaId === iqaId);
     setAuditeeList(filList)
     setTotalAuditeeCount(filList.length)
+    setDataTable(scList,filList.length)
     const auditees = scdList.filter(data => data.iqaId === iqaId).map(data => data.auditeeId);
     setFilAuditeeList(auditList.filter(data => !auditees.includes(data.auditeeId)))
     setPendingAuditeeCount(filList.length - scList.length)
@@ -414,9 +414,9 @@ const ScheduleListComponent = ({router}) => {
     setIqaId(value);
     setFilTeamList(teamList.filter(data => data.iqaId === value))
     const scList = scheduleList.filter(data => data.iqaId === value)
-    setDataTable(scList)
     const filList = fullAuditeeList.filter(data => data.iqaId === value);
     setAuditeeList(filList)
+    setDataTable(scList,filList.length)
     setTotalAuditeeCount(filList.length)
     setPendingAuditeeCount(filList.length - scList.length)
     setFilSchRemarks([])
