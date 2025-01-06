@@ -13,8 +13,8 @@ import dayjs from 'dayjs';
 import { format } from "date-fns";
 import * as Yup from "yup";
 import { Field, Formik, Form  } from "formik";
-
-  const scheduleValidation = Yup.object().shape({
+import CarReportPrint from "components/prints/qms/carReport-Print";
+const scheduleValidation = Yup.object().shape({
     completionDate: Yup.date().required('Completion Date is required'),
     rootCause      : Yup.string().required('Root Cause is Required').min(2,'Root Cause must be at least 2 characters').max(990,'Root Cause must not exceed 990 characters')
     .matches( /^[a-zA-Z0-9_ ]*$/,"Root Cause can only contain letters, numbers, and underscores")
@@ -351,7 +351,7 @@ const CorrectiveActionReport = ({router}) => {
           }
         })
     }
-  
+  console.log('filCarList',filCarList);
   return (
     <div>
       <Navbar />
@@ -498,9 +498,12 @@ const CorrectiveActionReport = ({router}) => {
                      { isAddMode? <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="submit" disabled = {!isValid || isSubmitting  }>Submit</Button></Box>:
                     <>{obj.auditStatus === 'INI' &&<Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="btn edit bt-sty" disabled = {!isValid || isSubmitting  }>Update</Button>
                       <Button type="button" variant="contained" className="btn back mg-l-10" onClick={forwardCarReport}>Forward</Button></Box>}</>}
-                     </Form>
+                   </Form>
                     )}
                     </Formik>
+                    <Box className='text-center mg-top-10'> <button onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName)} title="Print" aria-label="Print AuditSchedule"  >
+                      <i className="material-icons">print</i>
+                      </button></Box>
                      </td>
                      </tr>
                     }
