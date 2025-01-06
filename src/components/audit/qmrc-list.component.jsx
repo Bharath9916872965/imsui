@@ -2,7 +2,7 @@ import Datatable from "components/datatable/Datatable";
 import Navbar from "components/Navbar/Navbar";
 import { format } from "date-fns";
 import React, { useEffect, useState } from "react";
-import { getAssignedData, getQmrcList } from "services/audit.service";
+import { getAssignedData, getCommitteeScheduleList, OpenMoMDocument } from "services/audit.service";
 
 const QmrcListComponent = () =>{
 
@@ -11,6 +11,7 @@ const QmrcListComponent = () =>{
     const [showAssignDataModal, setshowAssignDataModal] = useState(false);
     const [selFilterAssignedData,setSelFilterAssignedData]= useState([]);
     const [isReady, setIsReady] = useState(false);
+    const [selLabCode, setSelLabCode] = useState('');
 
     useEffect(() => {
         QmrcListData();
@@ -19,11 +20,14 @@ const QmrcListComponent = () =>{
 
     const QmrcListData = async () => {
         try {
-            const QmrcList = await getQmrcList();
-            const assignedData = await getAssignedData();
+            const LabCode = localStorage.getItem('labCode')
+            const QmrcList = await getCommitteeScheduleList('QMRC');
+            console.log('QmrcList',QmrcList);
+            const assignedData = await getAssignedData('QMRC');
             setAssignData(assignedData);
             mappedData(QmrcList);
             setIsReady(true);
+            setSelLabCode(LabCode);
         } catch (error) {
             console.error('Error fetching data', error);
         } finally {
@@ -58,12 +62,18 @@ const QmrcListComponent = () =>{
                     // venue: item.meetingVenue || "-",
                     action: (
                         <>
-                        <button className=" btn btn-sm me-1" style={{color: 'grey'}} onClick={() => openActionItem(item)} title="Edit"> <i className="material-icons"  >visibility</i></button>
+                        <button className="icon-button print-icon-button" onClick={() => MomDownload(item)} title="MOM"> <i className="material-icons"  >print</i></button>
+                        <button className=" btn btn-sm me-1" style={{color: 'grey', marginBottom: "1rem" }} onClick={() => openActionItem(item)} title="Edit"> <i className="material-icons"  >visibility</i></button>
                         </>
                     ),
                 }))
             );
         };
+    
+
+        const MomDownload = async (item) =>{
+           const openMom = await OpenMoMDocument(item.scheduleId,selLabCode);
+        }
     
     const openActionItem = async (item) =>{
         setshowAssignDataModal(true);

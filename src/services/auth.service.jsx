@@ -39,7 +39,6 @@ export const login = async (username, password) => {
   
         await customAuditStampingLogin(username);
    
-        console.log('response.data------', response.data);
         return response.data;
       }
     } catch (error) {

@@ -1600,7 +1600,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
       <div className="col-md-2 imsCounter">
       <a 
   className="dashboard-links" 
-  href={`/iqa-auditee-list?iqaIdFromDashboard=${encodeURIComponent(iqaIdSelected)}&iqaNoFromDashboard=${encodeURIComponent(iqaNoSelected)}`}
+  href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
 >
           <div className="counter auditee">
               {/* <div className="counter-icon">
@@ -1635,7 +1635,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
       </div> */}
 
 <div className="col-md-2 imsCounter">
-      <a className="dashboard-links">
+      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=N`}> 
           <div className="counter team">
               {/* <div className="counter-icon">
                   <span> <BiLogoMicrosoftTeams  color="White" className="counter-icons"  /></span>
@@ -1647,7 +1647,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
       </div>
 
       <div className="col-md-2  imsCounter">
-      <a className="dashboard-links" href="">
+      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=B`}>
           <div className="counter schedule">
               {/* <div className="counter-icon">
                   <span> <MdScheduleSend  color="White" className="counter-icons"  /></span>
@@ -1659,7 +1659,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
       </div>
 
       <div className="col-md-2 imsCounter">
-      <a className="dashboard-links" href="">
+      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=O`}>
           <div className="counter ofi">
               {/* <div className="counter-icon">
                   <span> <MdScheduleSend  color="White" className="counter-icons"  /></span>
