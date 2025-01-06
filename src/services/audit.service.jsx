@@ -2,6 +2,7 @@ import axios from 'axios';
 import { authHeader } from './auth.header';
 import  config  from "../environment/config";
 import saveAs from 'file-saver'
+import environment from 'environment/environment.dev';
 
 const API_URL=config.API_URL;
 
@@ -54,10 +55,11 @@ export class IqaAuditeeDto{
 }
 
 export class AuditCheckList{
-    constructor(checkListMap,scheduleId,iqaId){
+    constructor(checkListMap,scheduleId,iqaId,iqaNo){
         this.checkListMap = checkListMap;
         this.scheduleId   = scheduleId;
         this.iqaId        = iqaId;
+        this.iqaNo        = iqaNo;
     }
 }
 
@@ -78,6 +80,13 @@ export class MostFqNCDescDto{
         this.auditObsId=auditObsId;
     }
 };
+
+export class AuditTransDto{
+    constructor(id,auditType){
+        this.id = id;
+        this.auditType = auditType;
+    }
+}
 
 
 export const givePreview = (EXT, data, name) => {
@@ -462,9 +471,10 @@ export const getScheduleRemarks = async ()=>{
     }
 }
 
-export const scheduleTran = async (scheduleId)=>{
+export const scheduleTran = async (values)=>{
     try {
-        return (await axios.post(`${API_URL}schedule-tran`,scheduleId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+        console.log('values----- ',values)
+        return (await axios.post(`${API_URL}schedule-tran`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in scheduleTran:', error);
         throw error;
@@ -596,26 +606,53 @@ export const getIqaAuditeeList = async (iqaId) => {
     }
   }
 
-  export const addAuditeeRemarks = async (values)=>{
+  export const addAuditeeRemarks = async (values,files)=>{
     try {
         const valuesToSend = {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
-        return (await axios.post(`${API_URL}add-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const formData = new FormData();
+        if(files.length > 0){
+            files.forEach((file) => {
+                if (file) {
+                  formData.append('files', file, file.name);
+                } else {
+                  formData.append('files', new Blob());
+                }
+              });
+        }else{
+            formData.append('files', new Blob());
+        }
+        formData.append('auditCheckListDTO', JSON.stringify(valuesToSend));
+          
+        return (await axios.post(`${API_URL}add-auditee-remarks`,formData,{headers : {'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in addAuditeeRemarks:', error);
         throw error;
     }
   }
 
-  export const updateAuditeeRemarks = async (values)=>{
+  export const updateAuditeeRemarks = async (values,files)=>{
     try {
         const valuesToSend = {
             ...values,
             checkListMap: convertMapToOrderedArray(values.checkListMap),
         };
-        return (await axios.post(`${API_URL}update-auditee-remarks`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const formData = new FormData();
+        if(files.length > 0){
+            files.forEach((file) => {
+                if (file) {
+                  formData.append('files', file, file.name);
+                } else {
+                  formData.append('files', new Blob());
+                }
+              });
+        }else{
+            formData.append('files', new Blob());
+        }
+        formData.append('auditCheckListDTO', JSON.stringify(valuesToSend));
+        return (await axios.post(`${API_URL}update-auditee-remarks`,formData,{headers : {'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in updateAuditeeRemarks:', error);
         throw error;
@@ -756,18 +793,22 @@ export const insertCorrectiveAction = async (values)=>{
 }
 
 
-export const getQmrcList = async ()=>{
+export const getCommitteeScheduleList = async (committeeType)=>{
     try {
-        return (await axios.post(`${API_URL}get-qmrc-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const data = { committeeType };
+        return (await axios.post(`${API_URL}get-committee-schedule-list`,
+            data,
+            {headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
-        console.error('Error occurred in getQmrcList:', error);
+        console.error('Error occurred in getCommitteeScheduleList:', error);
         throw error;
     }
 }
 
-export const getAssignedData = async ()=>{
+export const getAssignedData = async (committeeType)=>{
     try {
-        return (await axios.post(`${API_URL}get-qmrc-action-assign-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        const data = { committeeType };
+        return (await axios.post(`${API_URL}get-schedule-action-assign-list`,data,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in getAssignedData:', error);
         throw error;
@@ -803,6 +844,64 @@ export const getAssignedData = async ()=>{
         return (await axios.post(`${API_URL}forward-car`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in forwardCar:', error);
+        throw error;
+    }
+  }
+
+
+  export const OpenMoMDocument = async (scheduleId,labcode) =>{
+    try {
+        const response = await axios({
+          method: 'get',
+          url: `${environment.MOM_URL   }`,  // Backend endpoint
+          params: {
+            committeescheduleid: scheduleId,  // Pass scheduleId to backend
+            labcode: labcode,  // Pass labCode if necessary
+          },
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
+          },
+          responseType: 'blob',  // To handle the PDF as binary data (blob)
+        });
+    
+        // Create a Blob URL from the binary data
+        const pdfURL = window.URL.createObjectURL(new Blob([response.data], { type: 'application/pdf' }));
+    
+        // Open the PDF in a new tab
+        window.open(pdfURL, '_blank');  // Open PDF in a new tab
+      } catch (error) {
+        console.error('Error while fetching the PDF:', error);
+      }
+  }
+  
+  export const carApproveEmpData = async (carId)=>{
+    try {
+        return (await axios.post(`${API_URL}car-approve-emp-data`,carId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in carApproveEmpData:', error);
+        throw error;
+    }
+  }
+
+  export const returnCarReport = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}return-car-report`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in returnCarReport:', error);
+        throw error;
+    }
+ }
+
+
+ export const downloadCheckListFile = async (attachment,iqaNo,scheduleId)=>{
+    try {
+        const params = {fileName: attachment,iqaNo: iqaNo,scheduleId:scheduleId};
+        const response = await axios.get(`${API_URL}check-list-file-download`, {
+            params: params,headers: {'Content-Type': 'application/json', ...authHeader(),},responseType: 'arraybuffer',});
+        return response.data;
+    } catch (error) {
+        console.error('Error occurred in downloadCheckListFile:', error);
         throw error;
     }
   }

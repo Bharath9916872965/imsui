@@ -2,6 +2,18 @@
 
 
 /* -------------------------------- */
+.notification-count {
+  position: absolute;
+  top: -1px;  /* Adjust as needed */
+  right: -10px; /* Adjust as needed */
+  background-color: red;
+  color: white;
+  border-radius: 50%;
+  padding: 3px 5px;
+  font-size: 12px;
+  line-height: 1;
+  text-align: center;
+}
 
 .nav-item.dropdown:hover .dropdown-menu {
   display: block;
@@ -133,6 +145,10 @@
   width: 61%;
 }
 
+.width65{
+  width: 65%;
+}
+
 .width67{
   width: 67%;
 }
@@ -197,12 +213,24 @@
   color: #F96302 !important;
 }
 
+.aditee-sub-clr{
+  color : #b91cd6 !important;
+}
+
+.aditor-sub-clr{
+  color : #641cd6 !important;
+}
+
 .rating-4{
   color : rgb(15 189 15) !important;
 }
 
 .acknowledge{
   color: green !important;
+}
+
+.bg-green{
+  background-color: green !important;
 }
 
 .lead-auditee{
@@ -354,12 +382,26 @@
   height: 60px;
 }
 
+.hi-80{
+  height: 80px;
+}
+
 .completionDate{
   margin-top: 17px !important;
 }
 
+.dropdown-menu-left{
+  left: auto!important;
+  right: 0!important;
+  cursor: pointer!important;
+}
+
 .align-top {
   vertical-align: top !important;
+}
+
+.align-bottom {
+  vertical-align: bottom !important;
 }
 
 .top-5-rel{

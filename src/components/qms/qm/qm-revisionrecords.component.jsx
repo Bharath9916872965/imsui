@@ -261,8 +261,11 @@ const QmRevisionRecordsComponent = ({ router }) => {
       );
 
       if (filteredMrRepList && filteredMrRepList.length > 0) {
+        const latestInitiatedBy = VersionRecorList && VersionRecorList.length > 0 && VersionRecorList[0].initiatedBy
+        ? VersionRecorList[0].initiatedBy
+        : filteredMrRepList[0].empId;
         setInitialValues({
-          initiatedBy: filteredMrRepList[0].empId
+          initiatedBy: latestInitiatedBy
         })
       }
 

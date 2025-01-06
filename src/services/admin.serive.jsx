@@ -209,6 +209,39 @@ export const UpdateApprovalAuthority = async(values) =>{
   }
 }
 
+
+export const getNotifiCount= async () => {
+  try {
+      return (await axios.post(`${API_URL}get-notification-count`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in getNotifiCount:', error);
+      throw error;
+  }
+};
+
+
+export const getNotifiList= async () => {
+  try {
+      return (await axios.post(`${API_URL}get-notification-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in getNotifiList:', error);
+      throw error;
+  }
+};
+
+
+
+
+
+export const  updateNotification= async (notificationId) => {
+  console.log("notificationId", notificationId);
+  try {
+      return (await axios.post(`${API_URL}update-notification`,notificationId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in updateNotification:', error);
+      throw error;
+  }
+};
 export const getDivisionMasterList = async () => {
   try {
     const response = await axios.get(
