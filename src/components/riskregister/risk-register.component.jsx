@@ -7,7 +7,7 @@ import AlertConfirmation from "../../common/AlertConfirmation.component";
 import { Autocomplete, ListItemText, TextField } from "@mui/material";
 import withRouter from "common/with-router";
 import { CustomMenuItem } from "services/auth.header";
-import { getRiskRegisterList, insertRiskRegister } from "services/risk.service";
+import { getRiskRegisterList, insertRiskRegister,RiskRegisterMitigation } from "services/risk.service";
 import RiskRegisterPrint from "components/prints/qms/risk-register-print";
 
 
@@ -21,6 +21,7 @@ const RiskRegisterComponent = ({ router }) => {
   const [tblriskRegisterList, setTblRiskRegisterList] = useState([]);
   const [actionFrom, setActionFrom]=useState([]);
   const [element,setElement] = useState('')
+  const [riskregmitList,setriskregmitList]=useState('');
 
  
   const data1 = revisionElements.docType === "dwp" 
@@ -45,14 +46,24 @@ const RiskRegisterComponent = ({ router }) => {
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center',width: '50px', },
     { name: 'Risk Description', selector: (row) => row.riskDescription, sortable: true, grow: 2, align: 'text-start',width: '350px', },
     { name: 'Probability', selector: (row) => row.probability, sortable: true, grow: 2, align: 'text-center',width: '50px', },
-    { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '50px', },
-    { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '50px', },
-    { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center',width: '50px', },
-    { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '50px', },
-    { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '50px', },
+    { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+    { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+    { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+    { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+    { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor: (row) => getBackgroundColorForRiskNo(row.riskNo) },
     { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',width: '150px', },
   ];
 
+  const getBackgroundColorForRiskNo = (riskNo) => {
+    if (riskNo >= 1 && riskNo <= 4) {
+        return 'green'; // Green for riskNo 1-4
+    } else if (riskNo > 4 && riskNo <= 10) {
+        return 'yellow'; // Yellow for riskNo 5-10
+    } else if (riskNo > 10 && riskNo <= 25) {
+        return 'red'; // Red for riskNo 11-20
+    }
+    return 'inherit'; // Default background color if not in the ranges
+};
   useEffect(() => {
     riskRegister();
   }, []);
@@ -62,6 +73,8 @@ const RiskRegisterComponent = ({ router }) => {
       const eleData = router.location.state?.revisionElements;
       setElement(eleData)
       const riskregisterlist = await getRiskRegisterList(revisionElements.revisionRecordId);
+      const riskregMitigationlist = await RiskRegisterMitigation(eleData.groupDivisionId, eleData.docType);
+      setriskregmitList(riskregMitigationlist);
       setTableData(riskregisterlist);
     } catch (error) {
       console.error("Error fetching data:", error);
@@ -231,9 +244,9 @@ const RiskRegisterComponent = ({ router }) => {
             <button className="btn back "  onClick={goBack}>
               Back
             </button>
-            {/* <button className="btn btn-dark" onClick={getDocPDF('', revisionElements)}>
+            <button className="btn btn-dark" onClick={() => RiskRegisterPrint(riskregmitList)}>
               PRINT
-            </button> */}
+            </button>
              </div>
           {showModal && (
             <>

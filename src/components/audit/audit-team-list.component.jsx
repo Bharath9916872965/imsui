@@ -261,7 +261,6 @@ const AuditTeamListComponent = () => {
             </div>
           </div><br />
           <div className="team-list">
-
             {filAuditTeamDtoList.map((team, index) => (
               <div key={index} className="team-card">
                 <h3>{team.teamCode}</h3>

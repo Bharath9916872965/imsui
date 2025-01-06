@@ -140,7 +140,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
         setAmmendInitialValues((prevValues) => ({
           ...prevValues,
           currentVersion: "I1-R0",
-          description: "Original ISSUE and Revision",
+          description: "Original Issue",
         }));
 
         setNewAmendVersion("I1-R0");

@@ -60,3 +60,14 @@ export const insertMitigationRiskRegister = async (values)=>{
         throw error;
     }
 };
+
+export const RiskRegisterMitigation = async (groupDivisionId, docType) => {
+    
+    try {
+        return (await axios.post(`${API_URL}risk-RegMitigation-List/${groupDivisionId}/${docType}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in risk-RegMitigation-List', error);
+        throw error; 
+    }
+    
+};
