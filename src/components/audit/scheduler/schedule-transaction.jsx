@@ -20,6 +20,7 @@ const ScheduleTransactionComponent = () => {
       const data = JSON.parse(localStorage.getItem('scheduleData'));
       if(data){
         setData(data)
+        console.log('data.scheduleId------- ',data.scheduleId)
        const trans = await scheduleTran(new AuditTransDto(data.scheduleId,'S'))
        setTransaction(trans)
       }
