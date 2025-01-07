@@ -239,9 +239,7 @@ const AuditSummaryReport = () => {
 
 
     const handleRadioChange = (event) => {
-      console.log("Event object:", event);
-      console.log("Event target:", event.target);
-      console.log("Event target value:", event.target.value);
+     
       setSelectedOption(event.target.value);
     
     };
@@ -277,13 +275,15 @@ setFilScheduleList(mappedData);
       description: item.description || '-',
       auditorRemarks: item.auditorRemarks || '-'
     }));
+
         setfilNc(mappedData);
     
 }
 const setObs = (list)=>{
+ 
     const mappedData = list.map((item,index)=>({
     sn: index + 1,
-    sectionNo: item.sectionNo || '-',
+    carRefNo: item.carRefNo || '-',
     clauseNo: item.clauseNo || '-',
     description: item.description || '-',
     auditorRemarks: item.auditorRemarks || '-'
@@ -293,13 +293,16 @@ const setObs = (list)=>{
   
 }
 const setOfi = (list)=>{
+
     const mappedData = list.map((item,index)=>({
     sn: index + 1,
-    sectionNo: item.sectionNo || '-',
+    carRefNo: item.carRefNo || '-',
     clauseNo: item.clauseNo || '-',
+    sectionNo: item.sectionNo || '-',
     description: item.description || '-',
     auditorRemarks: item.auditorRemarks || '-'
   }));
+ 
     setfilOfi(mappedData);
   
 }
