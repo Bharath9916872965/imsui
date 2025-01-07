@@ -7,7 +7,7 @@ import './kpi-master.css'
 import withRouter from "common/with-router";
 import SelectPicker from "components/selectpicker/selectPicker";
 import KpiratingDialog from "components/Login/kpiRatingDialog.component";
-
+import kpiMasterPdf from "components/prints/qms/kpi-master-print";
 
 const KpiObjectiveMaster = ({router}) => {
 
@@ -230,7 +230,11 @@ const KpiObjectiveMaster = ({router}) => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="80%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="40%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="30%">
+               <span className="text-heading">&nbsp;   </span>
+               <button className=" btn-primary"  onClick={() =>kpiMasterPdf(filKpiMasterList)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+            </Box>
           <Box flex="20%">
             <SelectPicker options={grpDivOptions} label="Division/Group" readOnly = {!isMr} 
             value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}

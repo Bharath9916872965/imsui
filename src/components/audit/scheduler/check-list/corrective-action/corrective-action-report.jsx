@@ -13,6 +13,7 @@ import dayjs from 'dayjs';
 import { format } from "date-fns";
 import * as Yup from "yup";
 import { Field, Formik, Form  } from "formik";
+import CarReportPrint from "components/prints/qms/carReport-Print";
 import ReturnDialog from "components/Login/returnDialog.component";
 
   const scheduleValidation = Yup.object().shape({
@@ -613,6 +614,9 @@ const CorrectiveActionReport = ({router}) => {
                      </Form>
                     )}
                     </Formik>
+                    <Box className='text-center mg-top-10'> <button onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName)} title="Print" aria-label="Print AuditSchedule"  >
+                      <i className="material-icons">print</i>
+                      </button></Box>
                      </td>
                      </tr>
                     }

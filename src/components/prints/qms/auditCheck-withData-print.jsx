@@ -192,6 +192,30 @@ const tables = mainChapter.map((chapter) => {
       },
     ];
   });
+
+  if (chapter.clauseNo === '8.3.1') {
+    if (imgSource) {
+          subChapterRows.push([
+        {
+          image: imgSource, // Replace with the actual image path or base64 data
+          width: 380, // Adjust width as needed
+          height: 350, // Adjust height as needed
+          alignment: 'center', // Optional alignment
+          colSpan: 2, // Span the image across both columns
+        },
+        {},
+      ]);
+    } else {
+            subChapterRows.push([
+        {
+          text: 'Image Not Uploaded', // Placeholder text when the image is missing
+          colSpan: 2, // Span the text across both columns
+          alignment: 'center', // Optional alignment for the placeholder text
+        },
+        {},
+      ]);
+    }
+  }
   
   const tableBody = [
     [
