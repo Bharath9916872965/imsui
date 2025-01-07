@@ -108,7 +108,7 @@ const CorrectiveActionReport = ({router}) => {
       setIqaList(iqaList)
       setIqaOptions(iqaData)
       let fiCarList = [];
-      let iqa = null;
+      let iqa = '';
       if(iqaList.length >0){
          iqa = iqaList[0];
         setIqaId(iqa.iqaId);
