@@ -73,10 +73,20 @@ const KpiObjectiveMaster = ({router}) => {
       setKpiUnitList(unitList)
       setKpiMasterList(kpiMasterList)
       if(dwpData){
-        setGrpDivMainId(String(dwpData.revisionRecordId))
+        if(dwpData.docType === 'gwp'){
+          setGrpDivType('G');
+          const divData = grpDivList.find(data => Number(data.groupDivisionId) === Number(dwpData.groupDivisionId) && data.groupDivisionType === 'G');
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && data.kpiType === 'G'))
+          setGrpDivMainId(String(divData.groupDivisionMainId))
+        }else{
+          setGrpDivType('D');
+          const divData = grpDivList.find(data => Number(data.groupDivisionId) === Number(dwpData.groupDivisionId) && data.groupDivisionType === 'D');
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && data.kpiType === 'D'))
+          setGrpDivMainId(String(divData.groupDivisionMainId))
+        }
         setDwpData(dwpData)
         setIsMr(false);
-        setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
+        //setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
       }else{
         if(grpDivId === 'A'){
           setDataTable(kpiMasterList)
@@ -191,7 +201,7 @@ const KpiObjectiveMaster = ({router}) => {
       setGrpDivType('C');
     }else{
       const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(value));
-      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value) && divData.groupDivisionType === data.kpiType))
+      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType))
       setGrpDivId(divData.groupDivisionId);
       setGrpDivType(divData.groupDivisionType);
     }

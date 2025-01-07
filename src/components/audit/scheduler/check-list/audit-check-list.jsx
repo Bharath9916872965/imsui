@@ -83,8 +83,6 @@ const AuditCheckListComponent = ({router}) => {
        const obsList   = await getObservation();
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
-
-       console.log('chList----- ',chList)
        
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
@@ -305,7 +303,6 @@ const AuditCheckListComponent = ({router}) => {
     setObservations(initialObservations);
     setAuditorRemarks(initialAuditorRemarks);
     setAuditeeRemarks(initialAuditeeRemarks);
-    console.log('initialAttachmentNames----- ',initialAttachmentNames)
     setAttachmentNames(initialAttachmentNames);
     setIsValidationActive(false)
   }
@@ -481,7 +478,6 @@ const AuditCheckListComponent = ({router}) => {
   }
 
   const handleConfirm = async()=>{
-    console.log('element--- ',element)
     setIsValidationActive(true)
     auditorRemarksValid = false
     const mergedMap = new Map();
@@ -693,10 +689,17 @@ const AuditCheckListComponent = ({router}) => {
       <Navbar />
       <div className="card">
          <Box display="flex" alignItems="center" gap="10px" >
-          <Box flex="87%" className='text-center'><h3>{element && element.iqaNo}: Audit Check List</h3></Box>
+          <Box flex="35%" className='text-center'><h3>{element && element.iqaNo}: Audit Check List</h3></Box>
+          <Box flex="52%" className='text-center'>
+           <span className="clr-unselected color-coding">. </span><span className="p-top-5 fw-bolder">&emsp;Not Submitted</span>&emsp;&emsp;
+           <span className="selected-btn color-coding">. </span><span className="p-top-5 fw-bolder">&emsp;Selected</span>&emsp;&emsp;
+           <span className="auditee-submit color-coding">. </span><span className="p-top-5 fw-bolder">&emsp;Auditee Submit</span>&emsp;&emsp;
+           <span className="compiled color-coding">. </span><span className="p-top-5 fw-bolder">&emsp;Complied</span>&emsp;&emsp;
+           <span className="non-compiled color-coding">. </span><span className="p-top-5 fw-bolder">&emsp;Non-Complied</span>&emsp;&emsp;
+          </Box>
           <Box flex="13%"><button className="btn backClass" onClick={() => back()}>Back</button></Box>
          </Box>
-          <Box className="col-md-11 card l-bg-blue-dark text-left-center-card mg-top-10"  >
+          <Box className="col-md-11 card l-bg-blue-dark text-left-center-card mg-top-10 mg-down-10"  >
             <Box display="flex" alignItems="center" gap="10px">
               <Box flex="22%"><span className="fw-bolder">Date & Time (Hrs)</span> - {element && element.scheduleDate && format(new Date(element.scheduleDate),'dd-MM-yyyy HH:mm')}</Box>
               <Box flex="37%"><span className="fw-bolder">Division/Group/Project</span> - {element && (element.divisionName !== ''?element.divisionName:element.groupName !== ''?element.groupName:element.projectName)}</Box>
@@ -713,7 +716,7 @@ const AuditCheckListComponent = ({router}) => {
                  <Box flex="3%"></Box>
                   {filMainClause.length > 0 &&filMainClause.map(item =>{
                     const fx = 90/filMainClause.length -1;
-                    return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+item.description}</span>}>
+                    return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+item.description}</span>} className="mg-down-10">
                       <button className={((flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) && (new Date(schduleDate) <= new Date()) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
                       (auditeeSuccessBtns.includes(item.sectionNo)?'btn btn-sm bg-auditee-success':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')} 
                       onClick={()=>openTable(Number(item.sectionNo))}>{item.sectionNo}</button></Tooltip></Box>)
@@ -768,12 +771,9 @@ const AuditCheckListComponent = ({router}) => {
                                   selectionCount++;
                                   return(
                                     <tr className="table-active box-border">
-                                     <td className="text-left width60 box-border">
+                                     <td className="text-left width65 box-border">
                                      <Box display="flex" alignItems="center" gap="10px">
-                                     <Box flex="50%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description}
-                                     {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}</Box>
-                                     <Box flex="10%" >
-                                     <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  /></Box>
+                                     <Box flex="42%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description} </Box>
                                       <Box flex="40%">
                                         <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
@@ -787,12 +787,18 @@ const AuditCheckListComponent = ({router}) => {
                                            "& .MuiOutlinedInput-notchedOutline": {border: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? '1px solid red' : '1px solid inherit' },
                                            "& .MuiInputLabel-root.Mui-focused": {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',}}}/>
                                       </Box>
+                                      <Box flex="10%" >
+                                        <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  />
+                                      </Box>
+                                      <Box flex="8%" >
+                                        {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}
+                                      </Box>
                                      </Box>
                                      </td>
                                      <td className="text-center width15 box-border">
       {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions}  value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
                                      readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}</td>  
-                                     <td className="width25 box-border">
+                                     <td className="width20 box-border">
       {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) &&<TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
                                       inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                        InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}
@@ -818,10 +824,7 @@ const AuditCheckListComponent = ({router}) => {
                                <tr  className="table-active box-border">
                                 <td className="text-left width65 box-border">
                                  <Box display="flex" alignItems="center" justifyContent="space-between" gap="10px">
-                                 <Box flex="50%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description}
-                                 {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}</Box>
-                                    <Box flex="10%">
-                                      <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  /></Box>
+                                 <Box flex="42%" className='chapter-sty attach-input'> &emsp;&nbsp;&nbsp;{toLetter(l-1) + ". " + chapter1.description}</Box>
                                     <Box flex="40%">
                                       <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
@@ -834,6 +837,12 @@ const AuditCheckListComponent = ({router}) => {
                                            },
                                            "& .MuiOutlinedInput-notchedOutline": {border: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? '1px solid red' : '1px solid inherit' },
                                            "& .MuiInputLabel-root.Mui-focused": {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',}, }}/>
+                                    </Box>
+                                    <Box flex="10%">
+                                      <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  />
+                                    </Box>
+                                    <Box flex="8%">
+                                      {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}
                                     </Box>
                                  </Box>
                                 </td>

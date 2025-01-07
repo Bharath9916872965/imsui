@@ -215,7 +215,23 @@ const KpiObjectiveAction = ({router}) => {
 
   const getRating = (value,kpiId) =>{
     const filRating = kpiRatingList.filter(data => data.kpiId === kpiId);
-    const rating = filRating.find(item => value >= item.startValue && value <= item.endValue);
+
+    let rating = '';
+    if(Number(value) === 0){
+      for (let i = 0; i < filRating.length; i++) {
+        for (let j = i + 1; j < filRating.length; j++) {
+          if((Number(filRating[i].startValue) === 0 && Number(filRating[j].endValue) === 0 && Number(filRating[i].endValue) === 0 && Number(filRating[j].startValue) === 0)){
+            rating = filRating[j];
+          }
+        }
+      }
+      if(rating === ''){
+        rating = filRating.find(item => value >= item.startValue && value <= item.endValue);
+      }
+    }else{
+       rating = filRating.find(item => value >= item.startValue && value <= item.endValue);
+    }
+
 
     if(value !== '' && rating){
       setKpiRating(prev => new Map(prev).set(kpiId,rating.kpiRating))
