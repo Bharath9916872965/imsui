@@ -44,6 +44,7 @@ import DivisionGroupComponent from 'components/admin/divisionGroup.component';
 import ProjectComponent from 'components/admin/project.component';
 import mrmListComponent from 'components/audit/mrm-list.component';
 import MrmListComponent from 'components/audit/mrm-list.component';
+import AuditClosureComponent from 'components/audit/audit-closure.component';
 
 function App() {
   return (
@@ -81,6 +82,7 @@ function App() {
         <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
         <Route path="/qmrc-list" element={<QmrcListComponent />}/>
         <Route path="/mrm-list" element={<MrmListComponent />}/>
+        <Route path="/audit-closure" element={<AuditClosureComponent />}/>
         
 
         {/* Schedule */}
