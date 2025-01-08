@@ -138,6 +138,91 @@ export const getAllActiveDwpRecordList = async () => {
 
 
 
+export const getProjectListOfPrjEmps = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-project-list-of-prj-emps/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getProjectListOfPrjEmps', error);
+        throw error; 
+    }
+    
+};
+
+export const getDivGroupListOfDivEmps = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-div-group-list-of-div-emps/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDivGroupListOfDivEmps', error);
+        throw error; 
+    }
+    
+};
+
+export const getDivisionListOfDivEmps = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-division-list-of-div-emps/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDivisionsListOfDivEmps', error);
+        throw error; 
+    }
+    
+};
 
 
+
+export const getDivisionListOfDH = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-division-list-of-div-head/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDivisionsListOfDH', error);
+        throw error; 
+    }
+    
+};
+
+
+export const getDivisionListOfGH = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-division-list-of-group-head/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDivisionListOfGH', error);
+        throw error; 
+    }
+    
+};
+
+
+
+
+export const getAllActiveDivisionList = async () => {
+    try {
+      const response = await axios.get(
+        `${API_URL}get-all-active-division-list`,
+        { headers: authHeader() }
+      );
+      return response.data;
+    } catch (error) {
+      console.error('Error occurred in getAllActiveDivisionList:', error);
+      throw error;
+    }
+  };
+
+
+
+
+  export const getTrendNCAndObsList = async () => {
+    try {
+        return (await axios.post(`${API_URL}get-trend-nc-obs-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getTrendNCAndObsList', error);
+        throw error;
+    }
+}
 

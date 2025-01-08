@@ -390,10 +390,15 @@
   margin-top: 17px !important;
 }
 
-.dropdown-menu-left{
-  left: auto!important;
-  right: 0!important;
-  cursor: pointer!important;
+.dropdown-menu-left {
+  left: auto !important;
+  right: 0 !important;
+  cursor: pointer !important;
+  min-height: 150px; /* Set the minimum height */
+  max-height: 300px; /* Set the maximum height */
+  overflow-y: auto; /* Enable vertical scrolling */
+  overflow-x: hidden; /* Prevent horizontal scrolling */
+  white-space: nowrap; /* Prevent text from wrapping to a new line */
 }
 
 .align-top {
