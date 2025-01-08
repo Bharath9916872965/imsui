@@ -5,6 +5,7 @@ import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import dayjs from 'dayjs';
 import { AgCharts } from 'ag-charts-react';
 import { getTrendNCAndObsList } from "services/dashboard.service";
+import "./trend-nc-report.css";
 
 const TrendNCAndOBSReport = () => {
   const [error, setError] = useState(null);
@@ -220,7 +221,7 @@ obs: item.totalCountOBS || 0, // Same for OBS count
                 slotProps={{ textField: { size: 'small', style: { width: '180px' } } }}
               />
             </div>
-            <div className="trend-nc-graph">
+            <div className="trendGraph">
               <AgCharts options={AgChartTrendOfNCandOBSOption} />
             </div>
           </div>
