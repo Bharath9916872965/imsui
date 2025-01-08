@@ -616,7 +616,7 @@ const CorrectiveActionReport = ({router}) => {
                      </Form>
                     )}
                     </Formik>
-                    <Box className='text-center mg-top-10'> <button onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName)} title="Print" aria-label="Print AuditSchedule"  >
+                    <Box className='text-center mg-top-10'> <button onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData)} title="Print" aria-label="Print AuditSchedule"  >
                       <i className="material-icons">print</i>
                       </button></Box>
                      </td>
