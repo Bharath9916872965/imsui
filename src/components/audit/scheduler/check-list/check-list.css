@@ -186,3 +186,11 @@
     align-items: center !important;
     gap: 5px !important;
 }
+
+.color-coding{
+    display: inline-block;
+    transform: scale(8);
+    line-height: 1;
+    position: relative;
+    top: -41px;
+}

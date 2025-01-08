@@ -181,8 +181,13 @@
   margin-top: 10px;
 }
 
+.p-top-5{
+  position: relative;
+  top: 5px;
+}
+
 .mg-down-10{
-  margin-bottom: 10px;
+  margin-bottom: 10px !important;
 }
 .trash-btn{
   color: red !important;
@@ -272,6 +277,18 @@
   color: white !important;
 }
 
+.auditee-submit{
+  color: #ff7215 !important;
+}
+
+.compiled{
+  color: green !important;
+}
+
+.non-compiled{
+  color: red !important;
+}
+
 
 .dropdown {
   margin-right: 10px;
@@ -293,6 +310,10 @@
   background-color: #002CCD !important;
   color: #fff !important;
   font-weight: bolder !important;
+}
+
+.selected-btn{
+  color: #002CCD !important;
 }
 
 .mg-b-10{
@@ -343,6 +364,10 @@
   background-color: #60696b !important;
   color: #fff !important;
   font-weight: bolder !important;
+}
+
+.clr-unselected{
+  color: #60696b !important;
 }
 
 .bg-auditee-success{

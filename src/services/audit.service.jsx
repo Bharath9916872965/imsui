@@ -473,7 +473,6 @@ export const getScheduleRemarks = async ()=>{
 
 export const scheduleTran = async (values)=>{
     try {
-        console.log('values----- ',values)
         return (await axios.post(`${API_URL}schedule-tran`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in scheduleTran:', error);

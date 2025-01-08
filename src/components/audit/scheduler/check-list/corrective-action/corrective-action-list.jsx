@@ -75,8 +75,8 @@ const CorrectiveActionList = ({router}) => {
       }));
       setIqaList(iqaList)
       setIqaOptions(iqaData)
-      let fiCarList = null;
-      let iqa = null;
+      let fiCarList = [];
+      let iqa = '';
       if(iqaList.length >0){
         iqa = iqaList[0];
         setIqaId(iqa.iqaId);
@@ -100,11 +100,11 @@ const CorrectiveActionList = ({router}) => {
       if(['Admin','Director','MR','MR Rep'].includes(String(role))){
         setIsAdmin(true);
         setFilCarList(fiCarList);
-        setInitiValues(fiCarList,emp,new Date(iqa.fromDate));
+        setInitiValues(fiCarList,emp,iqa !== ''?new Date(iqa.fromDate):new Date());
        }else{
         const filList = fiCarList.filter(item => Number(item.auditeeEmpId) === Number(empId));
         setFilCarList(filList);
-        setInitiValues(filList,emp,new Date(iqa.fromDate));
+        setInitiValues(filList,emp,iqa !== ''?new Date(iqa.fromDate):new Date());
         setIsAdmin(false);
 
        }
@@ -129,7 +129,7 @@ const CorrectiveActionList = ({router}) => {
     const initialAction = new Map();
     const initialEmployee = new Map();
     const initialDates = new Map();
-    if(list.length > 0){
+    if(list && list.length > 0){
       if(list[0].actionPlan === ''){
         list.forEach(element => {
           setActionValueValidation(prev => [...new Set([...prev,String(element.correctiveActionId)])])
@@ -317,7 +317,7 @@ const CorrectiveActionList = ({router}) => {
                   </tr>
                 </thead>
                <tbody >
-                {filCarList.length > 0? filCarList.map((obj, i) => {
+                {filCarList && filCarList !=null && filCarList.length > 0? filCarList.map((obj, i) => {
                   return(                 
                     <tr  className="table-active box-border">
                       <td  className="text-left  box-border"><span className="fn-bold">{obj.carRefNo}</span></td>

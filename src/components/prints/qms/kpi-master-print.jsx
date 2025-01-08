@@ -1,16 +1,11 @@
 import pdfMake from 'pdfmake/build/pdfmake';
-import React from 'react';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
-const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
+const KPIMasterPrint = async (data) => {
 try {
     const labDetails = await getLabDetails();
     const logoImg = await getLogoImage();
     const drdoLogo = await getDrdoLogo();
-
-
-    const formattedFromDate = dayjs(iqaFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
-    const formattedToDate = dayjs(iqaToDate).format('DD-MMM YYYY'); 
     const getFormattedDate = () => {
       const date = new Date();
       const weekday = date.toLocaleString('en-IN', { weekday: 'short' });
@@ -28,51 +23,29 @@ try {
     let tableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Date :Time (Hrs)', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Division/Group', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Project', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Auditee', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Team', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Division/Group/LAB', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Objectives', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Metrics', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Norms', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'Target', bold: true, alignment: 'center', style: 'superheader' },
+       
        ],
     ];
 
-    // Add rows to the table body based on data
-    function parseDate(dateString) {
-      if (!dateString) return null; // Handle null or undefined dates
-      const [datePart, timePart] = dateString.split(' ');
-      const [day, month, year] = datePart.split('-');
-      return new Date(`${year}-${month}-${day}T${timePart}`);
-    }
-    
     data.forEach((item, index) => {
-      if (item && Object.keys(item).length > 0) { // Ensure item is not null or empty
-        let formattedDate = '-';
-        if (item.date) {
-          const parsedDate = parseDate(item.date);
-          if (!isNaN(parsedDate)) {
-            formattedDate = new Intl.DateTimeFormat('en-GB', {
-              day: '2-digit',
-              month: 'short',
-              year: 'numeric',
-              hour: '2-digit',
-              minute: '2-digit',
-              hour12: false,
-            }).format(parsedDate);
-          }
+        if (item && Object.keys(item).length > 0) {
+          tableBody.push([
+            { text: index + 1, style: 'normal', alignment: 'center' },
+            { text: item.division || '-', style: 'normal', alignment: 'center' },
+            { text: item.objectives || '-', style: 'normal', alignment: 'left' },
+            { text: item.metrics || '-', style: 'normal', alignment: 'left' },
+            { text: item.norms || '-', style: 'normal', alignment: 'left' },
+            { text: item.target || '-', style: 'normal', alignment: 'left' },
+            
+          ]);
+
         }
-    
-        tableBody.push([
-          { text: index + 1, style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
-          { text: formattedDate || '-', style: 'normal', alignment: 'center', margin: [0, 5, 0, 0] },
-          { text: item.divisionCode || '-', style: 'normal', alignment: 'left', margin: [0, 5, 0, 0] },
-          { text: item.project || '-', style: 'normal', alignment: 'left', margin: [2, 0, 2, 0] },
-          { text: item.auditee || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
-          { text: item.team || '-', style: 'normal', alignment: 'left', margin: [2, 5, 2, 0] },
-        ]);
-        
-      }
-    
-    });
+      });
     
     
     
@@ -82,7 +55,7 @@ try {
       {
         style: 'tableExample',
         table: {
-          widths: [40, 120, 140, 170, 160, 80],
+            widths: ['5%', '15%', '30%',  '30%','10%','10%'],
           body: tableBody,
         },
         margin: [10, 10, 0, 10],
@@ -92,7 +65,7 @@ try {
     // Define the document structure and styles
     const docDefinition = {
       info: {
-        title: 'Audit Schedule Print',
+        title: `KPI Master Print`,
       },
       pageSize: 'A4',
       pageOrientation: 'landscape',
@@ -122,14 +95,14 @@ try {
                       margin: [0, 0, 0, 4],
                     },
                     {
-                      text: `Audit Summary`,
+                      text: ``,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
                       margin: [0, 0, 0, 6],
                     },
                     {
-                      text: `${iqaNo}${'\u00A0'.repeat(2)}:${'\u00A0'.repeat(2)}AUDIT SCHEDULE (${formattedFromDate} - ${formattedToDate})`,
+                        text: `Key Process Indicator`,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
@@ -200,4 +173,4 @@ try {
   }
 };
 
-export default AuditSchedulePrint;
+export default KPIMasterPrint;

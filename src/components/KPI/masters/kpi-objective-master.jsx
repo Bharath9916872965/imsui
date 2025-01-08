@@ -7,7 +7,7 @@ import './kpi-master.css'
 import withRouter from "common/with-router";
 import SelectPicker from "components/selectpicker/selectPicker";
 import KpiratingDialog from "components/Login/kpiRatingDialog.component";
-
+import kpiMasterPdf from "components/prints/qms/kpi-master-print";
 
 const KpiObjectiveMaster = ({router}) => {
 
@@ -73,10 +73,20 @@ const KpiObjectiveMaster = ({router}) => {
       setKpiUnitList(unitList)
       setKpiMasterList(kpiMasterList)
       if(dwpData){
-        setGrpDivMainId(String(dwpData.revisionRecordId))
+        if(dwpData.docType === 'gwp'){
+          setGrpDivType('G');
+          const divData = grpDivList.find(data => Number(data.groupDivisionId) === Number(dwpData.groupDivisionId) && data.groupDivisionType === 'G');
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && data.kpiType === 'G'))
+          setGrpDivMainId(String(divData.groupDivisionMainId))
+        }else{
+          setGrpDivType('D');
+          const divData = grpDivList.find(data => Number(data.groupDivisionId) === Number(dwpData.groupDivisionId) && data.groupDivisionType === 'D');
+          setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && data.kpiType === 'D'))
+          setGrpDivMainId(String(divData.groupDivisionMainId))
+        }
         setDwpData(dwpData)
         setIsMr(false);
-        setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
+        //setDataTable(kpiMasterList.filter(data => Number(data.revisionRecordId) === Number(dwpData.revisionRecordId)))
       }else{
         if(grpDivId === 'A'){
           setDataTable(kpiMasterList)
@@ -191,7 +201,7 @@ const KpiObjectiveMaster = ({router}) => {
       setGrpDivType('C');
     }else{
       const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(value));
-      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value) && divData.groupDivisionType === data.kpiType))
+      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType))
       setGrpDivId(divData.groupDivisionId);
       setGrpDivType(divData.groupDivisionType);
     }
@@ -220,7 +230,11 @@ const KpiObjectiveMaster = ({router}) => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="80%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="40%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          <Box flex="30%">
+               <span className="text-heading">&nbsp;   </span>
+               <button className=" btn-primary"  onClick={() =>kpiMasterPdf(filKpiMasterList)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+            </Box>
           <Box flex="20%">
             <SelectPicker options={grpDivOptions} label="Division/Group" readOnly = {!isMr} 
             value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}
