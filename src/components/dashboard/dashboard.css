@@ -2,6 +2,7 @@
     width: 100%;
 }
 
+
 .dashboard-body{
   /* background: #f2f2f2!important; */
 }
@@ -18,7 +19,9 @@
     scrollbar-width: none;  /* For Firefox */
 }
 
-
+.modal-body.dasdboard-doc-model {
+  max-height:650px!important;
+}
 
 .content-wrapper .page-header h3 span, .content-wrapper .page-header .h3 span {
     font-size: 15px;
@@ -59,6 +62,26 @@
 .dashboard-iqa-select-picker .css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root  {
   color: darkblue!important;
 }
+
+.common-graphs-card{
+  background-color:transparent;
+  margin-top:50px!important;
+  min-height:350px!important;
+}
+
+.master-graphs{
+  padding-top:22px!important;
+}
+
+.user-graphs{
+  padding-top:18px!important;
+}
+
+.audit-graphs-card{
+  background-color:transparent;
+  border:none!important;
+  padding-top:22px!important;
+  }
 
 
 /******************************************/
@@ -243,10 +266,7 @@
 
 
 /********************simple counter start*****************************/
-.audit-graphs-card{
-background-color:transparent;
-border:none!important;
-}
+
 
 .dashboard-links {
   text-decoration: none !important; /* Removes the underline */
@@ -495,11 +515,7 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 
 
 /********************simple counter end*****************************/
-.common-graphs-card{
-  background-color:transparent;
-  margin-top:40px!important;
-  min-height:350px!important;
-}
+
 
 .panel{
   background: transparent;
@@ -669,16 +685,6 @@ background: linear-gradient(45deg, rgb(252, 182, 142), rgb(255, 72, 4)) !importa
 .checkListData{
   padding-left:0px!important;
 }
-
-
-.master-graphs{
-  padding-top:18px!important;
-}
-
-.user-graphs{
-  padding-top:18px!important;
-}
-
 
 
 .toggleIms-tabs{

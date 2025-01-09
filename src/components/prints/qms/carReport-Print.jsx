@@ -2,12 +2,14 @@ import pdfMake from 'pdfmake/build/pdfmake';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 import { format } from "date-fns";
-const CarReportPrint = async (data, iqaNo, projDivgrp, schFromDate, schToDate,carId,auditeeName,headName) => {
+const CarReportPrint = async (data, iqaNo, projDivgrp, schFromDate, schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData) => {
   try {
     console.log('data', data);
     console.log('carId', carId);
     console.log('auditeeName', auditeeName);
-    
+    console.log('initEmpData', initEmpData);
+    console.log('recEmpData', recEmpData);
+    console.log('approvedEmpData', approvedEmpData);
     // Fetch necessary data asynchronously
     const labDetails = await getLabDetails();
     const logoImg = await getLogoImage();
@@ -87,9 +89,25 @@ const filCarList = data ? data.filter(item => carId === item.correctiveActionId)
         table: {
           widths: [165, 165, 165],
           body: [
-            [    { text: 'Project Director ', style: 'superheader' }, 
-                { text: 'Primary Executive', style: 'superheader' },
-                { text: 'MR ', style: 'superheader' },
+            [  {  stack: [
+                { text: initEmpData.length > 0 ? `${initEmpData[0]}\n` : '',  style: 'normal',  },
+                { text: initEmpData.length > 0 ? format(initEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'normal', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+              ].filter(Boolean) 
+            },
+            {  stack: [
+              { text: recEmpData.length > 0 ? `${recEmpData[0]}\n` : '',  style: 'normal',  },
+              { text: recEmpData.length > 0 ? format(recEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'normal', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+            ].filter(Boolean) 
+          },
+          {  stack: [
+            { text: approvedEmpData.length > 0 ? `${approvedEmpData[0]}\n` : '',  style: 'normal',  },
+            { text: approvedEmpData.length > 0 ? format(approvedEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'normal', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+          ].filter(Boolean) 
+        },
+                         ],
+              [    { text: 'Signature of Project Director ', style: 'superheader' }, 
+                { text: 'Signature of Primary Executive', style: 'superheader' },
+                { text: 'Signature of MR ', style: 'superheader' },
               ],
            ]
         },
@@ -148,11 +166,29 @@ const filCarList = data ? data.filter(item => carId === item.correctiveActionId)
         },
         margin: [0, 20, 0, 15], // Reduced vertical margin for closer spacing
       };
-    
+      const forthTable = {
+        style: 'tableExample',
+        table: {
+          widths: [250, 250],
+          body: [
+            [
+              { text: '9. Proposed Corrective Actions by Primary Executive ', style: 'superheader',colSpan: 2 },
+              {  }, 
+            ],
+            [
+              {text: filCarList[0]?.actionPlan || '-', style: 'normal',colSpan: 2 },
+              {  }, 
+            ],
+          ],
+        },
+        margin: [0, 20, 0, 15], 
+      };
+      
       const MyContent = [];
       MyContent.push(firstTable);
       MyContent.push(secondTable);
       MyContent.push(thirdTable);
+      MyContent.push(forthTable);
     // Define document structure and styles
     const docDefinition = {
         info: {

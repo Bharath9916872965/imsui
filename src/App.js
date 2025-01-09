@@ -44,6 +44,7 @@ import DivisionGroupComponent from 'components/admin/divisionGroup.component';
 import ProjectComponent from 'components/admin/project.component';
 import mrmListComponent from 'components/audit/mrm-list.component';
 import MrmListComponent from 'components/audit/mrm-list.component';
+import TrendNCReport from 'components/report/trend-nc-report.component.jsx';
 import AuditClosureComponent from 'components/audit/audit-closure.component';
 
 function App() {
@@ -110,7 +111,7 @@ function App() {
           <Route path="/audit-summary-report" element={<AuditSummaryReport />} />
           <Route path="/nc-report" element={<NcReportComponent />} />
           <Route path="/most-frequent-ncs" element={<MostFrequentNcs />} />
-
+          <Route path="/trend-nc-report" element={<TrendNCReport/>} />
 
          
          {/* QSP */}
