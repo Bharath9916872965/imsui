@@ -885,6 +885,7 @@ const QmRevisionRecordsComponent = ({ router }) => {
           open={openMocDialog}
           onClose={handleCloseMocDialog}
           revisionRecordId={singleDoc.revisionRecordId}
+          statusCode={singleDoc.statusCode}
         />
       )}
       <div className="col-md-12" style={{ textAlign: "center" }}>

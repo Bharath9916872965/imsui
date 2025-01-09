@@ -3,13 +3,15 @@ import { addMappingOfClasses, getMocListById, getQmMocExcel } from "../../../ser
 import * as XLSX from 'xlsx';
 import AlertConfirmation from "../../../common/AlertConfirmation.component";
 
-const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId }) => {
+const QmAddMappingOfClassesDialog = ({ open, onClose, revisionRecordId,statusCode }) => {
   const [data, setData] = useState([]);
   const [isThereAnyFile, setIsThereAnyFile] = useState(false);
 
+  console.log('statusCode',statusCode);
   useEffect(() => {
     const fetchData = async () => {
-      const mocList = await getMocListById(revisionRecordId);
+      const mocList = await getMocListById(revisionRecordId,statusCode);
+      console.log('mocList',mocList);
       setData(mocList);
     }
     fetchData();

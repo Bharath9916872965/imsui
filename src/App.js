@@ -42,8 +42,9 @@ import QmrcListComponent from 'components/audit/qmrc-list.component';
 import DivisionComponent from 'components/admin/division.component';
 import DivisionGroupComponent from 'components/admin/divisionGroup.component';
 import ProjectComponent from 'components/admin/project.component';
-import mrmListComponent from 'components/audit/mrm-list.component';
 import MrmListComponent from 'components/audit/mrm-list.component';
+import AddAbbreviationDialog from 'components/qms/qm/qm-add-doc-content/add-abbreviation-dialog';
+import ProcurementListComponent from 'components/audit/scheduler/check-list/procurement-list-component';
 
 function App() {
   return (
@@ -81,6 +82,7 @@ function App() {
         <Route path="/iqa-auditee-list" element={<IqaAuditeeListComponent />} />
         <Route path="/qmrc-list" element={<QmrcListComponent />}/>
         <Route path="/mrm-list" element={<MrmListComponent />}/>
+        <Route path="/procurement-list" element={<ProcurementListComponent />}/>
         
 
         {/* Schedule */}
@@ -122,7 +124,7 @@ function App() {
          <Route path="/qsp8" element={<QspComponent docName={'qsp8'}/>} />
          <Route path="/qsp-add-content" element={<QspAddDocContentComponent/>} />
 
-         
+         <Route path="/add-abbreviation" element={<AddAbbreviationDialog/>} />
       </Routes>
 {/* <Login/> */}
     </div>
