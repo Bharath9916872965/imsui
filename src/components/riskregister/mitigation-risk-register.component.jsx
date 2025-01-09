@@ -45,6 +45,17 @@ const MitigationRiskRegisterComponent = ({router }) =>{
        
     ];
 
+    const riskColumns = [
+      { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center',width: '50px', },
+      { name: 'Original Risk Description', selector: (row) => row.riskDescription, sortable: true, grow: 2, align: 'text-start',width: '350px', },
+      { name: 'Probability', selector: (row) => row.probability, sortable: true, grow: 2, align: 'text-center',width: '50px', },
+      { name: 'TP', selector: (row) => row.technicalPerformance, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+      { name: 'Time', selector: (row) => row.time, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+      { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+      { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
+      { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor: (row) => getBackgroundColorForRiskNo(row.riskNo) },
+    ];
+
     const getBackgroundColorForRiskNo = (riskNo) => {
       if (riskNo >= 1 && riskNo <= 4) {
           return 'green'; // Green for riskNo 1-4
@@ -107,9 +118,19 @@ const MitigationRiskRegisterComponent = ({router }) =>{
           setTblMitigationRiskData([]);
         }
       };
-      
-      
-      
+
+      const riskSetTableData = [ 
+        {
+            sn: 1,
+            riskDescription: riskRegisterData.riskDescription || '-',
+            probability: riskRegisterData.probability || '-',
+            technicalPerformance: riskRegisterData.technicalPerformance || '-',
+            time: riskRegisterData.time || '-',
+            cost: riskRegisterData.cost || '-',
+            average: riskRegisterData.average || '-',
+            riskNo: riskRegisterData.riskNo || '-',
+        }
+    ];
       const mappedData = (list) => {
         setTblMitigationRiskData(
           list.map((item, index) => ({
@@ -206,9 +227,9 @@ const MitigationRiskRegisterComponent = ({router }) =>{
             <div className="card-body text-center">
                   <h3>{riskRegisterData.docType.toUpperCase()} - {riskRegisterData.divisionCode} : Mitigation Risk Register</h3><br/>
                   <div className="row">
-                    <div className="col-md-12" style={{ textAlign: 'start',color:'blue' }}>
-                    <span style={{color:'black',fontWeight: 'bold'}}>Risk Description :</span> {riskRegisterData.riskDescription}
-                    </div>
+                  <div id="card-body customized-card">
+                            <Datatable columns={riskColumns} data={riskSetTableData}/>
+                  </div>
                   </div><br/>
                   <Formik initialValues={initialValues} enableReinitialize validationSchema={validationSchema}  onSubmit={(values) => {handleSubmit(values, actionValue);}}>
                                           {({ values, errors, touched, setFieldValue, setFieldTouched, submitForm  }) => (
@@ -256,6 +277,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         renderInput={(params) => (
                                                           <TextField {...params} label="Probability" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
+                                                        disableClearable
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
@@ -282,6 +304,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         renderInput={(params) => (
                                                           <TextField {...params} label="Technical Performance" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
+                                                        disableClearable
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
@@ -307,6 +330,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         renderInput={(params) => (
                                                           <TextField {...params} label="Time" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
+                                                        disableClearable
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
@@ -332,6 +356,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                                         renderInput={(params) => (
                                                           <TextField {...params} label="Cost" size="small" fullWidth variant="outlined" margin="normal" />
                                                         )}
+                                                        disableClearable
                                                         ListboxProps={{ sx: { maxHeight: 200, overflowY: "auto" } }}
                                                       />
                                                     )}
@@ -399,7 +424,7 @@ const MitigationRiskRegisterComponent = ({router }) =>{
                                             </Form>
                                           )}
                                         </Formik>
-                  <div id="card-body customized-card">
+                                        <div id="card-body customized-card">
                             <Datatable columns={columns} data={tblMitigationRiskData}/>
                   </div>
               <div>

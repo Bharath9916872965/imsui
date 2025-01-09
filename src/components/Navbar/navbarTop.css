@@ -178,7 +178,7 @@
 }
 
 .mg-top-10{
-  margin-top: 10px;
+  margin-top: 10px !important;
 }
 
 .p-top-5{
@@ -292,6 +292,13 @@
 
 .dropdown {
   margin-right: 10px;
+}
+
+.box-margin{
+  margin-top: 10px !important;
+  margin-right: 10px !important;
+  margin-bottom: 10px !important;
+  margin-left: 10px !important;
 }
 
 .btn-name{

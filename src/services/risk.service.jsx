@@ -61,13 +61,24 @@ export const insertMitigationRiskRegister = async (values)=>{
     }
 };
 
-export const RiskRegisterMitigation = async (groupDivisionId, docType) => {
-    
+export const RiskRegisterMitigation = async (groupDivisionId, docType,revisionRecordId) => {
     try {
-        return (await axios.post(`${API_URL}risk-RegMitigation-List/${groupDivisionId}/${docType}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}risk-RegMitigation-List/${groupDivisionId}/${docType}/${revisionRecordId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in risk-RegMitigation-List', error);
         throw error; 
     }
     
 };
+
+
+export const getallMitigationRiskList = async() =>{
+    try {
+        return (await axios.post(`${API_URL}get-all-mitigation-risk-list`,{} , {
+            headers: authHeader()
+        })).data;
+    } catch (error) {
+        console.error('Error occurred in getallMitigationRiskList', error);
+        throw error;
+    }
+}

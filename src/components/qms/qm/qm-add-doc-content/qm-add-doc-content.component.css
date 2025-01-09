@@ -117,8 +117,52 @@
     height: 1.3em;
   }
 
+  .abbreclass{
+    border-bottom: var(--bs-border-width) var(--bs-border-style) #8c8f92 !important;
+} 
+
 .abbreclass:hover{ 
-    background-color: dimgray;
-    color: white;
-    padding: 5px;
+   background-color: dimgray;
+   color: white;
+   padding: 5px;
+}
+
+.card-delete{
+   box-shadow: rgba(50, 52, 53, 0.3) 0px 1px 2px 0px, rgba(122, 135, 146, 0.15) 0px 2px 6px 2px;
+   height: 500px;
+   scrollbar-width: thin;
+   background-color:  #ecf0f4;
+}
+
+.abbrename {
+   border-bottom: var(--bs-border-width) var(--bs-border-style) #989a9c !important;
+}
+
+.form-check-input{
+   border: double;
+}
+
+.abbresearch{
+   border: 1px solid #0083ff;
+}
+
+.aplhabet-abbre {
+   width: 100px;
+   height: 555px;
+   overflow-y: scroll;
+   margin-top: 31px;
+   scrollbar-width: thin; 
+   background-color: rgb(134, 129, 129);
+}
+
+.aplhabet-abbre::-webkit-scrollbar {
+   width: 6px;
+}
+
+.aplhabet-abbre::-webkit-scrollbar-thumb {
+   border-radius: 10px;
+}
+
+.aplhabet-abbre::-webkit-scrollbar-track {
+   background-color: rgb(134, 129, 129);
 }

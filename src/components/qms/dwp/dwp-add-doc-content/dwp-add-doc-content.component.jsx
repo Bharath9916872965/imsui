@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import withRouter from '../../../../common/with-router';
-import { addDwpChapterNameById, deleteDwpChapterByChapterId, getChapterById, getDwpAllChapters, getDwpChapterById, getDwpSubChaptersById, updateChapterContent, updateDwpChapterContent, updateDwpChapterNameById, updateDwpPagebreakAndLandscape } from "../../../../services/qms.service";
+import { addDwpChapterNameById, deleteDwpChapterByChapterId, getChapterById, getDwpAllChapters, getDwpChapterById, getDwpRevistionRecordById, getDwpSubChaptersById, updateChapterContent, updateDwpChapterContent, updateDwpChapterNameById, updateDwpPagebreakAndLandscape } from "../../../../services/qms.service";
 import { Helmet } from 'react-helmet';
 
 import './dwp-add-doc-content.component.css';
@@ -169,7 +169,9 @@ const DwpAddDocContentComponent = ({ router }) => {
             try {
                 const qmsDocTypeDto = {
                     docType: revisionElements.docType,
-                    groupDivisionId:revisionElements.groupDivisionId
+                    groupDivisionId:revisionElements.groupDivisionId,
+                    revisionRecordId: revisionElements.revisionRecordId,
+                    statusCode: revisionElements.statusCode,
                 }
         
                 setQmsDocTypeDto(qmsDocTypeDto);
@@ -500,6 +502,10 @@ const DwpAddDocContentComponent = ({ router }) => {
         return <DwpDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
     }
 
+    const abbreviationModal = async () =>{
+        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
+        navigate('/add-abbreviation', { state: { revisionData: revision, docType: revisionElements.docType.toUpperCase() } })
+    };
 
     return (
         <div sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowX: 'hidden' }}>
@@ -517,7 +523,8 @@ const DwpAddDocContentComponent = ({ router }) => {
                 <div id="main-wrapper">
                     <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
                         <div align='left' className="d-flex flex-column flex-md-row gap-1">
-                            <button className='btn topButtons' onClick={() => setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button>
+                            {/* <button className='btn topButtons' onClick={() => setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button> */}
+                            <button className='btn topButtons' onClick={abbreviationModal}>Abbreviation New<i className="material-icons" >text_fields</i></button>
                         </div>
                         <div className="d-flex flex-column flex-md-row gap-1">
 

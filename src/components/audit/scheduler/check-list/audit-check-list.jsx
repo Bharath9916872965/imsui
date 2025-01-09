@@ -1,4 +1,4 @@
-import React, { useEffect, useState,useRef } from "react";
+import React, { useEffect, useState,useRef, useCallback } from "react";
 import { Box,Grid,Card,CardContent,Tooltip,TextField} from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
 import '../../auditor-list.component.css';
@@ -44,7 +44,7 @@ const AuditCheckListComponent = ({router}) => {
   const [isAdmin,setIsAdmin] = useState(false)
   const [schduleDate,setSchduleDate] = useState(new Date())
   const [roleId,setRoleId] = useState(0);
-  const [flag,setFlag] = useState('')
+  const [flag,setFlag] = useState('');
   let attachMocId = 0;
   let auditorRemarksValid = false
   let lv1MocId ='';
@@ -70,6 +70,7 @@ const AuditCheckListComponent = ({router}) => {
 
      setRoleId(role)
       const eleData = router.location.state?.element;
+
       const scDate = eleData.scheduleDate;
       const [datePart] = scDate.split(" ")
       
@@ -650,7 +651,8 @@ const AuditCheckListComponent = ({router}) => {
 
   const uploadImage = async()=>{
     if(selectedImage && selectedImage !=null){
-      const response = await uploadCheckListImage(element,selectedImage);
+      //const response = await uploadCheckListImage(element,selectedImage);
+      const response = await uploadCheckListImage(new CheckListImgDto(attachMocId,element.scheduleId,selectedImage.name,element.iqaNo,element.iqaId),selectedImage);
       if(response.message === 'Image successfully uploaded: null'){
         Swal.fire({
           icon: "success",
@@ -683,6 +685,9 @@ const AuditCheckListComponent = ({router}) => {
           givePreview(EXT,response,docName);
   }
 
+ const redirecttoProcureComponent = useCallback((element) => {
+    navigate('/procurement-list', { state: { revisionElements: element } })
+  }, [navigate]);
 
   return (
     <div>
@@ -735,9 +740,20 @@ const AuditCheckListComponent = ({router}) => {
                         <Grid key={i}>
                          <table className="table table-responsive">
                           <thead className="table-light">
+                       
                            <tr>
-                              <th colSpan={3} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+chapter.description}</th>
+                            { chapter.clauseNo !== '8.4' && 
+                                <th colSpan={3} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+chapter.description}</th>
+                            }
+                            {chapter.clauseNo === '8.4' &&
+                            <>
+                              <th colSpan={2} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+chapter.description}</th>
+                              <th  scope="col" className="text-right"><button  className="icon-button edit-icon-button me-1" onClick={() => redirecttoProcureComponent(element)} title="Procurement">Procurement Details</button></th>
+                            </>
+
+                            }
                            </tr>
+                          
                           </thead>
                           <tbody>
                            {masterChapters.map((chapter1,j) => {

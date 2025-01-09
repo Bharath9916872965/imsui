@@ -30,9 +30,9 @@ export const updatechapterPagebreakAndLandscape = async (chapterPagebreakOrLands
     }
 }
 
-export const getQmAllChapters = async () => {
+export const getQmAllChapters = async (revisionRecordId,statusCode) => {
     try {
-        return (await axios.post(`${API_URL}get-all-qm-chapters`, {}, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}get-all-qm-chapters/${revisionRecordId}`, statusCode, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getQmAllChapters', error);
         throw error;
@@ -233,9 +233,9 @@ export const getQmMocExcel = async () => {
     }
 }
 
-export const getMocListById = async (revisionRecordId) => {
+export const getMocListById = async (revisionRecordId,statusCode) => {
     try {
-        return (await axios.post(`${API_URL}get-moclist`, revisionRecordId, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        return (await axios.post(`${API_URL}get-moclist/${revisionRecordId}`, statusCode, { headers: { 'Content-Type': 'plain/text', ...authHeader() } })).data;
     } catch (error) {
         console.error('Error occurred in getMocListById', error);
         throw error;
@@ -253,7 +253,11 @@ export const getDwpVersionRecordDtoList = async (qmsDocTypeDto) => {
 
 export const getDwpAllChapters = async (qmsDocTypeDto) => {
     try {
-        return (await axios.post(`${API_URL}get-all-dwp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        if(qmsDocTypeDto.statusCode==='APD'){
+            return (await axios.post(`${API_URL}get-all-dwp-chapters-rev`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        }else{
+            return (await axios.post(`${API_URL}get-all-dwp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        }
     } catch (error) {
         console.error('Error occurred in getDwpAllChapters', error);
         throw error;
@@ -474,7 +478,11 @@ export const updateQspPagebreakAndLandscape = async (chapterPagebreakOrLandscape
 
 export const getQspAllChapters = async (qmsDocTypeDto) => {
     try {
-        return (await axios.post(`${API_URL}get-all-qsp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        if(qmsDocTypeDto.statusCode==='APD'){
+            return (await axios.post(`${API_URL}get-all-qsp-chapters-rev`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        }else{
+            return (await axios.post(`${API_URL}get-all-qsp-chapters`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        }
     } catch (error) {
         console.error('Error occurred in getQspAllChapters', error);
         throw error;
@@ -737,6 +745,15 @@ export const qspRevisionTran = async (revisionRecordId)=>{
         return (await axios.post(`${API_URL}qsp-revision-tran`,revisionRecordId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in qspRevisionTran:', error);
+        throw error;
+    }
+}
+
+export const addNewAbbreviations = async (abbreData) => {
+    try {
+        return (await axios.post(`${API_URL}add-new-abbreviation`, abbreData, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addNewAbbreviations', error);
         throw error;
     }
 }
