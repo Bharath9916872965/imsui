@@ -4,6 +4,8 @@ import { Box } from "@mui/material";
 import Navbar from "../Navbar/Navbar";
 import Datatable from "../datatable/Datatable";
 import mostFrequentNcsPdf from "components/prints/qms/mostFrequent-Ncs-print";
+
+
 const MostFrequentNcs = () => {
   const [filmostFrequentNcsList, setFilmostFrequentNcsList] = useState([]);
   const [loading, setLoading] = useState(true);
@@ -62,6 +64,11 @@ const MostFrequentNcs = () => {
                <Box flex="25%">
                <span className="text-heading">&nbsp;   </span>
                <button className=" btn-primary"  onClick={() =>mostFrequentNcsPdf(filmostFrequentNcsList)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
+               &nbsp; &nbsp; &nbsp; &nbsp;
+               {/* <button className="btn btn-outline-danger btn-sm me-1"  onClick={() =>mostFrequentNcsPdf(filmostFrequentNcsList)} title="Pdf"  > <i className="material-icons">picture_as_pdf</i> </button>
+               &nbsp;&nbsp; &nbsp; &nbsp;
+               <button className="btn btn-outline-primary btn-sm me-1"  onClick={() =>mostFrequentNcsPdf(filmostFrequentNcsList)} title="Word"  >   <i className="material-icons">description</i></button>
+           */}
             </Box>
           </Box>
           <div id="card-body customized-card">
