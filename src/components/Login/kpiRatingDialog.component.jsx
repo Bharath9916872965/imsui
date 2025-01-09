@@ -31,8 +31,8 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,grpDiv
     kpiUnitId : Yup.string().required("Unit is required"),
     ratings   : Yup.array().of(
       Yup.object({
-        startValue : Yup.number().typeError("Start Value Must be a number").required("Start Value is required"),
-        endValue   : Yup.number().typeError("End Value Must be a number").required("End Value is required"),
+        startValue : Yup.number().typeError("Start Value Must be a number").required("Start Value is required").integer("Start Value must be a whole number").min(0, "Start Value must be a natural number (0 or greater)"),
+        endValue   : Yup.number().typeError("End Value Must be a number").required("End Value is required").integer("End Value must be a whole number").min(0, "End Value must be a natural number (0 or greater)"),
         rating     : Yup.number().typeError("Rating Must be a number").required("Ratinge is required"),
       })
     ).test("unique-range", "Ranges in ratings must not overlap", (ratings,context) => {

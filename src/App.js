@@ -45,6 +45,8 @@ import ProjectComponent from 'components/admin/project.component';
 import MrmListComponent from 'components/audit/mrm-list.component';
 import AddAbbreviationDialog from 'components/qms/qm/qm-add-doc-content/add-abbreviation-dialog';
 import ProcurementListComponent from 'components/audit/scheduler/check-list/procurement-list-component';
+import TrendNCReport from 'components/report/trend-nc-report.component.jsx';
+import AuditClosureComponent from 'components/audit/audit-closure.component';
 
 function App() {
   return (
@@ -83,6 +85,7 @@ function App() {
         <Route path="/qmrc-list" element={<QmrcListComponent />}/>
         <Route path="/mrm-list" element={<MrmListComponent />}/>
         <Route path="/procurement-list" element={<ProcurementListComponent />}/>
+        <Route path="/audit-closure" element={<AuditClosureComponent />}/>
         
 
         {/* Schedule */}
@@ -110,7 +113,7 @@ function App() {
           <Route path="/audit-summary-report" element={<AuditSummaryReport />} />
           <Route path="/nc-report" element={<NcReportComponent />} />
           <Route path="/most-frequent-ncs" element={<MostFrequentNcs />} />
-
+          <Route path="/trend-nc-report" element={<TrendNCReport/>} />
 
          
          {/* QSP */}

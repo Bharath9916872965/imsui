@@ -77,8 +77,6 @@ const Navbar = (props) => {
 
   const fetchHeaderModuleDetailList = async (imsFormRoleId) => {
     try {
-      console.log('dsdsds count'+await getNotifiCount());
-      console.log('dsdsds list'+JSON.stringify(await getNotifiList()));
       const moduleDetailListResponse = await getHeaderModuleDetailList(imsFormRoleId);
       setHeaderModuleDetailList(moduleDetailListResponse);
       const notifiCount = await getNotifiCount();

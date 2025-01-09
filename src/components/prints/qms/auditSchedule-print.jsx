@@ -3,13 +3,10 @@ import React from 'react';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
 const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
-
-  try {
-
+try {
     const labDetails = await getLabDetails();
     const logoImg = await getLogoImage();
     const drdoLogo = await getDrdoLogo();
-
 
 
     const formattedFromDate = dayjs(iqaFromDate).format('DD-MMM YYYY'); // Converts to 17-Mar 2024
@@ -75,7 +72,6 @@ const AuditSchedulePrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
         
       }
     
-
     });
     
     
