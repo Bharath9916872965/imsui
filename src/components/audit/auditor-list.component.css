@@ -91,6 +91,14 @@
     background-color: #28a745;
   }
 
+  .auditees{
+    background-color: #a17627;
+  }
+
+  .auditee-sub{
+    background-color: #007bff;
+  }
+
   .pending-count{
     background-color: #dc3545;
   }
@@ -101,4 +109,19 @@
     font-weight: bold;
     text-align: left;
   }
+
+  .form-control {
+    display: inline-block;
+    width: auto;
+  }
+  
+
+  #summernote {
+    text-align: left !important;
+  }
+  
+  .note-editable {
+    text-align: left !important;
+  }
+  
   

@@ -43,6 +43,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
   const [filteredMrList, setFilteredMrList] = useState([]);
   const [filteredDivisionalMrList, setFilteredDivisionalMrList] = useState([]);
   const [dwpGwpList, setDwpGwpList] = useState([]);
+  const [selDivId, setSelDivId] = useState([]);
 
   const [openAddIssueDialog, setOpenAddIssueDialog] = useState(false);
   const [newAmendVersion, setNewAmendVersion] = useState("");
@@ -87,9 +88,20 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
   useEffect(() => {
     const fetchGroupData = async () => {
       const { empName, designation, empId, imsFormRoleId, formRoleName } = await getLoginEmployeeDetails();
+      const divroleName = localStorage.getItem('roleName')
+      const selectedempId = localStorage.getItem('empId')
+      const empIdAsNum = Number(selectedempId);
+      const userManagerList = await getUserManagerList();
+      const seldivisionId=userManagerList.find(data => data.empId===empIdAsNum && data.formRoleName===divroleName);
+      console.log('seldivisionId',seldivisionId);
+      setSelDivId(seldivisionId);
+
+      setUserManagerList(userManagerList);
       const divisionId = router.location.state?.divisionId;
-      setDwpDivisionList(imsFormRoleId, empId,divisionId);
+      
+      setDwpDivisionList(imsFormRoleId, empId,divisionId,divroleName,seldivisionId);
       setDwpDivisionGroupList(imsFormRoleId, empId,divisionId);
+     
     }
     fetchGroupData();
   }, [])
@@ -105,7 +117,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
       const selempId = localStorage.getItem('empId')
       const empIdAsNumber = Number(selempId);
       setLoginEmpId(empIdAsNumber);
-
+      
       var divId = 0;
 
       if (groupDivisionId) {
@@ -145,8 +157,7 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
 
         setNewAmendVersion("I1-R0");
       }
-      const userManagerList = await getUserManagerList();
-      setUserManagerList(userManagerList);
+     
       const statusClasses = {
         INI: 'initiated',
         FWD: 'forwarde',
@@ -392,10 +403,9 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
     window.open('/dwp-revision-tran', '_blank');
   }
 
-  const setDwpDivisionList = async (imsFormRoleId, empId,divisionId) => {
+  const setDwpDivisionList = async (imsFormRoleId, empId,divisionId,rolename,seldivisionId) => {
 
     const dwpDivisionList = await getDwpDivisionList(imsFormRoleId, empId);
-
     if (dwpDivisionList && dwpDivisionList.length > 0) {
       if (docName === 'dwp') {
         if(divisionId){
@@ -408,8 +418,12 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
       }
     }
 
-    setDivisionList(dwpDivisionList);
-
+    if(rolename==='Divisional MR'){
+      const matchedDivision = dwpDivisionList.filter(div => div.divisionId === seldivisionId.divisionId);
+      setDivisionList(matchedDivision);
+    }else{
+      setDivisionList(dwpDivisionList);
+    }
   };
 
   const setDwpDivisionGroupList = async (imsFormRoleId, empId,groupId) => {

@@ -7,7 +7,7 @@ import AlertConfirmation from "../../common/AlertConfirmation.component";
 import { Autocomplete, ListItemText, TextField } from "@mui/material";
 import withRouter from "common/with-router";
 import { CustomMenuItem } from "services/auth.header";
-import { getRiskRegisterList, insertRiskRegister,RiskRegisterMitigation } from "services/risk.service";
+import { getallMitigationRiskList, getRiskRegisterList, insertRiskRegister,RiskRegisterMitigation } from "services/risk.service";
 import RiskRegisterPrint from "components/prints/qms/risk-register-print";
 
 
@@ -22,6 +22,8 @@ const RiskRegisterComponent = ({ router }) => {
   const [actionFrom, setActionFrom]=useState([]);
   const [element,setElement] = useState('')
   const [riskregmitList,setriskregmitList]=useState('');
+  const [allriskList, setAllRiskList] = useState([]);
+  const [isReady,setIsReady] = useState(false)
 
  
   const data1 = revisionElements.docType === "dwp" 
@@ -51,6 +53,7 @@ const RiskRegisterComponent = ({ router }) => {
     { name: 'Cost', selector: (row) => row.cost, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
     { name: 'Average', selector: (row) => row.average, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor : 'lightgrey' },
     { name: 'Risk No', selector: (row) => row.riskNo, sortable: true, grow: 2, align: 'text-center',width: '50px',bgColor: (row) => getBackgroundColorForRiskNo(row.riskNo) },
+    { name: 'Revision No', selector:(row) => row.revisionNo, sortable: true, geow: 2, align: 'text-center', width: '50px'},
     { name: 'Action', selector: (row) => row.action, sortable: true, grow: 2, align: 'text-center',width: '150px', },
   ];
 
@@ -66,16 +69,19 @@ const RiskRegisterComponent = ({ router }) => {
 };
   useEffect(() => {
     riskRegister();
-  }, []);
+  }, [isReady]);
 
   const riskRegister = async () => {
     try {
       const eleData = router.location.state?.revisionElements;
       setElement(eleData)
       const riskregisterlist = await getRiskRegisterList(revisionElements.revisionRecordId);
-      const riskregMitigationlist = await RiskRegisterMitigation(eleData.groupDivisionId, eleData.docType);
+      const allMitigationRiskList = await getallMitigationRiskList();
+      const riskregMitigationlist = await RiskRegisterMitigation(eleData.groupDivisionId, eleData.docType,revisionElements.revisionRecordId);
       setriskregmitList(riskregMitigationlist);
       setTableData(riskregisterlist);
+      setAllRiskList(allMitigationRiskList);
+      setIsReady(true)
     } catch (error) {
       console.error("Error fetching data:", error);
     } finally {
@@ -88,21 +94,50 @@ const RiskRegisterComponent = ({ router }) => {
   }
 
   const setTableData = (list) => {
-    const mappedData = list.map((item, index) => ({
-      sn: index + 1,
-      riskDescription: item.riskDescription || '-',
-      probability: item.probability || '-',
-      technicalPerformance: item.technicalPerformance || '-',
-      time: item.time || '-',
-      cost: item.cost || '-',
-      average: item.average || '-',
-      riskNo: item.riskNo || '-',
-      action: (
-        <><button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editRiskRegister(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
-        <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => AddSubRiskRegister(item)} title="Add"> <i className="material-icons"  >add</i></button>
-        </>
-      ),
-    }));
+    const mappedData = list.map((item, index) => {
+      let probabilityVal = '';
+      let technicalPerformanceVal = '';
+      let timeVal = '';
+      let costVal = '';
+      let averageVal = '';
+      let riskNoVal = '';
+      let revisionNoVal=0;
+      const mitList = allriskList.find(data => data.riskRegisterId == item.riskRegisterId);
+      if(mitList){
+        probabilityVal = mitList.probability || '-'
+        technicalPerformanceVal = mitList.technicalPerformance || '-'
+        timeVal = mitList.time || '-'
+        costVal = mitList.cost || '-'
+        averageVal = mitList.average || '-'
+        riskNoVal = mitList.riskNo || '-'
+        revisionNoVal= mitList.revisionNo 
+      }else{
+         probabilityVal = item.probability || '-'
+         technicalPerformanceVal = item.technicalPerformance || '-'
+         timeVal = item.time || '-'
+         costVal = item.cost || '-'
+         averageVal = item.average || '-'
+         riskNoVal = item.riskNo || '-'
+         revisionNoVal= 0
+      }
+      return{
+        sn: index + 1,
+        riskDescription: item.riskDescription || '-',
+        probability: probabilityVal || '-',
+        technicalPerformance: technicalPerformanceVal || '-',
+        time: timeVal || '-',
+        cost: costVal || '-',
+        average: averageVal || '-',
+        riskNo: riskNoVal || '-',
+        revisionNo: revisionNoVal!==0 ? revisionNoVal : 0 ,
+        action: (
+          <>
+          {!mitList && <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editRiskRegister(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>}
+          <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => AddSubRiskRegister(item)} title="Add"> <i className="material-icons"  >add</i></button>
+          </>
+        ),
+      }
+    });
     setTblRiskRegisterList(mappedData);
   }
 

@@ -4,21 +4,25 @@ import Navbar from "../Navbar/Navbar";
 import "./dashboard.css";
 import { Autocomplete, TextField, Box, ListItemText } from '@mui/material';
 import { CustomMenuItem } from 'services/auth.header';
-import {getIqaAuditeeList,getAuditeeTeamDtoList,getScheduleList} from "services/audit.service";
-import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
-import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount,
-  getTotalChecklistObsCountByIqa,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList}
-   from "services/dashboard.service";
-   
-import QmDocPrint from 'components/prints/qms/qm-doc-print';
-import DwpDocPrint from "components/prints/qms/dwp-doc-print";
+import { format } from "date-fns";
 import { AgCharts } from 'ag-charts-react'; 
 import Datatable from "components/datatable/Datatable";
-import {getDwpDivisionList,getDwpDivisionGroupList,getDwpProjectList,qspDocumentList} from "services/qms.service";
 
-
-import { format } from "date-fns";
+import QmDocPrint from 'components/prints/qms/qm-doc-print';
 import QspDocPrint from "components/prints/qms/qsp-doc-print";
+import DwpDocPrint from "components/prints/qms/dwp-doc-print";
+
+import {getIqaAuditeeList,getAuditeeTeamDtoList,getScheduleList} from "services/audit.service";
+
+import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
+
+import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount, getTotalChecklistObsCountByIqa
+ ,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList
+,getProjectListOfPrjEmps,getDivGroupListOfDivEmps,getDivisionListOfDivEmps,getDivisionListOfDH,getDivisionListOfGH,getAllActiveDivisionList}
+   from "services/dashboard.service";
+
+   import {qspDocumentList} from "services/qms.service";
+   
 
 
 const labelColorsChecklist = {
@@ -33,25 +37,19 @@ const labelColorsChecklist = {
 
 const Dashboard = () => {
 
-    //const [activeAuditeesCount,setActiveAuditeesCount] = useState(0);
-    //const [activeTeamsCount,setActiveTeamsCount] = useState(0);
-    //const [activeSchedulesCount,setActiveSchedulesCount] = useState(0);
-    //const [auditTeamFullList, setAuditTeamFullList] = useState([]);
-    // const [teamsCountBasedOnIqaSel,setTeamsCountBasedOnIqaSel] = useState(0);
-    // const [schedulesCountBasedOnIqaSel,setSchedulesCountBasedOnIqaSel] = useState(0);
-    //const isHidden =currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' );
-
-
   let currentLoggerRoleName = localStorage.getItem('roleName');
-  let currentLoggerRoleId = localStorage.getItem('roleId');
-  let currentLoggerEmpId = localStorage.getItem('empId');
-  let currentLoggerDivId = localStorage.getItem('divId');
-  let currentLoggerGroupId = localStorage.getItem('groupId');
- 
+  let currentLoggerRoleId =   localStorage.getItem('roleId');
+  let currentLoggerEmpId =    localStorage.getItem('empId');
 
+ 
+  const [isReady, setIsReady] = useState(false);
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaAuditeeFullList, setIqaAuditeeFullList] = useState([]);
   const [iqaOptions,setIqaOptions] = useState([]);
+
+  const [divisionMasterList, setDivisionMasterList] = useState([]);
+  const [divisionListOfDH, setDivisionListOfDH] = useState([]);
+  const [divisionListOfGH, setDivisionListOfGH] = useState([]);
   const [divisionListByRoleId, setDivisionListByRoleId] = useState([]);
   const [groupListByRoleId, setGroupListByRoleId] = useState([]);
   const [projectListByRoleId, setProjectListByRoleId] = useState([]);
@@ -91,6 +89,15 @@ const Dashboard = () => {
 
   
 
+    //const [activeAuditeesCount,setActiveAuditeesCount] = useState(0);
+    //const [activeTeamsCount,setActiveTeamsCount] = useState(0);
+    //const [activeSchedulesCount,setActiveSchedulesCount] = useState(0);
+    //const [auditTeamFullList, setAuditTeamFullList] = useState([]);
+    // const [teamsCountBasedOnIqaSel,setTeamsCountBasedOnIqaSel] = useState(0);
+    // const [schedulesCountBasedOnIqaSel,setSchedulesCountBasedOnIqaSel] = useState(0);
+    //const isHidden =currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' );
+
+
 
 
 
@@ -109,32 +116,85 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
    /////////////////Filter RoleWise ////////////////////
    let scheduleListRoleWise = [];
+   
       if (currentLoggerRoleName &&
            ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
       ){
-            let divisionIdsForLoggerRoleId = divisionListByRoleId
-            .map(division => division.divisionId)
-            .join(','); // Join all division IDs
+           
+        let divisionIdOfDH = divisionListOfDH
+        ? divisionListOfDH.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+        : '';
+         console.log('divisionIdOfDH: ' + divisionIdOfDH);
+    
+        let divisionIdOfGH = divisionListOfGH
+        ? divisionListOfGH.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+        : '';
+        console.log('divisionIdOfGH: ' + divisionIdOfGH);
+    
+        let divisionIdsForLoggerRoleId = divisionListByRoleId
+        ? divisionListByRoleId.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+        : ''; 
+         console.log('divisionIdOfDivisionEmployees: ' + divisionIdsForLoggerRoleId);
 
-            let groupIdsForLoggerRoleId = groupListByRoleId
-           .map(group => group.groupId)
-           .join(','); // Join all group division IDs
+        let currentLoggerDivId = localStorage.getItem('divId');
+        console.log('divisionIdOfCurrentEmployee: '+currentLoggerDivId);
+
+        // Combine all four division ID strings into one array, remove duplicates, and then join them back into a string
+           let uniqueDivisionIds = [
+             ...new Set(
+                (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
+                 .concat(divisionIdOfGH.split(',').filter(Boolean))
+                 .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
+                 .concat(currentLoggerDivId.split(',').filter(Boolean))
+               )
+            ]
+            .sort((a, b) => a - b)
+            .join(',');
+            console.log('Unique Division IDs: ' + uniqueDivisionIds);
+            
+           // If uniqueDivisionIds is not empty, filter schedules by divisionId
+           if (uniqueDivisionIds) {
+            const divisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+            const divisionMatchedSchedules = filteredSchedules.filter(schedule =>
+            divisionIdsArray.includes(Number(schedule.divisionId))
+           );
+           scheduleListRoleWise = [...scheduleListRoleWise, ...divisionMatchedSchedules];
+         }
+
+          //prev way
+          //   let groupIdsForLoggerRoleId = groupListByRoleId
+          //  .map(group => group.groupId)
+          //  .join(','); 
+
+          let groupIdsForLoggerRoleId = '';
+          if (uniqueDivisionIds) {
+          const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+           // Filter divisionMasterList to include only entries with matching divisionId
+            const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
+            uniqueDivisionIdsArray.includes(Number(division.divisionId))
+           );
+           // Extract groupIds from the matched divisions, or leave groupIdsForLoggerRoleId as an empty string if no matches
+               groupIdsForLoggerRoleId = matchedDivisionsToGetGroupIds.length > 0
+             ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
+              : '';
+           }
+          console.log('groupIdsForLoggerRoleId: '+groupIdsForLoggerRoleId);
 
            let projectIdsForLoggerRoleId = projectListByRoleId
            .map(group => group.projectId)
            .join(','); // Join all group project IDs
+           console.log('projectIdsForLoggerRoleId: '+projectIdsForLoggerRoleId);
 
 
 
 
-           // If divisionIdsForLoggerRoleId is not empty, filter schedules by divisionId
-           if (divisionIdsForLoggerRoleId) {
-             const divisionIdsArray = divisionIdsForLoggerRoleId.split(',').map(Number);
-             const divisionMatchedSchedules = filteredSchedules.filter(schedule =>
-             divisionIdsArray.includes(Number(schedule.divisionId))
-            );
-            scheduleListRoleWise = [...scheduleListRoleWise, ...divisionMatchedSchedules];
-          }
+    
 
           // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
           if (groupIdsForLoggerRoleId) {
@@ -168,8 +228,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         && !filteredSchedules.some(schedule => schedule.auditeeId === auditeeValSel)) {
       setAuditeeValSel(0); // Reset to "All"
       //setSchedulesCountBasedOnIqaSel(filteredSchedules.length);
-     
-    
 
     }
 
@@ -184,10 +242,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
         const updateGraphsData = async (iqaId, iqaNo, selectedTypeData, currentAuditeeIdSel) => {
           try {
-            
- 
-
-
             //from dwpDivisionList you can compare and filter by divisionId column
 
           let dataForKPI = [
@@ -212,12 +266,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
       let checkListByObsBasedOnIqaIdSelData = checkListDetailsBasedOnObservation.filter(item => item.iqaId === iqaId && item.auditeeId === currentAuditeeIdSel);
         
              if (checkListByObsBasedOnIqaIdSelData && checkListByObsBasedOnIqaIdSelData.length > 0) {
-              
-
-     
-
                   // Extract the first (and only) row that matches the condition
-      
         const entry = checkListByObsBasedOnIqaIdSelData[0];
              ///////////////////////COUNTER START////////////////////////////////////
                setTotalObsBasedOnIqaSel({
@@ -227,8 +276,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
        });
        ///////////////////////COUNTER END////////////////////////////////////
 
-
-        
         dataForObs = [entry.countOfNC, entry.countOfOBS, entry.countOfOFI]; 
         if (entry.divisionId > 0) {
           selAuditeeName =   entry.divisionName  
@@ -237,13 +284,12 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         } else if (entry.groupId > 0) {
           selAuditeeName =   entry.groupName  
           docType = "gwp";  
-          groupDivisionId = entry.groupId;                      // Dynamic data for group
+          groupDivisionId = entry.groupId;                      
         } else if (entry.projectId > 0) {
-          selAuditeeName =   entry.projectName                        // Dynamic data for project
+          selAuditeeName =   entry.projectName                    
         }
 
-
-        //////////////////KPI logic startedif currentAuditeeIdSel > 0 then KPI /////
+        //////////////////KPI logic started if currentAuditeeIdSel > 0 then KPI /////
         let revisionId = 0;
         const dwpRevisionList = await getAllActiveDwpRecordList();
         if (dwpRevisionList) {
@@ -254,23 +300,24 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
             if (filteredRows.length > 0) {
  
                 // Find the row with the highest revisionNo
-    const highestRevisionRow = filteredRows.reduce((max, current) => {
-      return current.revisionNo > max.revisionNo ? current : max;
-  });
+          const highestRevisionRow = filteredRows.reduce((max, current) => {
+            return current.revisionNo > max.revisionNo ? current : max;
+         });
   
-   // Extract the RevisionRecordId from the highest revision row
-   revisionId = highestRevisionRow.revisionRecordId;
+          //  the RevisionRecordId from the highest revision row was previously used for KPI
+          revisionId = highestRevisionRow.revisionRecordId;
 
             }
         }
 
         const kpiMasterList = await getKpiMasterList();
         const kpiObjRatingList = await getKpiObjRatingList();
+        //console.log('kpi data'+JSON.stringify(kpiObjRatingList));
 
           if (Array.isArray(kpiObjRatingList) && kpiObjRatingList.length > 0) {
             const filratingData = kpiObjRatingList.filter(
               (item) =>
-                Number(item.revisionRecordId) === Number(revisionId) &&
+                Number(item.groupDivisionId) === Number(groupDivisionId) &&
                 iqaId === item.iqaId
             );
            if (filratingData.length > 0) {
@@ -282,10 +329,9 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                   }));
             
           } else {
-             
                 const filKpiMasterData = kpiMasterList.filter(
                 (item) =>
-                  Number(item.revisionRecordId) === Number(revisionId) ||
+                  Number(item.groupDivisionId) === Number(groupDivisionId) ||
                  item.revisionRecordId === '0'
                  );
                 if (filKpiMasterData.length > 0) {
@@ -301,13 +347,8 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
           }else{
 
           }
-          
 
-
-
-            //dynamic data
-
-             }else {
+        }else {
                dataForObs = [0, 0, 0]; // Static data for when no auditee is selected
                setTotalObsBasedOnIqaSel({
                 totalCountNC: 0,
@@ -380,9 +421,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
               setAgChartObsForAuditeeSelOption(doughnutOptionsObsAuditeeSel);
 
 
-            ////KPI violet/////
-
- 
+            ////KPI Options/////
             const doughnutOptionsKPIAuditeeSel = {
               title: {
                 text: `KPI Statistics for ${iqaNo} and the Auditee ${selAuditeeName}`,
@@ -479,7 +518,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                   totalCountOBS: 0,
                   totalCountOFI: 0
                 });
-                console.log('No data found in all auditee graphs');
+
                 setAgChartChecklistOptions({
                   title: {
                     text: `Internal Quality Audit ${modifiedIqaNo}`,
@@ -505,7 +544,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                   totalCountOBS: 0,
                   totalCountOFI: 0
                 });
-                console.log('No data found in all auditee graphs');
+
                 setAgChartChecklistOptions({
                   title: {
                     text: `Internal Quality Audit ${modifiedIqaNo}`,
@@ -523,31 +562,78 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
               let checkListByObsRoleWise = [];
                 /////////////////Filter RoleWise ////////////////////
+              
+                //Admin,Director,MR and MR-Rep should get all only for below roles restriction
                 if (currentLoggerRoleName &&
-                  ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
+                  ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
                 ){
-                  let divisionIdsForLoggerRoleId = divisionListByRoleId
-                  .map(division => division.divisionId)
-                  .join(','); // Join all division IDs
-                  
-                  let groupIdsForLoggerRoleId = groupListByRoleId
-                 .map(group => group.groupId)
-                 .join(','); // Join all group division IDs
 
-                 let projectIdsForLoggerRoleId = projectListByRoleId
-                 .map(group => group.projectId)
-                 .join(','); // Join all group project IDs
-      
-                
-                 // If divisionIdsForLoggerRoleId is not empty, filter schedules by divisionId
-                 if (divisionIdsForLoggerRoleId) {
-                   const divisionIdsArray = divisionIdsForLoggerRoleId.split(',').map(Number);
-                   const divisionMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
-                   divisionIdsArray.includes(Number(checkList.divisionId))
-                  );
-                  checkListByObsRoleWise = [...checkListByObsRoleWise, ...divisionMatchedSchedules];
-                }
-      
+                  let divisionIdOfDH = divisionListOfDH
+                  ? divisionListOfDH.map(division => division.divisionId)
+                      .sort((a, b) => a - b) 
+                      .join(',')
+                  : '';
+              
+                  let divisionIdOfGH = divisionListOfGH
+                  ? divisionListOfGH.map(division => division.divisionId)
+                      .sort((a, b) => a - b) 
+                      .join(',')
+                  : '';
+              
+                  let divisionIdsForLoggerRoleId = divisionListByRoleId
+                  ? divisionListByRoleId.map(division => division.divisionId)
+                      .sort((a, b) => a - b) 
+                      .join(',')
+                  : ''; 
+          
+                  let currentLoggerDivId = localStorage.getItem('divId');
+          
+                  // Combine all four division ID strings into one array, remove duplicates, and then join them back into a string
+                     let uniqueDivisionIds = [
+                       ...new Set(
+                          (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
+                           .concat(divisionIdOfGH.split(',').filter(Boolean))
+                           .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
+                           .concat(currentLoggerDivId.split(',').filter(Boolean))
+                         )
+                      ]
+                      .sort((a, b) => a - b)
+                      .join(',');
+                      
+                     // If uniqueDivisionIds is not empty, filter schedules by divisionId
+                     if (uniqueDivisionIds) {
+                      const divisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+                      const divisionMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
+                      divisionIdsArray.includes(Number(checkList.divisionId))
+                     );
+                     checkListByObsRoleWise = [...checkListByObsRoleWise, ...divisionMatchedSchedules];
+                   }
+
+
+
+                //   let groupIdsForLoggerRoleId = groupListByRoleId
+                //  .map(group => group.groupId)
+                //  .join(','); 
+
+                 //prev way
+          //   let groupIdsForLoggerRoleId = groupListByRoleId
+          //  .map(group => group.groupId)
+          //  .join(','); 
+
+          let groupIdsForLoggerRoleId = '';
+          if (uniqueDivisionIds) {
+          const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+           // Filter divisionMasterList to include only entries with matching divisionId
+            const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
+            uniqueDivisionIdsArray.includes(Number(division.divisionId))
+           );
+           // Extract groupIds from the matched divisions, or leave groupIdsForLoggerRoleId as an empty string if no matches
+               groupIdsForLoggerRoleId = matchedDivisionsToGetGroupIds.length > 0
+             ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
+              : '';
+           }
+          console.log('groupIdsForLoggerRoleId: '+groupIdsForLoggerRoleId);
+
                 // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
                 if (groupIdsForLoggerRoleId) {
                 const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
@@ -557,6 +643,11 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                 checkListByObsRoleWise = [...checkListByObsRoleWise, ...groupMatchedSchedules];
                }
 
+               let projectIdsForLoggerRoleId = projectListByRoleId
+               .map(group => group.projectId)
+               .join(','); // Join all group project IDs
+    
+       
                // If projectIdsForLoggerRoleId is not empty, filter schedules by projectId
               if (projectIdsForLoggerRoleId) {
                   const projectIdsArray = projectIdsForLoggerRoleId.split(',').map(Number);
@@ -579,7 +670,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                 totalCountOBS: 0,
                 totalCountOFI: 0
               });
-              console.log('No data found in all graphs');
+
               setAgChartChecklistOptions({
                 title: {
                   text: `Internal Quality Audit ${modifiedIqaNo}`,
@@ -751,76 +842,8 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
   }
 };
 
-
-    const fetchData = async () => {
-      try {
-        const qmDetails = await getQmDashboardDetailedList();
-       const qspRevisionRecordDetails = await qspDocumentList();
-        const activeAuditorsCount = await getActiveAuditorsCount();
-        //const activeAuditeesCount = await getActiveAuditeeCount();
-        const IqaList = await getIqaDtoListForDahboard();
-
-        const divisionListByRoleId = await getDwpDivisionList(currentLoggerRoleId, currentLoggerEmpId);
-        setDivisionListByRoleId(divisionListByRoleId);
-
-          const groupListByRoleId = await getDwpDivisionGroupList(currentLoggerRoleId, currentLoggerEmpId);
-        setGroupListByRoleId(groupListByRoleId);
-
-        const projectListByRoleId = await getDwpProjectList(currentLoggerRoleId, currentLoggerEmpId);
-        setProjectListByRoleId(projectListByRoleId);
-        
-
-
-        //const AuditTeamDtoList = await getAuditeeTeamDtoList();
-  
-
-        setQMRecordList(qmDetails);
-        setQSPRecordList(qspRevisionRecordDetails);
-  
-        // qmDetails 
-        //const [qmDetailedData, setqmDetailedData] = useState({});
-        // if (qmDetails && qmDetails.length > 0) {
-        //   setqmDetailedData(qmDetails[0]); // Store just the first item
-        //   setQMNo('I' + qmDetails[0].issueNo + '-R' + qmDetails[0].revisionNo); // Update QMNo
-        // }
-
-         // activeAuditorsCount 
-         setActiveAuditorsCount(activeAuditorsCount);
-         // activeAuditeesCount 
-         //setActiveAuditeesCount(activeAuditeesCount);
-         //activeTeams
-         //const activeTeamsCount = await getActiveTeams();
-        // setActiveTeamsCount(activeTeamsCount);
-         //activeSchedules
-         //const activeSchedules = await getActiveSchedules();
-        // setActiveSchedulesCount(activeSchedules);
-
-        // Iqa dropdown and default iqa selection 
-     
-          setIqaFullList(IqaList);
-          const iqaData = IqaList.map(data => ({
-                          value : data.iqaId,
-                          label : data.iqaNo
-                      }));
-               
-          let iqaNoSelected = '';  
-          let iqaIdSelected = '';          
-          if(IqaList.length >0){
-            const iqa = IqaList[0];
-            iqaNoSelected = iqa.iqaNo;
-            iqaIdSelected = iqa.iqaId;
-            setIqaNo(iqa.iqaNo)
-            setIqaId(iqa.iqaId)
-       
-            const IqaAuditeeDtoList = await getIqaAuditeeList(iqa.iqaId);
-
-            if (IqaAuditeeDtoList && IqaAuditeeDtoList.length > 0) {
-              setIqaAuditeeFullList(IqaAuditeeDtoList);
-              setAuditeeCountBasedOnIqaSel(IqaAuditeeDtoList.length);
-            } else {
-              setAuditeeCountBasedOnIqaSel(0);
-            }
-
+       // previous fetch data involved below methods
+          //const AuditTeamDtoList = await getAuditeeTeamDtoList();
             // if (AuditTeamDtoList && AuditTeamDtoList.length > 0) {
             //   setAuditTeamFullList(AuditTeamDtoList);
             //   const filteredTeams = AuditTeamDtoList.filter(data => data.iqaId === iqa.iqaId);
@@ -828,35 +851,99 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             // } else {
             //   setTeamsCountBasedOnIqaSel(0);
             // }
+            // activeAuditeesCount 
+             //const activeAuditeesCount = await getActiveAuditeeCount();
+            //setActiveAuditeesCount(activeAuditeesCount);
+            //activeTeams
+            //const activeTeamsCount = await getActiveTeams();
+            // setActiveTeamsCount(activeTeamsCount);
+            //activeSchedules
+            //const activeSchedules = await getActiveSchedules();
+            // setActiveSchedulesCount(activeSchedules);
 
-            
+           
+
+    const fetchData = async () => {
+      try {
+        const qmDetails = await getQmDashboardDetailedList();
+           setQMRecordList(qmDetails);
+        const qspRevisionRecordDetails = await qspDocumentList();
+           setQSPRecordList(qspRevisionRecordDetails);
+        const activeAuditorsCount = await getActiveAuditorsCount();
+           setActiveAuditorsCount(activeAuditorsCount);
+       
+      //division active master list
+      const divisionsActiveMasterList = await getAllActiveDivisionList();
+      setDivisionMasterList(divisionsActiveMasterList);
+
+
+      //division head  get all his divisions
+      const divisionsListOfDivisionHead = await getDivisionListOfDH(currentLoggerRoleId, currentLoggerEmpId);
+      setDivisionListOfDH(divisionsListOfDivisionHead);
+
+      //group head get all his divisions
+      const divisionsListOfGroupHead = await getDivisionListOfGH(currentLoggerRoleId, currentLoggerEmpId);
+      setDivisionListOfGH(divisionsListOfGroupHead);
+       
+       
+      //division Employees
+        const divisionListByRoleId = await getDivisionListOfDivEmps(currentLoggerRoleId, currentLoggerEmpId);
+           setDivisionListByRoleId(divisionListByRoleId);
+           
+       //group Employees   
+        const groupListByRoleId = await getDivGroupListOfDivEmps(currentLoggerRoleId, currentLoggerEmpId);
+           setGroupListByRoleId(groupListByRoleId);
+       
+       //project Employees      
+       const projectListByRoleId = await getProjectListOfPrjEmps(currentLoggerRoleId, currentLoggerEmpId);
+           setProjectListByRoleId(projectListByRoleId);
+   
+        // Iqa dropdown and default iqa selection 
+          const IqaList = await getIqaDtoListForDahboard();
+          setIqaFullList(IqaList);
+          const iqaData = IqaList.map(data => ({
+                          value : data.iqaId,
+                          label : data.iqaNo
+                      }));
+          if(IqaList.length >0){
+            const iqa = IqaList[0];
+            setIqaNo(iqa.iqaNo)
+            setIqaId(iqa.iqaId)
+       
+          const IqaAuditeeDtoList = await getIqaAuditeeList(iqa.iqaId);
+
+          if (IqaAuditeeDtoList && IqaAuditeeDtoList.length > 0) {
+              setIqaAuditeeFullList(IqaAuditeeDtoList);
+              setAuditeeCountBasedOnIqaSel(IqaAuditeeDtoList.length);
+           } else {
+              setAuditeeCountBasedOnIqaSel(0);
+           }
+
+            //groupDivisionId comparison is removed everyone can see every doc of dwp amd gwp
             const dwpVersionRecordList = await getAllVersionRecordDtoList({
               docType: 'dwp',
-              groupDivisionId: (currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' )) 
-                ? '0' 
-                : currentLoggerDivId,
+              groupDivisionId: '0',
+              // groupDivisionId: (currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' )) 
+              //   ? '0' 
+              //   : currentLoggerDivId,
             });
             
             const gwpVersionRecordList = await getAllVersionRecordDtoList({
             docType: 'gwp',
-            groupDivisionId: (currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' )) 
-            ? '0' 
-            : currentLoggerGroupId,
+            groupDivisionId: '0',
+            // groupDivisionId: (currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' )) 
+            // ? '0' 
+            // : currentLoggerGroupId,
            });
             setDWPRecordList(dwpVersionRecordList);
             setGWPRecordList(gwpVersionRecordList);
-
-     
-            await scheduleListBasedOnLoggerRole(iqaIdSelected,iqaNoSelected)
-            await updateGraphsData(iqaIdSelected,iqaNoSelected,'div',0);
+            
+           // Once all required data is fetched and set then call scheduleListBasedOnLoggerRole and updateGraphsData in below user Graph
+            setIsReady(true);
 
           }
           setIqaOptions(iqaData)
-     
-    
-         // setAuditeeOptions(auditeeData)
-
-    
+           
         } catch (error) {
           console.error("Error fetching data:", error);
         }
@@ -865,11 +952,52 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
       useEffect(() => {
         fetchData();
       }, []);
+
+
+      useEffect(() => {
+        if (isReady) {
+          // Only call these functions once all required data is ready
+          (async () => {
+            try {
+              await scheduleListBasedOnLoggerRole(iqaIdSelected, iqaNoSelected);
+              await updateGraphsData(iqaIdSelected, iqaNoSelected, 'div', 0);
+            } catch (error) {
+              console.error("Error in post-ready operations:", error);
+            }
+          })();
+        }
+      }, [isReady]);
+
   // Now, print the qmDetailedData object properly in the console
 
 
   
+
   
+const getQMDocPDF = (action, revisionElements) => {;
+  return <QmDocPrint action={action} revisionElements={revisionElements} />
+}
+
+// const handleQMDocPrint = () => {
+//   if (!qmRecordList || qmRecordList.length === 0) {
+//     alert('QM Print is not available.');
+//     return;
+//   }
+//   console.log('qmRecordList:', qmRecordList);
+
+//   const validItem = qmRecordList.find(item => !["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode));
+
+//   if (validItem) {
+//     console.log('validItem success');
+//     <div>
+//     <>
+//     {getQMDocPDF('', validItem)}
+//   </>
+//   </div>
+//   } else {
+//     alert('QM Print is not available for current status.');
+//   }
+// };
 
   const openQMPopUpModal = ()=>{
     setQMShowModal(true);
@@ -915,17 +1043,37 @@ const columnsQM = [
   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
 ];
 
-const getQMDocPDF = (action, revisionElements) => {
-  return <QmDocPrint action={action} revisionElements={revisionElements} />
-}
+
+
+const mappedDataQM = qmRecordList.map((item, index) => ({
+  sn: index + 1,
+  description: item.description || '-' || '-',
+  // from: 'V' + item[5] + '-R' + item[6] || '-',
+  from: index + 1 < qmRecordList.length ? 'I' + qmRecordList[index + 1].issueNo + '-R' + qmRecordList[index + 1].revisionNo : '--',
+  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+  status: item.statusCode || '--',
+  action: (
+    <div>
+      {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
+        <>
+          {getQMDocPDF('', item)}
+        </>
+      )}
+    </div>
+  ),
+}));
+
 
 const columnsQSP = [
-   { name: 'QSP', selector: (row) => row.qsp, sortable: true, grow: 1, align: 'text-center', width: '30%'  },
-   { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start', width: '25%'  },
-   { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
-   { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
-   { name: 'Date Of Revision', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
-   { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center', width: '15%'  },
+   { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '5%'  },
+   { name: 'QSP', selector: (row) => row.qsp, sortable: true, grow: 1, align: 'text-center', width: '10%'  },
+   { name: 'QSP Name', selector: (row) => row.qspName, sortable: true, grow: 1, align: 'text-left', width: '30%'  },
+  //  { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start', width: '25%'  },
+  //  { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+  //  { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center', width: '5%'  },
+  //  { name: 'Date Of Revision', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
+  //  { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center', width: '15%'  },
    { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center', width: '20%'  },
 ];
 
@@ -958,44 +1106,39 @@ qspRecordList.forEach((item) => {
 const maxRevisionRecords = Object.values(groupedByDocName);
 
 
-const reversedMaxRevisionRecords = [...maxRevisionRecords].reverse();
+// Sort by `revisionRecordId` from old to new 
+// const sortedMaxRevisionRecords = [...maxRevisionRecords].sort((a, b) => a.revisionRecordId - b.revisionRecordId);
 
-const mapQspData = reversedMaxRevisionRecords.map((item, index) => ({
-  qsp: documentNameMapping[item.docName] || '-', // Get document name from the mapping
-  description: item.description || '-',
-  from: index + 1 < reversedMaxRevisionRecords.length
-    ? 'I' + reversedMaxRevisionRecords[index + 1].issueNo + '-R' + reversedMaxRevisionRecords[index + 1].revisionNo
-    : '--',
-  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-  status: item.statusCode || '--',
-  action: (
-    <div>
-                {getDocPDFQSP('', item)}
-    </div>
-  ),
-}));
+// Sort based on numeric value extracted from the 4th character of docName
+const sortedMaxRevisionRecords = [...maxRevisionRecords].sort((a, b) => {
+  const numA = parseInt(a.docName.slice(3)); // Remove the first 3 characters and convert to number
+  const numB = parseInt(b.docName.slice(3)); // Remove the first 3 characters and convert to number
+  return numA - numB; // Ascending order
+});
 
 
+const mapQspData = sortedMaxRevisionRecords.map((item, index) => {
+  const [qspCode, qspFullName] = documentNameMapping[item.docName]?.split(' - ') || ['-', '-'];
+  return {
+    sn: index + 1,
+    qsp: qspCode || '-', 
+    qspName: qspFullName || '-', 
+    // description: item.description || '-',
+    // from: index + 1 < sortedMaxRevisionRecords.length
+    //   ? 'I' + sortedMaxRevisionRecords[index + 1].issueNo + '-R' + sortedMaxRevisionRecords[index + 1].revisionNo
+    //   : '--',
+    // to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+    // issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+    // status: item.statusCode || '--',
+    action: (
+      <div>
+        {getDocPDFQSP('', item)}
+      </div>
+    ),
+  };
+});
 
-const mappedDataQM = qmRecordList.map((item, index) => ({
-  sn: index + 1,
-  description: item.description || '-' || '-',
-  // from: 'V' + item[5] + '-R' + item[6] || '-',
-  from: index + 1 < qmRecordList.length ? 'I' + qmRecordList[index + 1].issueNo + '-R' + qmRecordList[index + 1].revisionNo : '--',
-  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-  status: item.statusCode || '--',
-  action: (
-    <div>
-      {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
-        <>
-          {getQMDocPDF('', item)}
-        </>
-      )}
-    </div>
-  ),
-}));
+
 
 const getDocPDF = (action, revisionElements) => {
   return <DwpDocPrint action={action} revisionElements={revisionElements} />
@@ -1003,21 +1146,27 @@ const getDocPDF = (action, revisionElements) => {
 
 const columnsDWP = [
   { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-  { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
-  { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
+  { name: 'Division Code', selector: (row) => row.divCode, sortable: true, grow: 1, align: 'text-center' },
+  { name: 'Division Name', selector: (row) => row.divName, sortable: true, grow: 1, align: 'text-left' },
+  // { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
+  // { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
 ];
 
+
+
 const mappedDataDWP = dwpRecordList.map((item, index) => ({
   sn: index + 1,
-  description: item.description || '-' || '-',
-  from: index + 1 < dwpRecordList.length ? 'I' + dwpRecordList[index + 1].issueNo + '-R' + dwpRecordList[index + 1].revisionNo : '--',
-  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-  status: item.statusCode || '--',
+  divCode: item.divisionMasterDto ? item.divisionMasterDto.divisionCode : '-',
+  divName: item.divisionMasterDto ? item.divisionMasterDto.divisionName : '-',
+  // description: item.description || '-' || '-',
+  // from: index + 1 < dwpRecordList.length ? 'I' + dwpRecordList[index + 1].issueNo + '-R' + dwpRecordList[index + 1].revisionNo : '--',
+  // to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+  // issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+  // status: item.statusCode || '--',
   action: (
     <div>
       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
@@ -1031,20 +1180,27 @@ const mappedDataDWP = dwpRecordList.map((item, index) => ({
 
 const columnsGWP = [
   { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-  { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
-  { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
+  { name: 'Group Code', selector: (row) => row.grpCode, sortable: true, grow: 1, align: 'text-center' },
+  { name: 'Group Name', selector: (row) => row.grpName, sortable: true, grow: 1, align: 'text-center' },
+  
+  // { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
+  // { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
+  // { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
 ];
+
+
 const mappedDataGWP = gwpRecordList.map((item, index) => ({
   sn: index + 1,
-  description: item.description || '-' || '-',
-  from: index + 1 < gwpRecordList.length ? 'I' + gwpRecordList[index + 1].issueNo + '-R' + gwpRecordList[index + 1].revisionNo : '--',
-  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-  status: item.statusCode || '--',
+  grpCode:item.divisionGroupDto ? item.divisionGroupDto.groupCode : '-',
+  grpName:item.divisionGroupDto ? item.divisionGroupDto.groupName : '-',
+  // description: item.description || '-' || '-',
+  // from: index + 1 < gwpRecordList.length ? 'I' + gwpRecordList[index + 1].issueNo + '-R' + gwpRecordList[index + 1].revisionNo : '--',
+  // to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+  // issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+  // status: item.statusCode || '--',
   action: (
     <div>
       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
@@ -1448,13 +1604,22 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
 
           <div className="col-md-2  docs-panel">
           <div className="row docs-row" >
- 
-            <div className="docs-div qm " onClick={() => openQMPopUpModal()}>
+
+{/* <div className="docs-div qm" onClick={handleQMDocPrint}>
+  <div className="docs-content">
+    <span className="docs-label">QM</span>
+  </div>
+</div> */}
+
+
+
+             <div className="docs-div qm " onClick={() => openQMPopUpModal()}> 
                 <div className="docs-content">
                     <span className="docs-label">QM</span> 
                 </div>
-            </div>
-            {showQMModal && (
+                </div>
+
+             {showQMModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
               <div className="modal-dialog modal-lg modal-xl-custom">
                 <div className="modal-content" >
@@ -1465,7 +1630,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                     </button>
                   </div>
 
-                  <div className="modal-body model-max-height">
+                  <div className="modal-body model-max-height dasdboard-doc-model">
 
                   <div id="card-body customized-card">
                     <Datatable columns={columnsQM} data={mappedDataQM} />
@@ -1476,7 +1641,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
               </div>
             </div>
 
-          )}
+          )} 
       
         
             <div className="docs-div qsp " onClick={() => openQSPPopUpModal()}>
@@ -1495,7 +1660,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                     </button>
                   </div>
 
-                  <div className="modal-body model-max-height">
+                  <div className="modal-body model-max-height dasdboard-doc-model">
                  
                   <div id="card-body customized-card">
                     <Datatable columns={columnsQSP} data={mapQspData} />
@@ -1529,7 +1694,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                     </button>
                   </div>
 
-                  <div className="modal-body model-max-height">
+                  <div className="modal-body model-max-height dasdboard-doc-model">
                  
                 
                   <div id="card-body customized-card">
@@ -1564,7 +1729,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                     </button>
                   </div>
 
-                  <div className="modal-body model-max-height">
+                  <div className="modal-body model-max-height dasdboard-doc-model">
 
                   <div id="card-body customized-card">
                     <Datatable columns={columnsGWP} data={mappedDataGWP} />

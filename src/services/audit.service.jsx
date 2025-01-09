@@ -88,6 +88,15 @@ export class AuditTransDto{
     }
 }
 
+export class AuditClosureDTO{
+    constructor(closureId,iqaId,content,completionDate){
+        this.closureId      = closureId;
+        this.iqaId          = iqaId;
+        this.content        = content;
+        this.completionDate = completionDate;
+    }
+}
+
 
 export const givePreview = (EXT, data, name) => {
     let blob;
@@ -682,6 +691,7 @@ export const getIqaAuditeeList = async (iqaId) => {
 
   export const uploadCheckListImage = async (attachment,file)=>{
     try {
+        console.log('attachment-------- ',attachment)
         const formData = new FormData();
         formData.append('file', file);
         formData.append('ad', JSON.stringify(attachment));
@@ -913,6 +923,42 @@ export const getAssignedData = async (committeeType)=>{
         return response.data;
     } catch (error) {
         console.error('Error occurred in downloadCheckListFile:', error);
+        throw error;
+    }
+  }
+
+  export const getIqaScheduleList = async ()=>{
+    try {
+        return (await axios.post(`${API_URL}get-iqa-schedule-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getIqaScheduleList:', error);
+        throw error;
+    }
+  }
+
+  export const addAuditClosure = async (values) => {
+    try {
+        return (await axios.post(`${API_URL}add-audit-closure`, values, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in addAuditClosure', error);
+        throw error;
+    }
+  }
+
+  export const getAuditClosureList = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}get-audit-closure-list`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getAuditClosureList:', error);
+        throw error;
+    }
+  }
+
+  export const updateAuditClosure = async (values) => {
+    try {
+        return (await axios.post(`${API_URL}update-audit-closure`, values, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in updateAuditClosure', error);
         throw error;
     }
   }

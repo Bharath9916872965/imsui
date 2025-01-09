@@ -413,7 +413,11 @@ const KpiObjectiveAction = ({router}) => {
                       <td  className="text-left box-border"><span className="fn-bold">{obj.kpiUnitName === 'PERCENTAGE'?'%':(Number(kpiValue.get(obj.kpiId)) === 1?getUnitSingle[obj.kpiUnitName]:obj.kpiUnitName)}</span></td>
                       <td  className="text-left box-border">
                         <TextField className="form-control w-100" label="KPI Value" variant="outlined" size="small" value={kpiValue.get(obj.kpiId) || ''}
-                         onChange={(e) => onKpiValueChange(e.target.value, obj.kpiId)} 
+                         onChange={(e) => {const value = e.target.value; 
+                          if(/^\d*$/.test(value)){
+                            onKpiValueChange(e.target.value, obj.kpiId)
+                          }
+                          }} 
                          InputLabelProps={{ style: {color: isValidationActive && kpiValueValidation.includes(String(obj.kpiId)) ? 'red' : 'inherit',},}} 
                          sx={{
                              "& .MuiOutlinedInput-root": {
