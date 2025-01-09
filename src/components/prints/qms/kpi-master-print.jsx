@@ -1,7 +1,7 @@
 import pdfMake from 'pdfmake/build/pdfmake';
 import dayjs from 'dayjs';
 import { getDrdoLogo, getLabDetails, getLogoImage } from 'services/qms.service';
-const KPIMasterPrint = async (data) => {
+const KPIMasterPrint = async (data,selOpt) => {
 try {
     const labDetails = await getLabDetails();
     const logoImg = await getLogoImage();
@@ -15,52 +15,73 @@ try {
       const minute = date.getMinutes().toString().padStart(2, '0');
       const second = date.getSeconds().toString().padStart(2, '0');
       const timeZone = 'IST';
-
       return `${weekday} ${month} ${day} ${hour}:${minute}:${second} ${timeZone}`;
     };
 
-    // Table body with headers
-    let tableBody = [
-      [
-        { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Division/Group/LAB', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Objectives', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Metrics', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Norms', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'Target', bold: true, alignment: 'center', style: 'superheader' },
-       
-       ],
-    ];
-
+    let tableBody;
+ 
+    if (selOpt === 'ALL') {
+      tableBody = [
+        [
+          { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Division/Group/LAB', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Objectives', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Metrics', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Norms', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Target', bold: true, alignment: 'center', style: 'superheader' },
+        ],
+      ];
+    } else {
+      tableBody = [
+        [
+          { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Objectives', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Metrics', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Norms', bold: true, alignment: 'center', style: 'superheader' },
+          { text: 'Target', bold: true, alignment: 'center', style: 'superheader' },
+        ],
+      ];
+    }
+    
+    // Populate table rows based on data
     data.forEach((item, index) => {
-        if (item && Object.keys(item).length > 0) {
-          tableBody.push([
-            { text: index + 1, style: 'normal', alignment: 'center' },
-            { text: item.division || '-', style: 'normal', alignment: 'center' },
-            { text: item.objectives || '-', style: 'normal', alignment: 'left' },
-            { text: item.metrics || '-', style: 'normal', alignment: 'left' },
-            { text: item.norms || '-', style: 'normal', alignment: 'left' },
-            { text: item.target || '-', style: 'normal', alignment: 'left' },
-            
-          ]);
-
+      if (item && Object.keys(item).length > 0) {
+        const row = [
+          { text: index + 1, style: 'normal', alignment: 'center' },
+          { text: item.objectives || '-', style: 'normal', alignment: 'left' },
+          { text: item.metrics || '-', style: 'normal', alignment: 'left' },
+          { text: item.norms || '-', style: 'normal', alignment: 'left' },
+          { text: item.target || '-', style: 'normal', alignment: 'left' },
+        ];
+       // Add the division column only if grpDivId is equal to 'A'
+        if (selOpt === 'ALL') {
+          row.splice(1, 0, { text: item.division || '-', style: 'normal', alignment: 'center' });
         }
-      });
+    tableBody.push(row);
+      }
+    });
     
+    // Adjust column widths dynamically based on headers
+    const widths =
+    selOpt === 'ALL'
+        ? ['5%', '20%', '25%', '25%', '12.5%', '12.5%'] // With division column
+        : ['5%', '30%', '30%', '20%', '15%']; // Without division column
     
-    
-
-    // Define the PDF content
+    // Define MyContent with tableBody and dynamic widths
     let MyContent = [
       {
         style: 'tableExample',
         table: {
-            widths: ['5%', '15%', '30%',  '30%','10%','10%'],
+          widths: widths,
           body: tableBody,
         },
         margin: [10, 10, 0, 10],
       },
     ];
+    
+    console.log(MyContent);
+    
+    
 
     // Define the document structure and styles
     const docDefinition = {
@@ -102,7 +123,7 @@ try {
                       margin: [0, 0, 0, 6],
                     },
                     {
-                        text: `Key Process Indicator`,
+                      text: `Key Process Indicator - ${selOpt}`,
                       style: 'superheader',
                       fontSize: 14,
                       alignment: 'center',
@@ -172,5 +193,4 @@ try {
     console.error('Error generating PDF: ', error);
   }
 };
-
 export default KPIMasterPrint;

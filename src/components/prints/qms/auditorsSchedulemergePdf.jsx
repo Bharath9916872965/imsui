@@ -81,7 +81,7 @@ const GenerateCombinedPDF = async (
     let obsTableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'OBS No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
@@ -103,7 +103,7 @@ const GenerateCombinedPDF = async (
     let ofiTableBody = [
       [
         { text: 'SN', bold: true, alignment: 'center', style: 'superheader' },
-        { text: 'NC No', bold: true, alignment: 'center', style: 'superheader' },
+        { text: 'OFI No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },

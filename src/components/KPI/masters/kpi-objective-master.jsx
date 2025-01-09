@@ -28,7 +28,8 @@ const KpiObjectiveMaster = ({router}) => {
   const [grpDivName,setGrpDivName] = useState('A');
   const [dwpData,setDwpData] = useState('')
   const [groupDivisionList,setGroupDivisionList] = useState([])
-
+  const [selOpt,setselectedOption] = useState('ALL')
+  
     const [initialValues,setInitialValues] = useState({
       kpiId     : 0,
       objective : '',
@@ -41,7 +42,7 @@ const KpiObjectiveMaster = ({router}) => {
       ratings   : [{ startValue : '', endValue : '',rating : '' }],
     });
 
-
+console.log('selOpt',selOpt);
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
     { name: 'Division/Group/LAB', selector: (row) => row.division, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
@@ -189,23 +190,47 @@ const KpiObjectiveMaster = ({router}) => {
     setShowModal(true);
   }
 
-  const onGrpDivChange = (value)=>{
-    setGrpDivMainId(value)
-    if(value === 'A'){
+  // const onGrpDivChange = (value)=>{
+  // console.log('value',value);
+  //   setGrpDivMainId(value)
+  //   if(value === 'A'){
+  //     setDataTable(kpiMasterList);
+  //     setGrpDivId(value);
+  //     setGrpDivType('C');
+  //   }else if(value === '0'){
+  //     setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value)))
+  //     setGrpDivId(value);
+  //     setGrpDivType('C');
+  //   }else{
+  //     const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(value));
+  //     setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType))
+  //     setGrpDivId(divData.groupDivisionId);
+  //     setGrpDivType(divData.groupDivisionType);
+  //   }
+  // }
+const onGrpDivChange = (selectedOption) => {
+  if (selectedOption) {
+    setselectedOption(selectedOption.label)
+    const { value, label } = selectedOption; // Extract both value and label
+  setGrpDivMainId(value);
+    if (value === 'A') {
       setDataTable(kpiMasterList);
       setGrpDivId(value);
       setGrpDivType('C');
-    }else if(value === '0'){
-      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(value)))
+    } else if (value === '0') {
+      setDataTable( kpiMasterList.filter((data) => Number(data.groupDivisionId) === Number(value)));
       setGrpDivId(value);
       setGrpDivType('C');
-    }else{
-      const divData = groupDivisionList.find(data => Number(data.groupDivisionMainId) === Number(value));
-      setDataTable(kpiMasterList.filter(data => Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType))
-      setGrpDivId(divData.groupDivisionId);
-      setGrpDivType(divData.groupDivisionType);
+    } else {
+      const divData = groupDivisionList.find((data) => Number(data.groupDivisionMainId) === Number(value));
+      if (divData) {
+        setDataTable(kpiMasterList.filter((data) =>Number(data.groupDivisionId) === Number(divData.groupDivisionId) && divData.groupDivisionType === data.kpiType));
+        setGrpDivId(divData.groupDivisionId);
+        setGrpDivType(divData.groupDivisionType);
+      }
     }
   }
+};
 
   const back = ()=>{
     if(dwpData.docType === 'dwp'){
@@ -230,15 +255,16 @@ const KpiObjectiveMaster = ({router}) => {
       <div className="card">
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
-          <Box flex="40%" className='text-center'><h3>Key Process Indicator</h3></Box>
-          <Box flex="30%">
+          <Box flex="80%" className='text-center'><h3>Key Process Indicator</h3></Box>
+          {/* <Box flex="30%">
                <span className="text-heading">&nbsp;   </span>
                <button className=" btn-primary"  onClick={() =>kpiMasterPdf(filKpiMasterList)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
-            </Box>
+            </Box> */}
           <Box flex="20%">
             <SelectPicker options={grpDivOptions} label="Division/Group" readOnly = {!isMr} 
             value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}
-             handleChange={(newValue) => {onGrpDivChange( newValue?.value) }}/>
+             handleChange={(newValue) => {onGrpDivChange( newValue) }}
+             />
           </Box>
          </Box>
           <div id="card-body customized-card">
@@ -246,6 +272,10 @@ const KpiObjectiveMaster = ({router}) => {
           </div>
           <div>
             {<button className="btn add btn-name" onClick={kpiAdd}> Add </button>}
+            &nbsp; 
+            { <button className="btn btn-dark" onClick={() => kpiMasterPdf(filKpiMasterList,selOpt)}>
+PRINT
+</button>}
             {!isMr && <button className="btn backClass" onClick={() => back()}>Back</button>}
           </div>
         </div>

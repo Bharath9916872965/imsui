@@ -44,7 +44,7 @@ try {
             // { text: item.carRefNo || '-', style: 'normal', alignment: 'center' },
             { text: item.clauseNo || '-', style: 'normal', alignment: 'left' },
             { text: item.description || '-', style: 'normal', alignment: 'left' },
-            { text: item.ncCount || '-', style: 'normal', alignment: 'left' },
+            { text: item.NcCount || '-', style: 'normal', alignment: 'left' },
           ]);
         }
       });
