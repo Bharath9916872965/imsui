@@ -59,24 +59,37 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
   const rotatedP   = generateRotatedTextImage('(P)');
   const rotatedI   = generateRotatedTextImage('(I)');
   const rotateResidualRisk    = generateRotatedTextImage('Residual\nRisk ');
+  const getBackgroundColorForRiskNo = (riskNo) => {
+    if (riskNo >= 1 && riskNo <= 4) {
+        return 'green'; // Green for riskNo 1-4
+    } else if (riskNo > 4 && riskNo <= 10) {
+        return 'yellow'; // Yellow for riskNo 5-10
+    } else if (riskNo > 10 && riskNo <= 25) {
+        return 'red'; // Red for riskNo 11-20
+    }else if (riskNo===0){
+      return 'lightgrey';
+    }
+    return 'inherit'; // Default background color if not in the ranges
+};
   const firstTable = [
     {
       style: 'tableExample',
       table: {
-        widths: [28, 20, 20, 120,81,18, 18, 18, 38,25,18,18,18,18,38,25,90],
+        widths: [180,60,18, 18, 18, 38,35,18,18,18,18,38,25,110],
         body: [
           [
-            { text: 'RISK REGISTER - Project, Engineering & Support Division and its Groups / Sub Groups', style: 'superheader',colSpan: 17,fillColor: '#FDAF7B' },
-            { }, { },{ },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },{ },{ } ,{ },
+            { text: 'RISK REGISTER - Project, Engineering & Support Division and its Groups / Sub Groups', style: 'superheader',colSpan: 14,fillColor: '#FDAF7B' },
+            { }, { },{ },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
            ],
           [
-            { text: 'Risk Assessment, Mitigation & Risk Based Thinking(RBT)', style: 'superheader',colSpan: 17 ,fillColor: '#FDAF7B'},
-            {}, { }, { },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },{ },{ }  ,{ },
+            { text: 'Risk Assessment, Mitigation & Risk Based Thinking(RBT)', style: 'superheader',colSpan: 14 ,fillColor: '#FDAF7B'},
+            {}, { }, { },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
+           ],
+           [
+            { text: 'Documented Reference : ISO 9001:2015- 6.1 clause & QSP - Risk Mgmt', style: 'superheader',colSpan: 14 ,fillColor: '#FDAF7B'},
+            {}, { }, { },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
            ],
           [
-            { text:'',border: [true, true, true, false]},
-            { text:'',border: [true, true, true, false],},
-            { text:'',border: [true, true, true, false],},
             { text:'',border: [true, true, true, false]},
             { text:'',border: [true, true, true, false],},
             { text:'',border: [false, false, false, false], colSpan: 3,fillColor:'#D3D3D3'},
@@ -86,9 +99,6 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
             {  text:'', style:'superheader',border: [true, true, true, false]}
           ],
           [
-            { text: '  ', style: 'superheader',border: [true, false, true, false] },
-            {text: '  ', style: 'superheader',border: [true, false, true, false] },
-             {text: '  ', style: 'superheader',border: [true, false, true, false] },
             {text: '  ', style: 'superheader',border: [true, false, true, false] },
             {text: '  ', style: 'superheader',border: [true, false, true, false]},
             { text: 'Original Risk', style: 'superheader',colSpan: 3, fillColor:'#D3D3D3'},
@@ -105,9 +115,6 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
             {  text:'Mitigation Plan', style:'superheader',border: [true, false, true, false]}
           ],
           [
-            {text:'Risk #', style: 'superheader',border: [true, false, true, false]   },
-            {text:'', style: 'superheader' ,border: [true, false, true, false] }, 
-            {text:' ', style: 'superheader',border: [true, false, true, false] },
             { text: 'Risk Description', style: 'superheader',border: [true, false, false, false] },
             {text: 'Probability of Occurrence (P)\n(Scale 1 to 5)', style: 'superheader',border: [true, false, true, false] },
             { text:'impact on (Scale 1 to 5)',style:'superheader',colSpan: 3,fillColor:'#D3D3D3' },
@@ -124,22 +131,19 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
 
           ],
           [
-            {text:'', style: 'superheader',border: [true, false, true, true] },
-            { text:'', style: 'superheader',border: [true, false, true, true] }, 
-            { text:'', style: 'superheader',border: [true, false, true, true] },
             { text:'', style: 'superheader',border: [true, false, true, true]},
             {  text:'', style: 'superheader',border: [true, false, true, true]},
             { image: rotatedTP, width: 30, height: 60,fillColor:'#D3D3D3'},
-            {image: rotatedTIME,  width: 30, height: 60,fillColor:'#D3D3D3' },
+            {image: rotatedTIME, width: 30, height: 60,fillColor:'#D3D3D3' },
             {image:rotatedCost,width: 30,height: 60 ,fillColor:'#D3D3D3'},
             {image:rotatedAvg,width: 30,height: 60,fillColor:'#D3D3D3'},
             {image:rotatedPxI,width: 30,height: 60,fillColor:'#D3D3D3'},
             {image:rotatedP,width: 30,height: 60,fillColor:'#D3D3D3'},
-            { image: rotatedTP, width: 30, height: 60,fillColor:'#D3D3D3'},
-            { image:rotatedTIME,width: 30,height: 60,fillColor:'#D3D3D3'},
+            {image: rotatedTP, width: 30, height: 60,fillColor:'#D3D3D3'},
+            {image:rotatedTIME,width: 30,height: 60,fillColor:'#D3D3D3'},
             {image:rotatedCost,width: 30,height: 60,fillColor:'#D3D3D3' },
-            {image:rotatedAvg,width: 30,height: 60},
-            {image:rotateResidualRisk,width: 30,height: 60 } ,
+            {image:rotatedAvg,width: 30,height: 60,fillColor:'#D3D3D3' },
+            {image:rotateResidualRisk,width: 30,height: 60,fillColor:'#D3D3D3'  } ,
             { text: 'Mitigation Approach  ', style: 'superheader'},
             ],
 ]
@@ -147,26 +151,25 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
       },
       margin: [0, 20, 0, 15],
     }];
+
+    
     riskregmitmergeList.forEach((item, index) => {
       if (item && Object.keys(item).length > 0) {
         firstTable[0].table.body.push([
-          { text: (index + 1).toString(), style: 'normal', alignment: 'center' }, 
-          { },
-          { },
           { text: item.riskDescription || '-', style: 'normal', alignment: 'left' },
           { text: item.probability || '-', style: 'normal', alignment: 'center' },
           { text: item.technicalPerformance || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3' },
           { text: item.time || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3' },
           { text: item.cost || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3' },
           { text: item.average || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3' },
-          {text: item.riskNo || '-', style: 'normal', alignment: 'center',fillColor: '#FFFF00' },
+          {text: item.riskNo || '-', style: 'normal', alignment: 'center',fillColor: getBackgroundColorForRiskNo(Number(item.riskNo)), },
           {text: item.mitigationProbability || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3' },
           {text: item.mitigationTp || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3'}, 
           {text: item.mitigationTime || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3'}, 
           {text: item.mitigationCost || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3'},
           {text: item.mitigationAverage || '-', style: 'normal', alignment: 'center',fillColor:'#D3D3D3'},
-          {text: item.mitigationRiskNo || '-', style: 'normal', alignment: 'center',   fillColor: '#90EE90'},
-           {text: item.mitigationApproach || '-', style: 'normal', alignment: 'left'}
+          {text: item.mitigationRiskNo || '-', style: 'normal', alignment: 'center',   fillColor: getBackgroundColorForRiskNo(Number(item.mitigationRiskNo)),},
+          {text: item.mitigationApproach || '-', style: 'normal', alignment: 'left'}
         ]);
       }
     });

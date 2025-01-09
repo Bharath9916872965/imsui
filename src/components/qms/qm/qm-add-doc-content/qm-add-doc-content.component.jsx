@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import withRouter from '../../../../common/with-router';
-import { addChapterNameById, deleteChapterByChapterIdId, getChapterById, getQmAllChapters, getSubChaptersById, updateChapterContent, updateChapterNameById, updatechapterPagebreakAndLandscape } from "../../../../services/qms.service";
+import { addChapterNameById, deleteChapterByChapterIdId, getChapterById, getQmAllChapters, getQmRevistionRecordById, getSubChaptersById, updateChapterContent, updateChapterNameById, updatechapterPagebreakAndLandscape } from "../../../../services/qms.service";
 import {Button, Card, CardContent, FormControlLabel, Grid, IconButton, Switch, TextField, Tooltip, Typography, Alert} from '@mui/material';
 import { Helmet } from 'react-helmet';
 
@@ -199,7 +199,7 @@ const QmAddDocContentComponent = ({ router }) => {
   const getAllChapters = async () => {
       try {
 
-          let AllChapters = await getQmAllChapters();
+          let AllChapters = await getQmAllChapters(revisionElements.revisionRecordId,revisionElements.statusCode);
           AllChapters=AllChapters.filter(obj => obj.chapterParentId == 0)
           if (AllChapters && AllChapters.length > 0) {
               setEditorTitle(AllChapters[0].chapterName);
@@ -487,23 +487,19 @@ const QmAddDocContentComponent = ({ router }) => {
 }
 
 
-  const goBack = () => {
-    navigate(-1);
-  };
+    const goBack = () => {
+     navigate('/quality-manual');
+    };
 
   const getDocPDF = (action) => {
     return <QmDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
   }
 
-  const abbreviationModal = () =>{
-    setStatus('abbreviation');
-    setRevisionData(revisionElements);
+  const abbreviationModal = async () =>{
+    const revision = await getQmRevistionRecordById(revisionElements.revisionRecordId);
+    navigate('/add-abbreviation', { state: { revisionData: revision, docType: 'QM' } })
   };
 
-  switch(status){
-     case 'abbreviation' :
-         return <AbbreviationModal revisionData={revisionData} docType={'QM'}></AbbreviationModal>;
-  }
   return (
       <div sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowX: 'hidden' }}>
           <Helmet>
@@ -520,7 +516,7 @@ const QmAddDocContentComponent = ({ router }) => {
               <div id="main-wrapper">
                   <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
                       <div align='left' className="d-flex flex-column flex-md-row gap-1">
-                      <button className='btn topButtons' onClick={()=>setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button>
+                      {/* <button className='btn topButtons' onClick={()=>setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button> */}
                       <button className='btn topButtons' onClick={abbreviationModal}>Abbreviation New<i className="material-icons" >text_fields</i></button>
                       </div>
                       <div className="d-flex flex-column flex-md-row gap-1">

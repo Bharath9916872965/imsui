@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import withRouter from '../../../../common/with-router';
-import { addQspChapterNameById, deleteQspChapterByChapterId, getQspAllChapters, getQspChapterById, getQspSubChaptersById, updateQspChapterContent, updateQspChapterNameById, updateQspPagebreakAndLandscape } from "../../../../services/qms.service";
+import { addQspChapterNameById, deleteQspChapterByChapterId, getQspAllChapters, getQspChapterById, getQspRevistionRecordById, getQspSubChaptersById, updateQspChapterContent, updateQspChapterNameById, updateQspPagebreakAndLandscape } from "../../../../services/qms.service";
 import { Helmet } from 'react-helmet';
 import $ from 'jquery';
 
@@ -181,6 +181,8 @@ const QspAddDocContentComponent = ({ router }) => {
             try {
                 const qmsDocTypeDto = {
                     docType: revisionElements.docName,
+                    revisionRecordId: revisionElements.revisionRecordId,
+                    statusCode: revisionElements.statusCode,
                     // groupDivisionId:revisionElements.groupDivisionId
                 }
         
@@ -512,6 +514,10 @@ const QspAddDocContentComponent = ({ router }) => {
         return <QspDocPrint action={action} revisionElements={revisionElements} buttonType="Button" />
     }
 
+    const abbreviationModal = async () =>{
+        const revision = await getQspRevistionRecordById(revisionElements.revisionRecordId);
+        navigate('/add-abbreviation', { state: { revisionData: revision, docType: revisionElements.docName.toUpperCase() } })
+    };
 
     return (
         <div sx={{ display: 'flex', flexDirection: 'column', height: '100vh', overflowX: 'hidden' }}>
@@ -529,7 +535,8 @@ const QspAddDocContentComponent = ({ router }) => {
                 <div id="main-wrapper">
                     <div className="subHeadingLink d-flex flex-column flex-md-row justify-content-between">
                         <div align='left' className="d-flex flex-column flex-md-row gap-1">
-                            <button className='btn topButtons' onClick={() => setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button>
+                            {/* <button className='btn topButtons' onClick={() => setOpenDialog2(true)}>Abbreviation<i className="material-icons" >text_fields</i></button> */}
+                            <button className='btn topButtons' onClick={abbreviationModal}>Abbreviation New<i className="material-icons" >text_fields</i></button>
                         </div>
                         <div className="d-flex flex-column flex-md-row gap-1">
 

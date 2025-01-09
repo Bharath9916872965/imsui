@@ -28,7 +28,9 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
 
     const qmsDocTypeDto = {
       docType: revisionElements.docType,
-      groupDivisionId:revisionElements.groupDivisionId
+      groupDivisionId:revisionElements.groupDivisionId,
+      revisionRecordId: revisionElements.revisionRecordId,
+      statusCode: revisionElements.statusCode,
     }
 
     const fetchData = async () => {
@@ -371,14 +373,25 @@ function generateRotatedTextImage(text) {
       const latestRevisionData = [...ApprovedVersionReleaseList].sort(
         (a, b) => a.revisionRecordId - b.revisionRecordId
       );
-      for (let i = 0; i < latestRevisionData.length; i++) {
+
+      const revisionElementsArray = Array.isArray(revisionElements) 
+      ? revisionElements 
+      : [revisionElements];
+  
+      const filteredData = latestRevisionData.filter(item =>
+        revisionElementsArray.some(element => 
+            item.revisionRecordId <= (element.revisionRecordId || 0) // Use fallback if element.revisionRecordId is undefined
+        )
+      );
+
+      for (let i = 0; i < filteredData.length; i++) {
       var value = [
-        { text: latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center' },
-        { text: latestRevisionData[i].description, style: 'tdData' },
-        { text: i > 0 ? 'I' + latestRevisionData[i - 1].issueNo + '-R' + latestRevisionData[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
-        { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
-        { text: format(new Date(latestRevisionData[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
-        { text: 'I' + latestRevisionData[i].issueNo + '-R' + latestRevisionData[i].revisionNo, style: 'tdData', alignment: 'center', },
+        { text: filteredData[i].revisionNo, style: 'tdData', alignment: 'center' },
+        { text: filteredData[i].description, style: 'tdData' },
+        { text: i > 0 ? 'I' + filteredData[i - 1].issueNo + '-R' + filteredData[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
+        { text: 'I' + filteredData[i].issueNo + '-R' + filteredData[i].revisionNo, style: 'tdData', alignment: 'center', },
+        { text: format(new Date(filteredData[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
+        { text: 'I' + filteredData[i].issueNo + '-R' + filteredData[i].revisionNo, style: 'tdData', alignment: 'center', },
       ];
   
         DocVersionRelease.push(value);
