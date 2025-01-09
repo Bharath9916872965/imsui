@@ -101,6 +101,7 @@ obs: item.totalCountOBS || 0, // Same for OBS count
           yKey: "nc",
           yName: "NC",
           stroke: "red",
+          strokeWidth: 2.5,
           fill: "rgba(255, 0, 0, 0.2)",
           marker: {
             fill: "red",
@@ -124,11 +125,12 @@ obs: item.totalCountOBS || 0, // Same for OBS count
           xKey: "iqaName",
           yKey: "obs",
           yName: "OBS",
-          stroke: "blue",
-          fill: "rgba(0, 0, 255, 0.2)",
+          stroke: "#008dff",
+          strokeWidth: 2.5,
+          fill: "#318CE7",
           marker: {
-            fill: "blue",
-            stroke: "darkblue",
+            fill: "#008dff",
+            stroke: "#008dff",
             size: 8,
           },
           tooltip: {
