@@ -47,6 +47,7 @@ import AddAbbreviationDialog from 'components/qms/qm/qm-add-doc-content/add-abbr
 import ProcurementListComponent from 'components/audit/scheduler/check-list/procurement-list-component';
 import TrendNCReport from 'components/report/trend-nc-report.component.jsx';
 import AuditClosureComponent from 'components/audit/audit-closure.component';
+import AuditPatchComponent from 'components/admin/auditpatch.component';
 
 function App() {
   return (
@@ -65,7 +66,8 @@ function App() {
         <Route path="/division" element={<DivisionComponent />} />
         <Route path="/division-group" element={<DivisionGroupComponent />} />
         <Route path="/project" element={<ProjectComponent />} />
-        
+        <Route path="/audit-patch-list" element={<AuditPatchComponent />} />
+
         {/* QMS */}
         <Route path="/quality-manual" element={<QmRevisionRecordsComponent />} />
         <Route path="/qm-add-content" element={<QmAddDocContentComponent />} />

@@ -1,5 +1,7 @@
 import withRouter from "../../common/with-router";
 import { logout } from "../../services/auth.service";
+import workFlowPdf from 'assets/docs/workFlow.pdf'
+import userManualPdf from 'assets/docs/userManual.pdf'
 
 import "./navbarTop.css"
 import "../../static/buttons.css"
@@ -8,7 +10,13 @@ import { getHeaderModuleDetailList, getHeaderModuleList,changePassword,getNotifi
 import { getLoginEmployeeDetails} from "services/header.service";
 
 
+export const openUserManual = async () => {
+  window.open(userManualPdf, '_blank');
+}
 
+export const openWorkFlow = async () => {
+  window.open(workFlowPdf, '_blank'); 
+}
 
 
 const Navbar = (props) => {
@@ -47,6 +55,9 @@ const Navbar = (props) => {
     fetchData();
 
   }, []);
+
+
+  
 
   const gotoNoti = async (event, item) => {
     event.preventDefault(); 
@@ -176,7 +187,12 @@ const Navbar = (props) => {
                         Change Password
                       </a>
                     </li>
-
+                    <li>
+                    <a  className="dropdown-item" href="#" onClick={openUserManual}>User Manual</a>
+                    </li>
+                    <li>
+                    <a  className="dropdown-item" href="#"  onClick={openWorkFlow}  >Work Flow</a>
+                    </li>
                     <li>
                       <a className="dropdown-item" href='audit-stamping'>
                         Audit Stamping
