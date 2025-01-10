@@ -968,7 +968,7 @@ export const getAssignedData = async (committeeType)=>{
     try {
         const response = await axios({
           method: 'get',
-          url: `${"http://192.168.1.22:8080/pfts/getActiveProcurementList.htm"}`, 
+          url: `${environment.PFTS_URL   }`, 
           headers: {
             'Content-Type': 'application/json',
             'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
@@ -987,7 +987,7 @@ export const getAssignedData = async (committeeType)=>{
         try {
             const response = await axios({
               method: 'get',
-              url: `${"http://192.168.1.22:8080/ibas/getSupplyOrderList.htm"}`, 
+              url: `${environment.IBAS_URL   }`,
               headers: {
                 'Content-Type': 'application/json',
                 'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
