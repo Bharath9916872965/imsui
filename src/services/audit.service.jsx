@@ -950,3 +950,41 @@ export const getAssignedData = async (committeeType)=>{
         throw error;
     }
   }
+
+
+  export const getActiveProcurementList = async ()=>{
+    try {
+        const response = await axios({
+          method: 'get',
+          url: `${"http://192.168.1.22:8080/pfts/getActiveProcurementList.htm"}`, 
+          headers: {
+            'Content-Type': 'application/json',
+            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
+          },
+          responseType: 'json',
+        });
+        return response.data;
+      } catch (error) {
+        console.warn('Unable to fetch the procurement list. Returning fallback value.');
+        return [];
+      }
+    };
+
+
+    export const getSupplyOrderList = async ()=>{
+        try {
+            const response = await axios({
+              method: 'get',
+              url: `${"http://192.168.1.22:8080/ibas/getSupplyOrderList.htm"}`, 
+              headers: {
+                'Content-Type': 'application/json',
+                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
+              },
+              responseType: 'json', 
+            });
+            return response.data;
+          } catch (error) {
+            console.warn('Unable to fetch the supply order list. Returning fallback value.');
+            return []; 
+          }
+        };
