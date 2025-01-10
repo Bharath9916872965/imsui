@@ -280,3 +280,17 @@ export const getProjectMasterList= async () => {
     throw error;
   }
 };
+
+
+export const getAuditPatchList= async () => {
+  try {
+    const response = await axios.get(
+      `${API_URL}get-audit-patch-list`,
+      { headers: authHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error occurred in getAuditPatchList:', error);
+    throw error;
+  }
+};

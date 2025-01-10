@@ -1,5 +1,7 @@
 import withRouter from "../../common/with-router";
 import { logout } from "../../services/auth.service";
+import workFlowPdf from 'assets/docs/workFlow.pdf'
+import userManualPdf from 'assets/docs/userManual.pdf'
 
 import "./navbarTop.css"
 import "../../static/buttons.css"
@@ -8,7 +10,13 @@ import { getHeaderModuleDetailList, getHeaderModuleList,changePassword,getNotifi
 import { getLoginEmployeeDetails} from "services/header.service";
 
 
+export const openUserManual = async () => {
+  window.open(userManualPdf, '_blank');
+}
 
+export const openWorkFlow = async () => {
+  window.open(workFlowPdf, '_blank'); 
+}
 
 
 const Navbar = (props) => {
@@ -47,6 +55,9 @@ const Navbar = (props) => {
     fetchData();
 
   }, []);
+
+
+  
 
   const gotoNoti = async (event, item) => {
     event.preventDefault(); 
@@ -102,7 +113,7 @@ const Navbar = (props) => {
             <a href="/dashboard" className="nav-link">
               <div className="d-flex" style={{ float: 'left' }}>
                 <h3 className="mb-0 d-flex align-items-center me-2">
-                  <span className="i-name">I</span><span className="ms-name">MS</span>
+                  <span className="ms-name">I</span><span className="ms-name">MS</span>
                 </h3>
                 <h6 className="mb-0 d-flex align-items-end">
                   {title || ''} {empName}, {designation || ''} ({formRoleName || ''})
@@ -176,7 +187,12 @@ const Navbar = (props) => {
                         Change Password
                       </a>
                     </li>
-
+                    <li>
+                    <a  className="dropdown-item" href="#" onClick={openUserManual}>User Manual</a>
+                    </li>
+                    <li>
+                    <a  className="dropdown-item" href="#"  onClick={openWorkFlow}  >Work Flow</a>
+                    </li>
                     <li>
                       <a className="dropdown-item" href='audit-stamping'>
                         Audit Stamping
@@ -206,7 +222,7 @@ const Navbar = (props) => {
               <i className="material-icons" style={{ fontSize: '20px' }}>notifications</i> 
               <span className='notification-count'>{Number(notifiCount)}</span>
             </a>
-            <ul className="dropdown-menu dropdown-menu-left" >
+            <ul className="dropdown-menu dropdown-menu-notification" >
             {notifiList.length > 0 ? (
 
                 notifiList.map((item, index) => (

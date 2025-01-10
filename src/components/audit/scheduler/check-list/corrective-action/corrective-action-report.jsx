@@ -303,19 +303,19 @@ const CorrectiveActionReport = ({router}) => {
     const recData = list.filter(({auditStatus}) => auditStatus === 'CRM')
     const apvData = list.filter(({auditStatus}) => auditStatus === 'CAP')
     if(iniData.length > 0){
-      setInitEmpData([iniData[0].empName,iniData[0].transactionDate])
+      setInitEmpData([iniData[0].empName,iniData[0].transactionDate,iniData[0].remarks])
     }else{
       setInitEmpData([])
     }
 
     if(recData.length > 0){
-      setRecEmpData([recData[0].empName,recData[0].transactionDate])
+      setRecEmpData([recData[0].empName,recData[0].transactionDate,recData[0].remarks])
     }else{
       setRecEmpData([])
     }
 
     if(apvData.length > 0){
-      setApprovedEmpData([apvData[0].empName,apvData[0].transactionDate])
+      setApprovedEmpData([apvData[0].empName,apvData[0].transactionDate,apvData[0].remarks])
     }else{
       setApprovedEmpData([])
     }
@@ -636,9 +636,11 @@ const CorrectiveActionReport = ({router}) => {
                      </Form>
                     )}
                     </Formik>
-                    <Box className='text-center mg-top-10'> <button onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData)} title="Print" aria-label="Print AuditSchedule"  >
-                      <i className="material-icons">print</i>
-                      </button></Box>
+                    <Box > 
+                  <button className="btn btn-dark" onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData)} title="Print" aria-label="Print AuditSchedule" >
+                  PRINT
+                </button>
+                      </Box>
                      </td>
                      </tr>
                     }
