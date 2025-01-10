@@ -196,6 +196,17 @@ export const getDivisionListOfGH = async (imsFormRoleId, empId) => {
     
 };
 
+export const getProjectListOfPrjDir = async (imsFormRoleId, empId) => {
+    
+    try {
+        return (await axios.post(`${API_URL}get-project-list-of-prj-director/${imsFormRoleId}/${empId}`, [], { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getProjectListOfPrjDir', error);
+        throw error; 
+    }
+    
+};
+
 
 
 
