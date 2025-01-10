@@ -222,7 +222,7 @@ const Navbar = (props) => {
               <i className="material-icons" style={{ fontSize: '20px' }}>notifications</i> 
               <span className='notification-count'>{Number(notifiCount)}</span>
             </a>
-            <ul className="dropdown-menu dropdown-menu-left" >
+            <ul className="dropdown-menu dropdown-menu-notification" >
             {notifiList.length > 0 ? (
 
                 notifiList.map((item, index) => (
