@@ -121,7 +121,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         let scheduleListRoleWise = [];
    
         if (currentLoggerRoleName &&
-           ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
+           ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
         ){
 
           ////////////////////////DIVISION IDS FILTER/////////////////////////////////////
@@ -1682,31 +1682,46 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                
 
  <div className="col-md-8 counter-row">
- <div className="col-md-2  imsCounter">
-              <a className="dashboard-links" href="/auditor-list">
-                <div className="counter auditor">
-                 <h3>Active Auditors</h3>
-                 <span className="counter-value">{activeAuditorsCount}</span>
-               </div>
-             </a>
-          </div>
 
-
-
-      <div className="col-md-2 imsCounter">
-      <a 
-  className="dashboard-links" 
-  href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
->
-          <div className="counter auditee">
-              {/* <div className="counter-icon">
-                  <span> <FaUserCog  color="White" className="counter-icons"  /></span>
-              </div> */}
-              <h3>{iqaNoSelected} Auditees</h3>
-              <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
-          </div>
-          </a>
+  <div className="col-md-2 imsCounter">
+    {currentLoggerRoleName &&
+    ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+      <div className="counter auditor no-link">
+        <h3>Active Auditors</h3>
+        <span className="counter-value">{activeAuditorsCount}</span>
       </div>
+    ) : (
+      <a className="dashboard-links" href="/auditor-list">
+        <div className="counter auditor">
+          <h3>Active Auditors</h3>
+          <span className="counter-value">{activeAuditorsCount}</span>
+        </div>
+      </a>
+    )}
+  </div>
+
+
+
+  <div className="col-md-2 imsCounter">
+  {currentLoggerRoleName &&
+  ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+    <div className="counter auditee no-link">
+      <h3>{iqaNoSelected} Auditees</h3>
+      <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+    </div>
+  ) : (
+    <a
+      className="dashboard-links"
+      href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
+    >
+      <div className="counter auditee">
+        <h3>{iqaNoSelected} Auditees</h3>
+        <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+      </div>
+    </a>
+  )}
+</div>
+
 
 
       
