@@ -229,12 +229,7 @@ export const getNotifiList= async () => {
   }
 };
 
-
-
-
-
 export const  updateNotification= async (notificationId) => {
-  console.log("notificationId", notificationId);
   try {
       return (await axios.post(`${API_URL}update-notification`,notificationId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
   } catch (error) {

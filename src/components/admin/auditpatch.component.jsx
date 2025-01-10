@@ -34,7 +34,6 @@ const AuditPatchComponent = () => {
       const auditpatchList = async() =>{
         try {
             const auditPatchList = await getAuditPatchList();
-            console.log('auditPatchList',auditPatchList);
             setTableData(auditPatchList);
         } catch (error) {
             console.error("Error fetching data:", error);
@@ -61,7 +60,6 @@ const AuditPatchComponent = () => {
       
       const editAuditPatch = async(item) =>{
         setShowModal(true);
-        console.log('item',item);
         setInitialValues({
             versionNo: item.versionNo,
             description: item.description,
@@ -71,12 +69,10 @@ const AuditPatchComponent = () => {
 
 
       const handleSubmit = async (values) => {
-        console.log('values',values);
         const finalvalue = {
             ...values,
             auditPatchesId,
         };
-        console.log('finalvalue',finalvalue);
         const successMessage = "Audit Patch Updated Successfully!" ;
         const unsuccessMessage = "Audit Patch Update Unsuccessful!" ;
         const Title =  "Are you sure to Update ?" ;
