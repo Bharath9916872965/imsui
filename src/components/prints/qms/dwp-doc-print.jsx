@@ -5,7 +5,7 @@ import htmlToPdfmake from 'html-to-pdfmake';
 import { dwprevisionTran, getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getDwpVersionRecordDtoList, getLabDetails, getLogoImage } from 'services/qms.service';
 import { getEmployeesList } from 'services/header.service';
 import { format } from 'date-fns';
-
+import {RiskRegisterMitigation } from "services/risk.service";
 
 const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
@@ -23,6 +23,7 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [revisionRecordData, setRevisionRecordData] = useState([]);
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [dwpTransactionList, setDwpTransactionList] = useState([]);
+  const [riskregmitList,setriskregmitList]=useState('');
 
   useEffect(() => {
 
@@ -35,7 +36,10 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
 
     const fetchData = async () => {
       try {
-        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
+        
+       const riskregmitmergeList = await RiskRegisterMitigation(revisionElements.groupDivisionId, revisionElements.docType,revisionElements.revisionRecordId);
+       setriskregmitList(riskregmitmergeList)
+       const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
         setRevisionRecordData(revision);
         Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
           setLabDetails(labDetails);
@@ -200,8 +204,45 @@ function generateRotatedTextImage(text) {
     
     return canvas.toDataURL();
 }
-  
-
+function generateRotatedTextImageRisk(text) {
+  const canvas = document.createElement('canvas');
+  const ctx = canvas.getContext('2d');
+  const textFontSize = 24; // Text font size in px
+  const canvasWidth = 80; // Width before rotation
+  const canvasHeight = 150; // Height before rotation
+  canvas.width = canvasWidth;
+  canvas.height = canvasHeight;
+  ctx.font = `bold ${textFontSize}px Roboto`; 
+  ctx.fillStyle = 'black'; // Text color
+  ctx.translate(canvasWidth / 2, canvasHeight / 2); // Move to center
+  ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
+  ctx.textAlign = 'center';
+  ctx.textBaseline = 'middle';
+  ctx.fillText(text, 0, 0); // Draw at rotated position
+  return canvas.toDataURL();
+}
+const rotatedImage = generateRotatedTextImageRisk('ISO-9001:2015');
+  const rotatedTIME = generateRotatedTextImageRisk('TIME');
+  const rotatedTP  = generateRotatedTextImageRisk('TP');
+  const rotatedCost  = generateRotatedTextImageRisk('Cost');
+  const rotatedAvg  = generateRotatedTextImageRisk('Avg.(I) ');
+  const rotatedPxI   = generateRotatedTextImageRisk('(PxI)');
+  const rotatedP   = generateRotatedTextImageRisk('(P)');
+  const rotatedI   = generateRotatedTextImageRisk('(I)');
+  const rotateResidualRisk    = generateRotatedTextImageRisk('Residual\nRisk ');
+  const OverallImpact   = generateRotatedTextImageRisk('Overall Impact');
+  const getBackgroundColorForRiskNo = (riskNo) => {
+    if (riskNo >= 1 && riskNo <= 4) {
+        return 'green'; // Green for riskNo 1-4
+    } else if (riskNo > 4 && riskNo <= 10) {
+        return 'yellow'; // Yellow for riskNo 5-10
+    } else if (riskNo > 10 && riskNo <= 25) {
+        return 'red'; // Red for riskNo 11-20
+    }else if (riskNo===0){
+      return 'lightgrey';
+    }
+    return 'inherit'; // Default background color if not in the ranges
+};
 
   const handlePdfGeneration = () => {
     // setRefresh(true);
@@ -489,6 +530,16 @@ function generateRotatedTextImage(text) {
     // ----------Document Abbreviation table end----------------
 
 
+let emptySpace =[];
+emptySpace.push([{
+  text: '', 
+  border: [false, false, false, false],
+ 
+},])
+
+
+    
+
 
     let docDefinition = {
       info: {
@@ -697,16 +748,132 @@ function generateRotatedTextImage(text) {
 
         },
         allValues,
-      ],
-
-      layouts: {
+        {
+          table: {
+         
+            body: emptySpace
+            
+          },
+           pageOrientation: 'landscape', 
+          pageBreak: 'after'
+        },
+     //risk reg table starts
+        {
+          style: 'tableExample',
+          table: {
+           //widths: [18,180,60,18, 18, 18, 38,35,18,18,18,18,38,25,110],
+           
+            body: [
+              [
+                { 
+                  text: 'Appendix – A (Risk Register)', 
+                  style: 'Risksuperheader', 
+                  colSpan: 15, 
+                 
+                  fontSize: 18,fontWeight: 'bold',
+                  border: [false, false, false, false] ,margin: [0, 0, 0, 20]
+                },
+                { }, { }, { }, { }, { }, { }, { }, { }, { }, { }, { }, { }, { }, { },
+              ],
+              [{text: 'RISK REGISTER - Project, Engineering & Support Division and its Groups / Sub Groups', style: 'Risksuperheader',colSpan: 15,fillColor: '#FDAF7B' },
+                { },
+                { }, { },{ },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
+               ],
+              [{text: 'Risk Assessment, Mitigation & Risk Based Thinking(RBT)', style: 'Risksuperheader',colSpan: 15 ,fillColor: '#FDAF7B'},
+                { },
+                {}, { }, { },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
+               ],
+               [{text: 'Documented Reference : ISO 9001:2015- 6.1 clause & QSP - Risk Mgmt', style: 'Risksuperheader',colSpan: 15 ,fillColor: '#FDAF7B'},
+                { },
+                {}, { }, { },{ },{ },{ },{ }, { },{ },{ },{ },{ },{ },
+               ],
+              [{text:'',border: [true, true, true, false]},
+                { text:'',border: [true, true, true, false]},
+                { text:'',border: [true, true, true, false],},
+                { text:'',border: [false, false, false, false], colSpan: 3,fillColor:'#D3D3D3'},
+                { text:'',border: [false, false, true, false],},
+                { text:'',border: [false, false, true, false],},
+                {text:'',border: [false, false, false, true],fillColor:'#D3D3D3'},
+                 {text: 'Risk Rating ', style: 'Risksuperheader',colSpan: 7, border: [false, true, true, true],fillColor:'#D3D3D3'},
+                 {text: ' ',background: 'lightblue',},{ },{ },{ },{ },{ },
+                {  text:'', style:'Risksuperheader',border: [true, true, true, false]}
+              ],
+              [{text: '  ', style: 'Risksuperheader',border: [true, false, true, false]},
+                {text: '  ', style: 'Risksuperheader',border: [true, false, true, false] },
+                {text: '  ', style: 'Risksuperheader',border: [true, false, true, false]},
+                { text: 'Original Risk', style: 'Risksuperheader',colSpan: 3, fillColor:'#B3C8CF'},
+                { text: ' ', style: 'Risksuperheader',colSpan:5,border: [true, true, true, false], fillColor:'#B3C8CF'},
+                { },
+                {text: '  ', style: 'Risksuperheader',border: [true, false, true, false],fillColor:'#B3C8CF' }, 
+                { text:'', style:'Risksuperheader',border: [true, false, true, false] ,fillColor:'#B3C8CF'},
+                {  text:'', style:'Risksuperheader',border: [true, false, false, false],fillColor:'#FFF2C2'},
+                {  text:'', style:'Risksuperheader',border: [false, false, false, false],fillColor:'#FFF2C2'},
+                {  text:'', style:'Risksuperheader',border: [false, false, false, false],fillColor:'#FFF2C2'},
+                {  text:'', style:'Risksuperheader',border: [false, false, false, false],fillColor:'#FFF2C2'},
+                { text:'', style:'Risksuperheader',border: [true, false, false, false] ,fillColor:'#FFF2C2'},
+                { text:'', style:'Risksuperheader',border: [true, false, false, false] ,fillColor:'#FFF2C2'},
+                {  text:'Mitigation Plan', style:'Risksuperheader',border: [true, false, true, false]}
+              ],
+              [{text: 'SN', style: 'Risksuperheader',border: [true, false, false, false] },
+                { text: 'Risk Description', style: 'Risksuperheader',border: [true, false, false, false] },
+                {text: 'Probability of Occurrence (P)\n(Scale 1 to 5)', style: 'Risksuperheader',border: [true, false, true, false] },
+                { text:'impact on (Scale 1 to 5)',style:'Risksuperheader',colSpan: 3,fillColor:'#B3C8CF' },
+                {},{},
+                { text:'Overall Impact',style:'Risksuperheader' ,border: [true, false, true, true],fillColor:'#B3C8CF'}, 
+                // {    image: OverallImpact, width: 30, height: 60,fillColor:'#B3C8CF',fillColor:'#B3C8CF'}, 
+             { text:'Risk No',style:'Risksuperheader',border: [true, false, true, true] ,fillColor:'#B3C8CF'},
+                { text:'Mitigated Risk ', style:'Risksuperheader', colSpan: 4,border: [true, false, true, true],fillColor:'#FFF2C2'},
+                { },
+                { },
+                { },
+                { text:'Overall Impact',style:'Risksuperheader' ,border: [true, false, true, true],fillColor:'#FFF2C2'},
+                {text:'Risk No', style:'Risksuperheader',border: [true, false, true, true],fillColor:'#FFF2C2' },
+                { text:' ', style:'Risksuperheader',border: [true, false, true, true],}
+    
+              ],
+              [{text:'', style: 'Risksuperheader',border: [true, false, true, true]},
+                { text:'', style: 'Risksuperheader',border: [true, false, true, true]},
+                {  text:'', style: 'Risksuperheader',border: [true, false, true, true]},
+                { image: rotatedTP, width: 30, height: 60,fillColor:'#B3C8CF'},
+                {image: rotatedTIME, width: 30, height: 60,fillColor:'#B3C8CF' },
+                {image:rotatedCost,width: 30,height: 60 ,fillColor:'#B3C8CF'},
+                {image:rotatedAvg,width: 30,height: 60,fillColor:'#B3C8CF'},
+                {image:rotatedPxI,width: 30,height: 60,fillColor:'#B3C8CF'},
+                {image:rotatedP,width: 30,height: 60,fillColor:'#FFF2C2'},
+                {image: rotatedTP, width: 30, height: 60,fillColor:'#FFF2C2'},
+                {image:rotatedTIME,width: 30,height: 60,fillColor:'#FFF2C2'},
+                {image:rotatedCost,width: 30,height: 60,fillColor:'#FFF2C2' },
+                {image:rotatedAvg,width: 30,height: 60,fillColor:'#FFF2C2' },
+                {image:rotateResidualRisk,width: 30,height: 60,fillColor:'#FFF2C2'  } ,
+                { text: 'Mitigation Approach  ', style: 'Risksuperheader'},
+                ],
+                ...riskregmitList.map((item, index) => [
+                  { text: index + 1, style: 'normal', alignment: 'left' },
+                  { text: item.riskDescription || '-', style: 'normal', alignment: 'left' },
+                  { text: item.probability || '-', style: 'normal', alignment: 'center' },
+                  { text: item.technicalPerformance || '-', style: 'normal', alignment: 'center',fillColor:'#B3C8CF' },
+                  { text: item.time || '-', style: 'normal', alignment: 'center',fillColor:'#B3C8CF' },
+                  { text: item.cost || '-', style: 'normal', alignment: 'center',fillColor:'#B3C8CF' },
+                  { text: item.average || '-', style: 'normal', alignment: 'center',fillColor:'#B3C8CF' },
+                  {text: item.riskNo || '-', style: 'normal', alignment: 'center',fillColor: getBackgroundColorForRiskNo(Number(item.riskNo)), },
+                  {text: item.mitigationProbability || '-', style: 'normal', alignment: 'center',fillColor:'#FFF2C2' },
+                  {text: item.mitigationTp || '-', style: 'normal', alignment: 'center',fillColor:'#FFF2C2'}, 
+                  {text: item.mitigationTime || '-', style: 'normal', alignment: 'center',fillColor:'#FFF2C2'}, 
+                  {text: item.mitigationCost || '-', style: 'normal', alignment: 'center',fillColor:'#FFF2C2'},
+                  {text: item.mitigationAverage || '-', style: 'normal', alignment: 'center',fillColor:'#FFF2C2'},
+                  {text: item.mitigationRiskNo || '-', style: 'normal', alignment: 'center',   fillColor: getBackgroundColorForRiskNo(Number(item.mitigationRiskNo)),},
+                  {text: item.mitigationApproach || '-', style: 'normal', alignment: 'left',}
+                ])
+        ],    },
+        },
+             //risk reg table ends
+],
+    layouts: {
         noBorders: {
           defaultBorder: false
         }
       },
-
-
-      styles: {
+    styles: {
         tableExample: {
             margin: [35, 5, 0, 70],
             // alignment: 'center',
@@ -715,7 +882,10 @@ function generateRotatedTextImage(text) {
             fontSize: 11, bold: true,
             decoration: 'underline',
         },
-
+        Risksuperheader: {
+          fontSize: 12,
+          bold: true,
+        },
         firstRestricted: {
             fontSize: 8,
             decoration: 'underline',
