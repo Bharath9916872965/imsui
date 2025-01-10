@@ -29,7 +29,7 @@
 }
 
 .i-name {
-  color: red;
+  color: white;
   transition: color 1.5s ease;
 }
 .nav-item:hover .i-name {
@@ -426,7 +426,6 @@
   left: auto !important;
   right: 0 !important;
   cursor: pointer !important;
-  min-height: 150px; /* Set the minimum height */
   max-height: 300px; /* Set the maximum height */
   overflow-y: auto; /* Enable vertical scrolling */
   overflow-x: hidden; /* Prevent horizontal scrolling */

@@ -102,7 +102,7 @@ const Navbar = (props) => {
             <a href="/dashboard" className="nav-link">
               <div className="d-flex" style={{ float: 'left' }}>
                 <h3 className="mb-0 d-flex align-items-center me-2">
-                  <span className="i-name">I</span><span className="ms-name">MS</span>
+                  <span className="ms-name">I</span><span className="ms-name">MS</span>
                 </h3>
                 <h6 className="mb-0 d-flex align-items-end">
                   {title || ''} {empName}, {designation || ''} ({formRoleName || ''})
