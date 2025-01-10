@@ -1,5 +1,5 @@
-import React, { useEffect, useState } from "react";
-import { getIqaScheduleList,AuditClosureDTO,addAuditClosure,getAuditClosureList,updateAuditClosure } from "services/audit.service";
+import React, { useEffect, useState,useRef } from "react";
+import { getIqaScheduleList,AuditClosureDTO,addAuditClosure,getAuditClosureList,updateAuditClosure,uploadAuditClosureFile,downloadAuditClosureFile,givePreview } from "services/audit.service";
 import { Box, Typography, Button, TextField,Autocomplete, Grid } from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
 import './auditor-list.component.css';
@@ -19,7 +19,7 @@ import AlertConfirmation from "common/AlertConfirmation.component";
 const AuditClosureComponent = ({router}) => {
 
   const [isReady, setIsReady] = useState(false);
-  const [isComplted, setComplted] = useState(false);
+  const [isComplted, setComplted] = useState(true);
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaOptions,setIqaOptions] = useState([]);
   const [iqaNo,setIqaNo] = useState('');
@@ -34,8 +34,9 @@ const AuditClosureComponent = ({router}) => {
   const [auditorSubmitCount,setAuditorSubmitCount] = useState(0);
   const [auditeeAcceptCount,setAuditeeAcceptCount] = useState(0);
   const [auditClouserList,setAuditClouserList] = useState([]);
-  const [filAuditClouserList,setFilAuditClouserList] = useState([]);
-  const [element,setElement] = useState('')
+  const [element,setElement] = useState('');
+  const [selectedFile, setSelectedFile] = useState(undefined);
+  const fileInputRef = useRef(null);
 
 
 
@@ -171,6 +172,8 @@ const AuditClosureComponent = ({router}) => {
     const auditClouser = await getAuditClosureList();
     setAuditClouserList(auditClouser);
     setIsAddMode(false);
+    setSelectedFile(undefined)
+    fileInputRef.current.value = '';
     if(auditClouser && auditClouser.length > 0){
       const iqaAuditData = auditClouser.find(data => data.iqaId === iqaId);
       if(iqaAuditData){
@@ -198,57 +201,87 @@ const AuditClosureComponent = ({router}) => {
 
     const content = $('#summernote').summernote('code');
 
-    await AlertConfirmation({
-      title: isAddMode?'Are you sure Add Audit Closure ?':'Are you sure Update Audit Closure ?' ,
-      message: '',
-      }).then(async (result) => {
-      if (result) {
-        try {
-
-            if(isAddMode){
-              const response = await addAuditClosure(new AuditClosureDTO(0,Number(iqaId),content,closureDate));
-              if (response.status === 'S') {
-                afterSubmit();
-                Swal.fire({
-                  icon: "success",
-                  title: response.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: response.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                });
+    if(content.trim() === ''){
+      Swal.fire({
+        icon: "warning",
+        title: 'Plase Add Remarks',
+        showConfirmButton: false,
+        timer: 1500
+      });
+    }else{
+      await AlertConfirmation({
+        title: isAddMode?'Are you sure Add Audit Closure ?':'Are you sure Update Audit Closure ?' ,
+        message: '',
+        }).then(async (result) => {
+        if (result) {
+          try {
+            let attchmentName = '';
+              if(isAddMode){
+                if(selectedFile && selectedFile !=null){
+                  attchmentName = selectedFile.name;
+                }
+                const response = await addAuditClosure(new AuditClosureDTO(0,Number(iqaId),content,closureDate,attchmentName,iqaNo,''));
+                if (response.status === 'S') {
+                  if(selectedFile && selectedFile !=null){
+                   const fileResponse = await uploadAuditClosureFile(new AuditClosureDTO(0,Number(iqaId),content,closureDate,attchmentName,iqaNo,''),selectedFile);
+                   afterSubmit();
+                  }else{
+                    afterSubmit();
+                  }
+                  
+                  Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
+              }else{
+                if(selectedFile && selectedFile !=null){
+                  attchmentName = selectedFile.name;
+                }else{
+                  attchmentName = element.attachmentName;
+                }
+                const response = await updateAuditClosure(new AuditClosureDTO(element.closureId,Number(iqaId),content,closureDate,attchmentName,iqaNo,''));
+                if (response.status === 'S') {
+                  if(selectedFile && selectedFile !=null){
+                    const fileResponse = await uploadAuditClosureFile(new AuditClosureDTO(element.closureId,Number(iqaId),content,closureDate,attchmentName,iqaNo,element.attachmentName),selectedFile);
+                    afterSubmit();
+                   }else{
+                     afterSubmit();
+                   }
+                  Swal.fire({
+                    icon: "success",
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                } else {
+                  Swal.fire({
+                    icon: "error",
+                    title: response.message,
+                    showConfirmButton: false,
+                    timer: 1500
+                  });
+                }
               }
-            }else{
-              const response = await updateAuditClosure(new AuditClosureDTO(element.closureId,Number(iqaId),content,closureDate));
-              if (response.status === 'S') {
-                afterSubmit();
-                Swal.fire({
-                  icon: "success",
-                  title: response.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              } else {
-                Swal.fire({
-                  icon: "error",
-                  title: response.message,
-                  showConfirmButton: false,
-                  timer: 1500
-                });
-              }
-            }
-          
-
-        } catch (error) {
-          Swal.fire('Error!', 'There was an issue adding the Audit Closure.', 'error');
+            
+  
+          } catch (error) {
+            Swal.fire('Error!', 'There was an issue adding the Audit Closure.', 'error');
+          }
         }
-      }
-    });
+      });
+    }
+
+
 
   }
 
@@ -294,6 +327,31 @@ const AuditClosureComponent = ({router}) => {
     setClosureDate(value)
   }
 
+  const onFileSelected = (e) => {
+    const file = e.target.files[0];
+    if (file) {
+        if(file.size>200485760){
+          setSelectedFile(undefined)
+          Swal.fire({
+            icon: "warning",
+            title: 'Maximum file upload size is 200Mb !!!',
+            showConfirmButton: false,
+            timer: 2500
+          });
+        }else{
+          setSelectedFile(file)
+        }
+      }else{
+        setSelectedFile(undefined)
+      }
+  }
+
+    const downloadAtachment = async()=>{
+            const EXT= element.attachmentName.slice(element.attachmentName.lastIndexOf('.')+1);
+            const response =   await downloadAuditClosureFile(element.attachmentName,iqaNo);
+            givePreview(EXT,response,element.attachmentName);
+   }
+
   return (
     <div>
       <Navbar />
@@ -319,15 +377,29 @@ const AuditClosureComponent = ({router}) => {
             <Box flex="60%">
              <div className="card">
               <div className="text-center box-margin">
-                  <LocalizationProvider dateAdapter={AdapterDayjs}>
-                    <Box item  className="mg-top-10 mg-down-10 text-left">
-                      <DatePicker format='DD-MM-YYYY'  value={closureDate} label="Closure Date" views={['year', 'month', 'day']}
-                      onChange={(newValue) => {ClosureDateChange(newValue)}}slotProps={{ textField: { size: 'small' } }}/>
-                    </Box>
-                  </LocalizationProvider>
-                  <textarea id="summernote" className="form-control mg-top-10"></textarea>
+              <Box display="flex" alignItems="center" gap="10px" className='mg-top-10'>
+               <Box flex="30%">
+                 <LocalizationProvider dateAdapter={AdapterDayjs}>
+                      <Box item  className="mg-top-10 mg-down-10 text-left">
+                        <DatePicker format='DD-MM-YYYY'  value={closureDate} label="Closure Date" views={['year', 'month', 'day']}
+                        minDate = {iqaFromDate && dayjs(new Date(iqaFromDate))} onChange={(newValue) => {ClosureDateChange(newValue)}}slotProps={{ textField: { size: 'small' } }}/>
+                      </Box>
+                 </LocalizationProvider>
+               </Box>
+               <Box flex="30%">
+                <TextField className="bottom-5-rel" label="Choose File" variant="outlined" type="file" size="small" margin="normal"
+                  onChange={(e) => onFileSelected(e)} InputLabelProps={{ shrink: true,}} inputRef={fileInputRef} />
+               </Box>
+               <Box flex="40%">
+                <Box className='attachment' onClick = {()=>downloadAtachment()}>{element && element.attachmentName !== '' && element.attachmentName}</Box>
+               </Box>
+                </Box>
+                <Box display="flex" alignItems="center" gap="10px" className='mg-top-10'>
+                  <Box flex="100%">
+                    <textarea id="summernote" className="form-control mg-top-10"></textarea>
+                  </Box>
+                </Box>
               </div>
-               
               {isComplted && (isAddMode ?<div className="text-center mg-top-10 mg-down-10"><button onClick={() => closureAdd()} className="btn btn-success bt-sty">Submit</button></div>:
               <div className="text-center mg-top-10 mg-down-10"><button onClick={() => closureAdd()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
              </div>

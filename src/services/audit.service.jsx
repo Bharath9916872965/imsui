@@ -64,12 +64,13 @@ export class AuditCheckList{
 }
 
 export  class CheckListImgDto{
-    constructor(mocId,scheduleId,checkListAttachementName,iqaNo,iqaId){
+    constructor(mocId,scheduleId,checkListAttachementName,iqaNo,iqaId,mocDescription){
         this.mocId              = mocId;
         this.scheduleId         = scheduleId;
         this.checkListAttachementName = checkListAttachementName;
         this.iqaNo              = iqaNo;
         this.iqaId              = iqaId;
+        this.mocDescription     = mocDescription;
     }
 }
 export class MostFqNCDescDto{
@@ -89,11 +90,14 @@ export class AuditTransDto{
 }
 
 export class AuditClosureDTO{
-    constructor(closureId,iqaId,content,completionDate){
-        this.closureId      = closureId;
-        this.iqaId          = iqaId;
-        this.content        = content;
-        this.completionDate = completionDate;
+    constructor(closureId,iqaId,content,completionDate,attchmentName,iqaNo,oldAttchmentName){
+        this.closureId        = closureId;
+        this.iqaId            = iqaId;
+        this.content          = content;
+        this.completionDate   = completionDate;
+        this.attchmentName    = attchmentName;
+        this.iqaNo            = iqaNo;
+        this.oldAttchmentName = oldAttchmentName;
     }
 }
 
@@ -218,7 +222,7 @@ export const getIqaAuditeelist = async () => {
             headers: authHeader()
         })).data;
     } catch (error) {
-        console.error('Error occurred in getAuditeeDtoList', error);
+        console.error('Error occurred in getIqaAuditeelist', error);
         throw error; 
     }
 };
@@ -691,7 +695,6 @@ export const getIqaAuditeeList = async (iqaId) => {
 
   export const uploadCheckListImage = async (attachment,file)=>{
     try {
-        console.log('attachment-------- ',attachment)
         const formData = new FormData();
         formData.append('file', file);
         formData.append('ad', JSON.stringify(attachment));
@@ -950,3 +953,36 @@ export const getAssignedData = async (committeeType)=>{
         throw error;
     }
   }
+
+  export const uploadAuditClosureFile = async (attachment,file)=>{
+    try {
+        const formData = new FormData();
+        formData.append('file', file);
+        formData.append('ad', JSON.stringify(attachment));
+        return (await axios.post(`${API_URL}upload-audit-closure-file`,formData,{headers : { 'Content-Type': 'multipart/form-data', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in uploadAuditClosureFile:', error);
+        throw error;
+    }
+ }
+
+    export const downloadAuditClosureFile = async (attachment,iqaNo)=>{
+        try {
+            const params = {fileName: attachment,iqaNo: iqaNo};
+            const response = await axios.get(`${API_URL}audit-closure-file-download`, {
+                params: params,headers: {'Content-Type': 'application/json', ...authHeader(),},responseType: 'arraybuffer',});
+            return response.data;
+        } catch (error) {
+            console.error('Error occurred in downloadAuditClosureFile:', error);
+            throw error;
+        }
+    }
+
+    export const getClosureDate = async (values) => {
+        try {
+            return (await axios.post(`${API_URL}gat-closure-date`, values, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        } catch (error) {
+            console.error('Error occurred in getClosureDate', error);
+            throw error;
+        }
+      }

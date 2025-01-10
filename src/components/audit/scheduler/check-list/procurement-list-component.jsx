@@ -3,7 +3,7 @@ import Datatable from "components/datatable/Datatable";
 import Navbar from "components/Navbar/Navbar";
 import React, { useState, useEffect, useCallback } from 'react';
 import { Box,Tabs, Tab,Badge} from '@mui/material';
-import { getActiveProcurementList } from "services/audit.service";
+//import { getActiveProcurementList } from "services/audit.service";
 
 const ProcurementListComponent = ({ router }) => {
 
@@ -20,9 +20,9 @@ const ProcurementListComponent = ({ router }) => {
         setSelectedTab(newValue);
     }
 
-    const procurementList = async() =>{
-        const activeProcurementList = await getActiveProcurementList();
-    }
+    // const procurementList = async() =>{
+    //     const activeProcurementList = await getActiveProcurementList();
+    // }
     const procurementcolumns = [
         { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
         { name: 'DemandNo', selector: (row) => row.date, sortable: true, grow: 2, align: 'text-center', width: '9%'  },
