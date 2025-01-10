@@ -323,25 +323,25 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         }
 
         //////////////////KPI logic started if currentAuditeeIdSel > 0 then KPI /////
-        let revisionId = 0;
-        const dwpRevisionList = await getAllActiveDwpRecordList();
-        if (dwpRevisionList) {
-             //Finding Primary key RevisionRecordId
-            const filteredRows = dwpRevisionList.filter(item => 
-                item.groupDivisionId === groupDivisionId && item.docType === docType
-            );
-            if (filteredRows.length > 0) {
- 
-                // Find the row with the highest revisionNo
-          const highestRevisionRow = filteredRows.reduce((max, current) => {
-            return current.revisionNo > max.revisionNo ? current : max;
-         });
-  
-          //  the RevisionRecordId from the highest revision row was previously used for KPI
-          revisionId = highestRevisionRow.revisionRecordId;
+        //let revisionId = 0;
+        //const dwpRevisionList = await getAllActiveDwpRecordList();
+        // if (dwpRevisionList) {
 
-            }
-        }
+        //     const filteredRows = dwpRevisionList.filter(item => 
+        //         item.groupDivisionId === groupDivisionId && item.docType === docType
+        //     );
+        //     if (filteredRows.length > 0) {
+ 
+       
+        //   const highestRevisionRow = filteredRows.reduce((max, current) => {
+        //     return current.revisionNo > max.revisionNo ? current : max;
+        //  });
+  
+
+        //   revisionId = highestRevisionRow.revisionRecordId;
+
+        //     }
+        // }
 
         const kpiMasterList = await getKpiMasterList();
         const kpiObjRatingList = await getKpiObjRatingList();
@@ -1006,6 +1006,25 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
               //   ? '0' 
               //   : currentLoggerDivId,
             });
+
+            let filteredDwpVersionRecordList = []; 
+
+            if (dwpVersionRecordList) {
+             filteredDwpVersionRecordList = Object.values(
+               dwpVersionRecordList.reduce((acc, record) => {
+                        const { groupDivisionId, revisionNo } = record;
+                        if (
+                            !acc[groupDivisionId] || 
+                            acc[groupDivisionId].revisionNo < revisionNo
+                        ) {
+                            acc[groupDivisionId] = record;
+                        }
+                        return acc;
+                    }, {})
+                );
+            }
+            
+             setDWPRecordList(filteredDwpVersionRecordList);
             
             const gwpVersionRecordList = await getAllVersionRecordDtoList({
             docType: 'gwp',
@@ -1014,8 +1033,30 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             // ? '0' 
             // : currentLoggerGroupId,
            });
-            setDWPRecordList(dwpVersionRecordList);
-            setGWPRecordList(gwpVersionRecordList);
+
+           let filteredGwpVersionRecordList = []; 
+
+           if (gwpVersionRecordList) {
+               filteredGwpVersionRecordList = Object.values(
+                   gwpVersionRecordList.reduce((acc, record) => {
+                       const { groupDivisionId, revisionNo } = record;
+                       if (
+                           !acc[groupDivisionId] || 
+                           acc[groupDivisionId].revisionNo < revisionNo
+                       ) {
+                           acc[groupDivisionId] = record;
+                       }
+                       return acc;
+                   }, {})
+               );
+           }
+           
+      
+           setGWPRecordList(filteredGwpVersionRecordList);
+
+
+         
+     
             
            // Once all required data is fetched and set then call scheduleListBasedOnLoggerRole and updateGraphsData in below user Graph
             setIsReady(true);
@@ -1541,7 +1582,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
             {showQSPModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom" style={{ maxWidth: '80%' }}>
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal" >
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">QSP</h5>
@@ -1574,8 +1615,8 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
       
             {showDWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
+            <div className={`modal fade show modal-visible`} style={{ display: 'block'}} aria-modal="true" role="dialog">
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal"  >
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">DWP </h5>
@@ -1610,7 +1651,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
             {showGWPModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal">
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">GWP</h5>
