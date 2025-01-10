@@ -195,7 +195,7 @@ const AuditSummaryReport = () => {
           ];
           const ofiColumns = [
             { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
-            { name: 'Ofi No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
+            { name: 'OFI No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
             { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
             { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
             { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
