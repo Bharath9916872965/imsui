@@ -58,6 +58,9 @@
   color: darkblue !important; /* Apply darkblue color specifically to the label of this instance */
 }
 
+.docDashboardModal{
+  margin-top:4px!important;
+}
 
 .dashboard-iqa-select-picker .css-hvjq6j-MuiFormLabel-root-MuiInputLabel-root  {
   color: darkblue!important;

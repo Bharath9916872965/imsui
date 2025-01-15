@@ -8,7 +8,7 @@ import { format } from "date-fns";
 import { AgCharts } from 'ag-charts-react'; 
 import Datatable from "components/datatable/Datatable";
 
-import QmDocPrint from 'components/prints/qms/qm-doc-print';
+import QmDocPrintDashboard from "components/prints/qms/qm-doc-print-dashboard";
 import QspDocPrint from "components/prints/qms/qsp-doc-print";
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
 
@@ -18,10 +18,12 @@ import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
 
 import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount, getTotalChecklistObsCountByIqa
  ,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList
-,getProjectListOfPrjEmps,getDivGroupListOfDivEmps,getDivisionListOfDivEmps,getDivisionListOfDH,getDivisionListOfGH,getAllActiveDivisionList}
+,getProjectListOfPrjEmps,getDivGroupListOfDivEmps,getDivisionListOfDivEmps,getProjectListOfPrjDir,getDivisionListOfDH,getDivisionListOfGH,getAllActiveDivisionList}
    from "services/dashboard.service";
 
    import {qspDocumentList} from "services/qms.service";
+
+
    
 
 
@@ -36,7 +38,7 @@ const labelColorsChecklist = {
 
 
 const Dashboard = () => {
-
+  const [selectedItem, setSelectedItem] = useState(null);
   let currentLoggerRoleName = localStorage.getItem('roleName');
   let currentLoggerRoleId =   localStorage.getItem('roleId');
   let currentLoggerEmpId =    localStorage.getItem('empId');
@@ -48,6 +50,7 @@ const Dashboard = () => {
   const [iqaOptions,setIqaOptions] = useState([]);
 
   const [divisionMasterList, setDivisionMasterList] = useState([]);
+  const [projectListOfPrjDir, setProjectListOfPrjDir] = useState([]);
   const [divisionListOfDH, setDivisionListOfDH] = useState([]);
   const [divisionListOfGH, setDivisionListOfGH] = useState([]);
   const [divisionListByRoleId, setDivisionListByRoleId] = useState([]);
@@ -114,49 +117,58 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
       const filteredSchedules = ScheduleDtoList.filter(data => data.iqaId === iqaId);
 
 
-   /////////////////Filter RoleWise ////////////////////
-   let scheduleListRoleWise = [];
+
+        let scheduleListRoleWise = [];
    
-      if (currentLoggerRoleName &&
-           ['MR Rep', 'Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
-      ){
-           
-        let divisionIdOfDH = divisionListOfDH
-        ? divisionListOfDH.map(division => division.divisionId)
-            .sort((a, b) => a - b) 
-            .join(',')
-        : '';
-         console.log('divisionIdOfDH: ' + divisionIdOfDH);
-    
-        let divisionIdOfGH = divisionListOfGH
-        ? divisionListOfGH.map(division => division.divisionId)
-            .sort((a, b) => a - b) 
-            .join(',')
-        : '';
-        console.log('divisionIdOfGH: ' + divisionIdOfGH);
-    
-        let divisionIdsForLoggerRoleId = divisionListByRoleId
-        ? divisionListByRoleId.map(division => division.divisionId)
-            .sort((a, b) => a - b) 
-            .join(',')
-        : ''; 
-         console.log('divisionIdOfDivisionEmployees: ' + divisionIdsForLoggerRoleId);
+        if (currentLoggerRoleName &&
+           ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
+        ){
 
-        let currentLoggerDivId = localStorage.getItem('divId');
-        console.log('divisionIdOfCurrentEmployee: '+currentLoggerDivId);
+          ////////////////////////DIVISION IDS FILTER/////////////////////////////////////
+         let divisionIdOfDH = divisionListOfDH
+         ? divisionListOfDH.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+          : '';
+          //console.log('divisionIdOfDH: ' + divisionIdOfDH);
+    
+          let divisionIdOfGH = divisionListOfGH
+          ? divisionListOfGH.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+          : '';
+           //console.log('divisionIdOfGH: ' + divisionIdOfGH);
+    
+          let divisionIdsForLoggerRoleId = divisionListByRoleId
+           ? divisionListByRoleId.map(division => division.divisionId)
+            .sort((a, b) => a - b) 
+            .join(',')
+          : ''; 
+          //console.log('divisionIdOfDivisionEmployees: ' + divisionIdsForLoggerRoleId);
 
-        // Combine all four division ID strings into one array, remove duplicates, and then join them back into a string
-           let uniqueDivisionIds = [
-             ...new Set(
-                (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
-                 .concat(divisionIdOfGH.split(',').filter(Boolean))
-                 .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
-                 .concat(currentLoggerDivId.split(',').filter(Boolean))
-               )
+           let currentLoggerDivId = localStorage.getItem('divId');
+          //console.log('divisionIdOfCurrentEmployee: '+currentLoggerDivId);
+
+           // Combine all four division ID strings into one array, remove duplicates, and then join them back into a string
+           let uniqueDivisionIds;
+
+           if (['Divisional MR'].includes(currentLoggerRoleName.trim())) {
+            uniqueDivisionIds = currentLoggerDivId; // Filter out empty strings
+           } else {
+            uniqueDivisionIds = [
+                ...new Set(
+                    (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
+                    .concat(divisionIdOfGH.split(',').filter(Boolean))
+                    .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
+                    .concat(currentLoggerDivId)
+                )
             ]
             .sort((a, b) => a - b)
             .join(',');
-            console.log('Unique Division IDs: ' + uniqueDivisionIds);
+           }
+        
+          // console.log('Unique Division IDs: ' + uniqueDivisionIds);
+          
             
            // If uniqueDivisionIds is not empty, filter schedules by divisionId
            if (uniqueDivisionIds) {
@@ -171,44 +183,61 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
           //   let groupIdsForLoggerRoleId = groupListByRoleId
           //  .map(group => group.groupId)
           //  .join(','); 
-
-          let groupIdsForLoggerRoleId = '';
-          if (uniqueDivisionIds) {
-          const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
-           // Filter divisionMasterList to include only entries with matching divisionId
-            const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
-            uniqueDivisionIdsArray.includes(Number(division.divisionId))
-           );
-           // Extract groupIds from the matched divisions, or leave groupIdsForLoggerRoleId as an empty string if no matches
+          
+          ////////////////////////GROUP IDS FILTER/////////////////////////////////////
+            let groupIdsForLoggerRoleId = '';
+            if (uniqueDivisionIds) {
+             const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+             // Filter divisionMasterList to include only entries with matching divisionId
+              const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
+              uniqueDivisionIdsArray.includes(Number(division.divisionId))
+              );
+              // Extract groupIds from the matched divisions, or leave groupIdsForLoggerRoleId as an empty string if no matches
                groupIdsForLoggerRoleId = matchedDivisionsToGetGroupIds.length > 0
-             ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
+               ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
               : '';
-           }
-          console.log('groupIdsForLoggerRoleId: '+groupIdsForLoggerRoleId);
-
-           let projectIdsForLoggerRoleId = projectListByRoleId
-           .map(group => group.projectId)
-           .join(','); // Join all group project IDs
-           console.log('projectIdsForLoggerRoleId: '+projectIdsForLoggerRoleId);
+              }
+              //console.log('groupIdsForLoggerRoleId: '+groupIdsForLoggerRoleId);
 
 
+              // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
+              if (groupIdsForLoggerRoleId) {
+                const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
+                const groupMatchedSchedules = filteredSchedules.filter(schedule =>
+                 groupIdsArray.includes(Number(schedule.groupId))
+                );
+                scheduleListRoleWise = [...scheduleListRoleWise, ...groupMatchedSchedules];
+               }
 
+           ////////////////////////PROJECT IDS FILTER/////////////////////////////////////
+           let projectIdsOfPrjDirector = projectListOfPrjDir
+           ? projectListOfPrjDir.map(project => project.projectId)
+               .sort((a, b) => a - b) 
+               .join(',')
+           : ''; 
+           //console.log('projectIdsOfPrjDirector: '+projectIdsOfPrjDirector);
 
-    
+           let projectIdsOfProjectEmployees = projectListByRoleId
+           ? projectListByRoleId.map(project => project.projectId)
+               .sort((a, b) => a - b) 
+               .join(',')
+           : ''; 
+           //console.log('projectIdsOfProjectEmployees: '+projectIdsOfProjectEmployees);
 
-          // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
-          if (groupIdsForLoggerRoleId) {
-          const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
-          const groupMatchedSchedules = filteredSchedules.filter(schedule =>
-           groupIdsArray.includes(Number(schedule.groupId))
-          );
-          scheduleListRoleWise = [...scheduleListRoleWise, ...groupMatchedSchedules];
-         }
+          let uniqueProjectIds;
+          uniqueProjectIds = [
+           ...new Set(
+            (projectIdsOfPrjDirector.split(',').filter(Boolean)) // Filter out empty strings
+            .concat(projectIdsOfProjectEmployees.split(',').filter(Boolean))
+          )
+         ]
+         .sort((a, b) => a - b)
+         .join(',');
+          //console.log('uniqueProjectIds: '+uniqueProjectIds);
 
-         
-          // If projectIdsForLoggerRoleId is not empty, filter schedules by projectId
-          if (projectIdsForLoggerRoleId) {
-            const projectIdsArray = projectIdsForLoggerRoleId.split(',').map(Number);
+          // If uniqueProjectIds is not empty, filter schedules by projectId
+          if (uniqueProjectIds) {
+            const projectIdsArray = uniqueProjectIds.split(',').map(Number);
             const projectMatchedSchedules = filteredSchedules.filter(schedule =>
               projectIdsArray.includes(Number(schedule.projectId))
             );
@@ -251,6 +280,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         let selAuditeeName;
         let docType;
         let groupDivisionId;
+        let kpiType;
 
           
             let modifiedIqaNo = iqaNo.substring(4);  
@@ -279,46 +309,50 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         dataForObs = [entry.countOfNC, entry.countOfOBS, entry.countOfOFI]; 
         if (entry.divisionId > 0) {
           selAuditeeName =   entry.divisionName  
-          docType = "dwp";        
-          groupDivisionId = entry.divisionId;       
+          docType = "dwp";   
+          groupDivisionId = entry.divisionId; 
+          kpiType = "D";      
         } else if (entry.groupId > 0) {
           selAuditeeName =   entry.groupName  
-          docType = "gwp";  
+          docType = "gwp"; 
+          kpiType = "G";   
           groupDivisionId = entry.groupId;                      
         } else if (entry.projectId > 0) {
-          selAuditeeName =   entry.projectName                    
+          selAuditeeName =   entry.projectName  
+          kpiType = "";                    
         }
 
         //////////////////KPI logic started if currentAuditeeIdSel > 0 then KPI /////
-        let revisionId = 0;
-        const dwpRevisionList = await getAllActiveDwpRecordList();
-        if (dwpRevisionList) {
-             //Finding Primary key RevisionRecordId
-            const filteredRows = dwpRevisionList.filter(item => 
-                item.groupDivisionId === groupDivisionId && item.docType === docType
-            );
-            if (filteredRows.length > 0) {
- 
-                // Find the row with the highest revisionNo
-          const highestRevisionRow = filteredRows.reduce((max, current) => {
-            return current.revisionNo > max.revisionNo ? current : max;
-         });
-  
-          //  the RevisionRecordId from the highest revision row was previously used for KPI
-          revisionId = highestRevisionRow.revisionRecordId;
+        //let revisionId = 0;
+        //const dwpRevisionList = await getAllActiveDwpRecordList();
+        // if (dwpRevisionList) {
 
-            }
-        }
+        //     const filteredRows = dwpRevisionList.filter(item => 
+        //         item.groupDivisionId === groupDivisionId && item.docType === docType
+        //     );
+        //     if (filteredRows.length > 0) {
+ 
+       
+        //   const highestRevisionRow = filteredRows.reduce((max, current) => {
+        //     return current.revisionNo > max.revisionNo ? current : max;
+        //  });
+  
+
+        //   revisionId = highestRevisionRow.revisionRecordId;
+
+        //     }
+        // }
 
         const kpiMasterList = await getKpiMasterList();
         const kpiObjRatingList = await getKpiObjRatingList();
-        //console.log('kpi data'+JSON.stringify(kpiObjRatingList));
-
+       
+        if(kpiType){
           if (Array.isArray(kpiObjRatingList) && kpiObjRatingList.length > 0) {
             const filratingData = kpiObjRatingList.filter(
               (item) =>
                 Number(item.groupDivisionId) === Number(groupDivisionId) &&
-                iqaId === item.iqaId
+                iqaId === item.iqaId &&
+                kpiType === item.kpiType 
             );
            if (filratingData.length > 0) {
         
@@ -331,8 +365,9 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
           } else {
                 const filKpiMasterData = kpiMasterList.filter(
                 (item) =>
-                  Number(item.groupDivisionId) === Number(groupDivisionId) ||
-                 item.revisionRecordId === '0'
+                  ((Number(item.groupDivisionId) === Number(groupDivisionId) 
+                  && kpiType === item.kpiType)|| item.groupDivisionId === 0 )
+             
                  );
                 if (filKpiMasterData.length > 0) {
                     dataForKPI = filKpiMasterData.map((item, index) => ({
@@ -347,6 +382,7 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
           }else{
 
           }
+        }
 
         }else {
                dataForObs = [0, 0, 0]; // Static data for when no auditee is selected
@@ -561,13 +597,14 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
      
 
               let checkListByObsRoleWise = [];
-                /////////////////Filter RoleWise ////////////////////
+
               
                 //Admin,Director,MR and MR-Rep should get all only for below roles restriction
                 if (currentLoggerRoleName &&
                   ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim())
                 ){
 
+                       ////////////////////////DIVISION IDS FILTER/////////////////////////////////////
                   let divisionIdOfDH = divisionListOfDH
                   ? divisionListOfDH.map(division => division.divisionId)
                       .sort((a, b) => a - b) 
@@ -589,18 +626,24 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                   let currentLoggerDivId = localStorage.getItem('divId');
           
                   // Combine all four division ID strings into one array, remove duplicates, and then join them back into a string
-                     let uniqueDivisionIds = [
-                       ...new Set(
-                          (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
-                           .concat(divisionIdOfGH.split(',').filter(Boolean))
-                           .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
-                           .concat(currentLoggerDivId.split(',').filter(Boolean))
-                         )
+                  let uniqueDivisionIds;
+
+                  if (['Divisional MR'].includes(currentLoggerRoleName.trim())) {
+                      uniqueDivisionIds = currentLoggerDivId; // Filter out empty strings
+                  } else {
+                      uniqueDivisionIds = [
+                          ...new Set(
+                              (divisionIdOfDH.split(',').filter(Boolean)) // Filter out empty strings
+                              .concat(divisionIdOfGH.split(',').filter(Boolean))
+                              .concat(divisionIdsForLoggerRoleId.split(',').filter(Boolean))
+                              .concat(currentLoggerDivId)
+                          )
                       ]
                       .sort((a, b) => a - b)
                       .join(',');
-                      
-                     // If uniqueDivisionIds is not empty, filter schedules by divisionId
+                  }
+                  
+ 
                      if (uniqueDivisionIds) {
                       const divisionIdsArray = uniqueDivisionIds.split(',').map(Number);
                       const divisionMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
@@ -611,30 +654,26 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
 
 
 
-                //   let groupIdsForLoggerRoleId = groupListByRoleId
-                //  .map(group => group.groupId)
-                //  .join(','); 
 
                  //prev way
           //   let groupIdsForLoggerRoleId = groupListByRoleId
           //  .map(group => group.groupId)
           //  .join(','); 
 
-          let groupIdsForLoggerRoleId = '';
-          if (uniqueDivisionIds) {
-          const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
-           // Filter divisionMasterList to include only entries with matching divisionId
-            const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
-            uniqueDivisionIdsArray.includes(Number(division.divisionId))
-           );
-           // Extract groupIds from the matched divisions, or leave groupIdsForLoggerRoleId as an empty string if no matches
+           ////////////////////////GROUP IDS FILTER/////////////////////////////////////
+                 let groupIdsForLoggerRoleId = '';
+               if (uniqueDivisionIds) {
+                const uniqueDivisionIdsArray = uniqueDivisionIds.split(',').map(Number);
+                   const matchedDivisionsToGetGroupIds = divisionMasterList.filter(division =>
+                   uniqueDivisionIdsArray.includes(Number(division.divisionId))
+               );
+            
                groupIdsForLoggerRoleId = matchedDivisionsToGetGroupIds.length > 0
-             ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
-              : '';
-           }
-          console.log('groupIdsForLoggerRoleId: '+groupIdsForLoggerRoleId);
-
-                // If groupIdsForLoggerRoleId is not empty, filter schedules by groupId
+                 ? [...new Set(matchedDivisionsToGetGroupIds.map(division => division.groupId))].join(',')
+                   : '';
+               }
+  
+            
                 if (groupIdsForLoggerRoleId) {
                 const groupIdsArray = groupIdsForLoggerRoleId.split(',').map(Number);
                 const groupMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
@@ -643,24 +682,43 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                 checkListByObsRoleWise = [...checkListByObsRoleWise, ...groupMatchedSchedules];
                }
 
-               let projectIdsForLoggerRoleId = projectListByRoleId
-               .map(group => group.projectId)
-               .join(','); // Join all group project IDs
     
-       
-               // If projectIdsForLoggerRoleId is not empty, filter schedules by projectId
-              if (projectIdsForLoggerRoleId) {
-                  const projectIdsArray = projectIdsForLoggerRoleId.split(',').map(Number);
-                  const projectMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
-                     projectIdsArray.includes(Number(checkList.projectId))
+              ////////////////////////PROJECT IDS FILTER/////////////////////////////////////
+               let projectIdsOfPrjDirector = projectListOfPrjDir
+               ? projectListOfPrjDir.map(project => project.projectId)
+                   .sort((a, b) => a - b) 
+                   .join(',')
+               : ''; 
+    
+               let projectIdsOfProjectEmployees = projectListByRoleId
+               ? projectListByRoleId.map(project => project.projectId)
+                   .sort((a, b) => a - b) 
+                   .join(',')
+               : ''; 
+    
+              let uniqueProjectIds;
+              uniqueProjectIds = [
+               ...new Set(
+                (projectIdsOfPrjDirector.split(',').filter(Boolean)) // Filter out empty strings
+                .concat(projectIdsOfProjectEmployees.split(',').filter(Boolean))
+              )
+           ]
+           .sort((a, b) => a - b)
+           .join(',');
+          
+
+               // If uniqueProjectIds is not empty, filter schedules by projectId
+               if (uniqueProjectIds) {
+               const projectIdsArray = uniqueProjectIds.split(',').map(Number);
+               const projectMatchedSchedules = checkListByObsBasedOnIqaIdSelData.filter(checkList =>
+                  projectIdsArray.includes(Number(checkList.projectId))
                  );
                  checkListByObsRoleWise = [...checkListByObsRoleWise, ...projectMatchedSchedules];
                }
-
-             }else{
-                  checkListByObsRoleWise = checkListByObsBasedOnIqaIdSelData;
+            }else{
+              checkListByObsRoleWise = checkListByObsBasedOnIqaIdSelData;
             }
-    
+
 
 
             if (!checkListByObsRoleWise.length) {
@@ -771,6 +829,8 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                     fill: labelColorsChecklist.OFI, 
                   },
                 ],
+                height: 310, // Adjust the height
+                pixelRatio: window.devicePixelRatio || 1,
               });
 
             }
@@ -876,7 +936,10 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
       const divisionsActiveMasterList = await getAllActiveDivisionList();
       setDivisionMasterList(divisionsActiveMasterList);
 
-
+      const prjListOfProjectDirector = await getProjectListOfPrjDir(currentLoggerRoleId, currentLoggerEmpId);
+      //project director get all his projects
+      setProjectListOfPrjDir(prjListOfProjectDirector);
+      
       //division head  get all his divisions
       const divisionsListOfDivisionHead = await getDivisionListOfDH(currentLoggerRoleId, currentLoggerEmpId);
       setDivisionListOfDH(divisionsListOfDivisionHead);
@@ -899,7 +962,23 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
            setProjectListByRoleId(projectListByRoleId);
    
         // Iqa dropdown and default iqa selection 
-          const IqaList = await getIqaDtoListForDahboard();
+          let IqaList = await getIqaDtoListForDahboard();
+
+          const currentDate = new Date().toISOString().split('T')[0]; // Get the current date in 'YYYY-MM-DD' format
+        
+          if (IqaList) {
+            IqaList = IqaList.filter(iqa => {
+              const fromDate = new Date(iqa.fromDate).toISOString().split('T')[0];
+              const toDate = new Date(iqa.toDate).toISOString().split('T')[0]; 
+          
+      
+              return fromDate <= currentDate && toDate <= currentDate;
+            });
+          }
+          // console.log('Filtered IqaList:', IqaList);
+
+
+
           setIqaFullList(IqaList);
           const iqaData = IqaList.map(data => ({
                           value : data.iqaId,
@@ -927,6 +1006,25 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
               //   ? '0' 
               //   : currentLoggerDivId,
             });
+
+            let filteredDwpVersionRecordList = []; 
+
+            if (dwpVersionRecordList) {
+             filteredDwpVersionRecordList = Object.values(
+               dwpVersionRecordList.reduce((acc, record) => {
+                        const { groupDivisionId, revisionNo } = record;
+                        if (
+                            !acc[groupDivisionId] || 
+                            acc[groupDivisionId].revisionNo < revisionNo
+                        ) {
+                            acc[groupDivisionId] = record;
+                        }
+                        return acc;
+                    }, {})
+                );
+            }
+            
+             setDWPRecordList(filteredDwpVersionRecordList);
             
             const gwpVersionRecordList = await getAllVersionRecordDtoList({
             docType: 'gwp',
@@ -935,8 +1033,30 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
             // ? '0' 
             // : currentLoggerGroupId,
            });
-            setDWPRecordList(dwpVersionRecordList);
-            setGWPRecordList(gwpVersionRecordList);
+
+           let filteredGwpVersionRecordList = []; 
+
+           if (gwpVersionRecordList) {
+               filteredGwpVersionRecordList = Object.values(
+                   gwpVersionRecordList.reduce((acc, record) => {
+                       const { groupDivisionId, revisionNo } = record;
+                       if (
+                           !acc[groupDivisionId] || 
+                           acc[groupDivisionId].revisionNo < revisionNo
+                       ) {
+                           acc[groupDivisionId] = record;
+                       }
+                       return acc;
+                   }, {})
+               );
+           }
+           
+      
+           setGWPRecordList(filteredGwpVersionRecordList);
+
+
+         
+     
             
            // Once all required data is fetched and set then call scheduleListBasedOnLoggerRole and updateGraphsData in below user Graph
             setIsReady(true);
@@ -974,30 +1094,11 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
   
 
   
-const getQMDocPDF = (action, revisionElements) => {;
-  return <QmDocPrint action={action} revisionElements={revisionElements} />
-}
+  const handleQMClick = (item) => {
+    setSelectedItem(item); // Set the item to trigger rendering of QmDocPrintDashboard
+  };
 
-// const handleQMDocPrint = () => {
-//   if (!qmRecordList || qmRecordList.length === 0) {
-//     alert('QM Print is not available.');
-//     return;
-//   }
-//   console.log('qmRecordList:', qmRecordList);
 
-//   const validItem = qmRecordList.find(item => !["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode));
-
-//   if (validItem) {
-//     console.log('validItem success');
-//     <div>
-//     <>
-//     {getQMDocPDF('', validItem)}
-//   </>
-//   </div>
-//   } else {
-//     alert('QM Print is not available for current status.');
-//   }
-// };
 
   const openQMPopUpModal = ()=>{
     setQMShowModal(true);
@@ -1033,37 +1134,35 @@ const handleGWPClose = ()=>{
   setGWPShowModal(false);
 }
 
-const columnsQM = [
-  { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
-  { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
-  { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
-  { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
-  { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
-];
+// const columnsQM = [
+//   { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
+//   { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-start' },
+//   { name: 'Issue From', selector: (row) => row.from, sortable: true, grow: 2, align: 'text-center' },
+//   { name: 'Issue To', selector: (row) => row.to, sortable: true, grow: 2, align: 'text-center' },
+//   { name: 'DOR', selector: (row) => row.issueDate, sortable: true, grow: 2, align: 'text-center' },
+//   { name: 'Status', selector: (row) => row.status, sortable: false, grow: 2, align: 'text-center' },
+//   { name: 'Action', selector: (row) => row.action, sortable: false, grow: 2, align: 'text-center' },
+// ];
 
 
 
-const mappedDataQM = qmRecordList.map((item, index) => ({
-  sn: index + 1,
-  description: item.description || '-' || '-',
-  // from: 'V' + item[5] + '-R' + item[6] || '-',
-  from: index + 1 < qmRecordList.length ? 'I' + qmRecordList[index + 1].issueNo + '-R' + qmRecordList[index + 1].revisionNo : '--',
-  to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
-  issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
-  status: item.statusCode || '--',
-  action: (
-    <div>
-      {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
-        <>
-          {getQMDocPDF('', item)}
-        </>
-      )}
-    </div>
-  ),
-}));
-
+// const mappedDataQM = qmRecordList.map((item, index) => ({
+//   sn: index + 1,
+//   description: item.description || '-' || '-',
+//   from: index + 1 < qmRecordList.length ? 'I' + qmRecordList[index + 1].issueNo + '-R' + qmRecordList[index + 1].revisionNo : '--',
+//   to: 'I' + item.issueNo + '-R' + item.revisionNo || '-',
+//   issueDate: format(new Date(item.dateOfRevision), 'dd-MM-yyyy') || '-',
+//   status: item.statusCode || '--',
+//   action: (
+//     <div>
+//       {!["APR", "APR-GDDQA", "APR-DGAQA"].includes(item.statusCode) && (
+//         <>
+//           {getQMDocPDF(item)}
+//         </>
+//       )}
+//     </div>
+//   ),
+// }));
 
 const columnsQSP = [
    { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '5%'  },
@@ -1410,210 +1509,42 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
 {/************************************ ROW START ***************************************/}
 <div className="row">
 
-{/*******************************GRID LEFT********************************************* */}
 
-
-    {/* <div className="col-xl-2 col-lg-12 stretch-card grid-margin divider-div-left" >
-      <div className="row" >
-             <div className="col-xl-12 col-md-4 stretch-card grid-margin grid-margin-sm-0 pb-sm-1">
-       
-               <div className="col-service-card"   onClick={() => openQMPopUpModal()} >
-                 <div className="service-card">
-                   <h3>QM</h3>
-                   <p>
-                   </p>
-                    <figcaption></figcaption>
-                </div>
-              </div>
-
-              {showQMModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">QM </h5>
-                    <button type="button" className="btn btn-danger" onClick={handleQMClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height">
-
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsQM} data={mappedDataQM} />
-                  </div>
-                  
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}
-         </div>
-                
-                
-     <div className="col-xl-12 col-md-4 stretch-card grid-margin grid-margin-sm-0 pb-sm-1">
-
-      <div className="col-service-card"  onClick={() => openQSPPopUpModal()} >
-        <div className="service-card">
-          <h3>QSP</h3>
-          <p>
-          </p>
-          <figcaption></figcaption>
-        </div>
-      </div>
-
-      {showQSPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">QSP </h5>
-                    <button type="button" className="btn btn-danger" onClick={handleQSPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height">
-                 
-                  <table className="table table-bordered table-hover">
-                      <thead>
-                       <tr>
-                          <th className='width25'>QSP</th>
-                          <th className='width10'>Issue From</th>
-                          <th className='width10'>Issue To</th>
-                          <th className='width10'>DOR</th>
-                          <th className='width10'>Print</th>
-                       </tr>
-                       </thead> 
-                       <tbody>
-                          <tr>
-                              <td className='width25'></td>
-                              <td className='width10 text-start'></td>
-                              <td className='width10 text-start'></td>
-                              <td className='width10'></td>
-                              <td className='width10'></td>
-                          </tr>
-                        </tbody>
-                    </table>
-
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}
-
-
-
-     </div>
-                 
-     <div className="col-xl-12 col-md-4 stretch-card grid-margin grid-margin-sm-0 pb-sm-1">
-
-     <div className="col-service-card"  onClick={() => openDWPPopUpModal()}>
-        <div className="service-card">
-   
-          <h3>DWP</h3>
-          <p>
-           
-          </p>
-          <figcaption></figcaption>
-        </div>
-      </div>
-
-      {showDWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">DWP </h5>
-                    <button type="button" className="btn btn-danger" onClick={handleDWPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height">
-                 
-                
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsDWP} data={mappedDataDWP} />
-                  </div>
-
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}
-
-
-        </div>
-
-
-       <div className="col-xl-12 col-md-4 stretch-card grid-margin grid-margin-sm-0 pb-sm-1">
-       <div className="col-service-card"  onClick={() => openGWPPopUpModal()}>
-        <div className="service-card">
-   
-          <h3>GWP</h3>
-          <p>
-           
-          </p>
-          <figcaption></figcaption>
-        </div>
-      </div>
-      {showGWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">GWP</h5>
-                    <button type="button" className="btn btn-danger" onClick={handleGWPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height">
-
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsGWP} data={mappedDataGWP} />
-                  </div>
-
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-          )}
-
-
-
-      </div>
-    </div>
-  </div> */}
-
-
-  {/**************************************************GRID RIGHT***************************************************************** */}
-  {/* <div className="col-xl-10 col-lg-12 stretch-card grid-margin divider-div-right "> */}
   <div className="col-xl-12 col-lg-12 stretch-card grid-margin  ">
               
               <div className="card audit-graphs-card">
                  <div className="row">
 
           <div className="col-md-2  docs-panel">
+          
           <div className="row docs-row" >
 
-{/* <div className="docs-div qm" onClick={handleQMDocPrint}>
-  <div className="docs-content">
-    <span className="docs-label">QM</span>
-  </div>
-</div> */}
+
+          <div className="docs-div qm">
+  {qmRecordList.map((item, index) => (
+    <div 
+      key={index} 
+      className="docs-content" 
+      onClick={() => handleQMClick(item)}
+
+    >
+        {selectedItem && (
+        <QmDocPrintDashboard
+          revisionElements={selectedItem}
+          openInNewTab={true} // You can pass this prop to control new tab opening
+        />
+      )}
+      <span className="docs-label">QM</span>
+    </div>
+  ))}
+</div>
+ 
+
+   
 
 
 
-             <div className="docs-div qm " onClick={() => openQMPopUpModal()}> 
+            {/* <div className="docs-div qm " onClick={() => openQMPopUpModal()}> 
                 <div className="docs-content">
                     <span className="docs-label">QM</span> 
                 </div>
@@ -1641,7 +1572,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
               </div>
             </div>
 
-          )} 
+          )}   */}
       
         
             <div className="docs-div qsp " onClick={() => openQSPPopUpModal()}>
@@ -1651,7 +1582,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
             {showQSPModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom" style={{ maxWidth: '80%' }}>
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal" >
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">QSP</h5>
@@ -1684,8 +1615,8 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
       
             {showDWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
+            <div className={`modal fade show modal-visible`} style={{ display: 'block'}} aria-modal="true" role="dialog">
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal"  >
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">DWP </h5>
@@ -1720,7 +1651,7 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
             </div>
             {showGWPModal && (
             <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
+              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal">
                 <div className="modal-content" >
                   <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
                     <h5 className="modal-title">GWP</h5>
@@ -1751,31 +1682,46 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
                
 
  <div className="col-md-8 counter-row">
- <div className="col-md-2  imsCounter">
-              <a className="dashboard-links" href="/auditor-list">
-                <div className="counter auditor">
-                 <h3>Active Auditors</h3>
-                 <span className="counter-value">{activeAuditorsCount}</span>
-               </div>
-             </a>
-          </div>
 
-
-
-      <div className="col-md-2 imsCounter">
-      <a 
-  className="dashboard-links" 
-  href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
->
-          <div className="counter auditee">
-              {/* <div className="counter-icon">
-                  <span> <FaUserCog  color="White" className="counter-icons"  /></span>
-              </div> */}
-              <h3>{iqaNoSelected} Auditees</h3>
-              <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
-          </div>
-          </a>
+  <div className="col-md-2 imsCounter">
+    {currentLoggerRoleName &&
+    ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+      <div className="counter auditor no-link">
+        <h3>Active Auditors</h3>
+        <span className="counter-value">{activeAuditorsCount}</span>
       </div>
+    ) : (
+      <a className="dashboard-links" href="/auditor-list">
+        <div className="counter auditor">
+          <h3>Active Auditors</h3>
+          <span className="counter-value">{activeAuditorsCount}</span>
+        </div>
+      </a>
+    )}
+  </div>
+
+
+
+  <div className="col-md-2 imsCounter">
+  {currentLoggerRoleName &&
+  ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+    <div className="counter auditee no-link">
+      <h3>{iqaNoSelected} Auditees</h3>
+      <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+    </div>
+  ) : (
+    <a
+      className="dashboard-links"
+      href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
+    >
+      <div className="counter auditee">
+        <h3>{iqaNoSelected} Auditees</h3>
+        <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+      </div>
+    </a>
+  )}
+</div>
+
 
 
       
