@@ -6,6 +6,7 @@ import { dwprevisionTran, getAbbreviationsByIdNotReq, getDocTemplateAttributes, 
 import { getEmployeesList } from 'services/header.service';
 import { format } from 'date-fns';
 import {RiskRegisterMitigation } from "services/risk.service";
+import { getKpiMasterList } from "services/kpi.service";
 
 const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
@@ -24,7 +25,7 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [employeeDetails, setEmployeeDetails] = useState([]);
   const [dwpTransactionList, setDwpTransactionList] = useState([]);
   const [riskregmitList,setriskregmitList]=useState('');
-
+  const [kpiMasterfilList,setfilKpiMasterList] = useState([]);
   useEffect(() => {
 
     const qmsDocTypeDto = {
@@ -39,6 +40,9 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
         
        const riskregmitmergeList = await RiskRegisterMitigation(revisionElements.groupDivisionId, revisionElements.docType,revisionElements.revisionRecordId);
        setriskregmitList(riskregmitmergeList)
+         const kpiMasterList  = await getKpiMasterList()
+         const filteredKpiMasterList = kpiMasterList.filter(item => item.groupDivisionId === revisionElements.groupDivisionId);
+         setfilKpiMasterList(filteredKpiMasterList);
        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
         setRevisionRecordData(revision);
         Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
@@ -536,9 +540,43 @@ emptySpace.push([{
   border: [false, false, false, false],
  
 },])
+//for kpi
+const getUnitSingle = {
+  'DAYS'   : ' DAY',
+  'NOS'    : ' NO',
+  'WEEKS'  : ' WEEK',
+  'MONTHS' : ' MONTH',
+  'QUATER' : 'QUATER',
+  'YEAR'   : 'YEAR',
+};
 
+const getunit = (unitName, target) => {
+  if (Number(target) === 1 && unitName !== 'PERCENTAGE') {
+    return target + ' ' + getUnitSingle[unitName]; // Ensure 'getUnitSingle' is defined elsewhere
+  } else {
+    return unitName === 'PERCENTAGE' ? target + '%' : target + ' ' + unitName;
+  }
+};
+let kpi=[];
+kpi.push([
+  { text: 'SN', bold: true, alignment: 'center', style: 'Risksuperheader' },
+  { text: 'Objectives', bold: true, alignment: 'center', style: 'Risksuperheader' },
+  { text: 'Metrics', bold: true, alignment: 'center', style: 'Risksuperheader' },
+  { text: 'Norms', bold: true, alignment: 'center', style: 'Risksuperheader' },
+  { text: 'Target', bold: true, alignment: 'center', style: 'Risksuperheader' },
+]);
 
-    
+// Loop through kpiMasterfilList and add rows
+for (let i = 0; i < kpiMasterfilList.length; i++) {
+  const kpiUnit = getunit(kpiMasterfilList[i].kpiUnitName, kpiMasterfilList[i].kpiTarget); 
+  kpi.push([
+    { text: (i + 1).toString(), style: 'tdData', alignment: 'center' }, 
+    { text: kpiMasterfilList[i].kpiObjectives, style: 'tdData', alignment: 'center' }, 
+    { text: kpiMasterfilList[i].kpiMerics, style: 'tdData' }, 
+    { text: kpiMasterfilList[i].kpiNorms, style: 'tdData' }, 
+    { text: kpiUnit, style: 'tdData' } 
+  ]);
+}
 
 
     let docDefinition = {
@@ -744,10 +782,25 @@ emptySpace.push([{
             title: { text: 'TABLE OF CONTENTS', style: 'header', bold: true, alignment: 'center', fontSize: 14, margin: [0, 10, 0, 10] },
             numberStyle: { bold: true },
           },
-          // pageBreak: 'after'
+           pageBreak: 'after'
 
         },
         allValues,
+        //for KPI Starts
+        {
+          text: 'Key Process Indicator (KPI) & Metrics', // Table header
+          style: 'tableHeader',
+          alignment: 'center',
+          fontSize: 16, 
+       bold: true, 
+          margin: [0, 10, 0, 10], // Optional spacing
+        },
+        { table: {
+          widths: ['5%', '30%', '30%', '20%', '15%'],
+          body: kpi
+          
+        },},
+        //    //for KPI Ends
         {
           table: {
          
@@ -757,6 +810,8 @@ emptySpace.push([{
            pageOrientation: 'landscape', 
           pageBreak: 'after'
         },
+        //
+      
      //risk reg table starts
         {
           style: 'tableExample',
@@ -866,6 +921,8 @@ emptySpace.push([{
                 ])
         ],    },
         },
+      
+
              //risk reg table ends
 ],
     layouts: {
