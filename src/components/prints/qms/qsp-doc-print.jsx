@@ -38,11 +38,15 @@ const QspDocPrint = ({ action, revisionElements, buttonType }) => {
       try {
         const revision = await getQspRevistionRecordById(revisionElements.revisionRecordId);
         setRevisionRecordData(revision);
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getQspAllChapters(qmsDocTypeDto), getQspDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), qspDocumentList(), getEmployeesList(), qspRevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, qspRevisionRecordDetails, employeeData, qspTransactionData]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq("0"), getQspAllChapters(qmsDocTypeDto), getQspDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), qspDocumentList(), getEmployeesList(), qspRevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, qspRevisionRecordDetails, employeeData, qspTransactionData]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
-          setDocAbbreviationsResponse(docAbbreviationsResponse);
+          let abbreviationIds = revision.abbreviationIdNotReq ? revision.abbreviationIdNotReq.split(",").map(Number) : [0];
+          let mainlist = docAbbreviationsResponse.filter((item) =>
+            abbreviationIds.some((id) => id === item.abbreviationId)
+          );
+          setDocAbbreviationsResponse(mainlist);
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);

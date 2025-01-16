@@ -45,11 +45,15 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
          setfilKpiMasterList(filteredKpiMasterList);
        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
         setRevisionRecordData(revision);
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq(revision.abbreviationIdNotReq), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq("0"), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
-          setDocAbbreviationsResponse(docAbbreviationsResponse);
+          let abbreviationIds = revision.abbreviationIdNotReq ? revision.abbreviationIdNotReq.split(",").map(Number) : [0];
+          let mainlist = docAbbreviationsResponse.filter((item) =>
+            abbreviationIds.some((id) => id === item.abbreviationId)
+          );
+          setDocAbbreviationsResponse(mainlist);
           setAllChaptersList(allChaptersLists);
           setDocumentSummaryDto(DocumentSummaryDto);
           setDocTemplateAttributes(DocTemplateAttributes);
