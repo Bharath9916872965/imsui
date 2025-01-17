@@ -37,7 +37,6 @@ const AuditeeListComponent = () => {
     });
 
     const validationSchema = Yup.object().shape({
-        empId: Yup.string().required("Employee required"),
         headType: Yup.string().required("HeadType required"),
     });
 
@@ -73,7 +72,6 @@ const AuditeeListComponent = () => {
             const filteredprojectList = project.filter(
                 (proj) => !AuditeeList.some((auditee) => auditee.projectId === proj.projectId)
             );
-
             setFilteredDivisionList(filtereddivisionList);
             setFilteredDivisionGroupList(filtereddivisionGroupList);
             setFilteredProjectList(filteredprojectList);
@@ -180,24 +178,41 @@ const AuditeeListComponent = () => {
         // if (!confirm.isConfirmed) return;
         if (confirm) {
             try {
+                let targetType = "";
+                let targetName = "";
+                // Determine the type (Division, Group, Project) and name
+                if (values.headType === "D") {
+                    targetType = "Division";
+                    const division = divisionList.find((div) => div.divisionId === values.divisionId);
+                    if(division){
+                        values.empId = division.divisionHeadId;
+                        targetName   = division.divisionCode;
+                    }else{
+                        targetName = 'Unknown Division';
+                    }
+                } else if (values.headType === "G") {
+                    targetType = "Group";
+                    const group = divisionGroupList.find((group) => group.groupId === values.groupId);
+                    if(group){
+                        values.empId = group.groupHeadId;
+                        targetName   = group.groupCode;
+                    }else{
+                        targetName = 'Unknown Group';
+                    }
+                } else if (values.headType === "P") {
+                    targetType = "Project";
+                    const project = projectList.find((proj) => proj.projectId === values.projectId);
+                    if(project){
+                        values.empId = project.projectDirector;
+                        targetName   = project.projectCode;
+                    }else{
+                        targetName = 'Unknown Project';
+                    }
+                }
+
                 const result = await insertAuditee(new AuditeeDto(values.empId, values.groupId, values.divisionId, values.projectId, values.headType, values.auditeeId));
                 if (result === 200) {
                     const addedAuditee = empdetails.find((employee) => employee.empId === values.empId)?.empName || "Auditee";
-
-                    // Determine the type (Division, Group, Project) and name
-                    let targetType = "";
-                    let targetName = "";
-                    if (values.headType === "D") {
-                        targetType = "Division";
-                        targetName = divisionList.find((div) => div.divisionId === values.divisionId)?.divisionCode || "Unknown Division";
-                    } else if (values.headType === "G") {
-                        targetType = "Group";
-                        targetName = divisionGroupList.find((group) => group.groupId === values.groupId)?.groupCode || "Unknown Group";
-                    } else if (values.headType === "P") {
-                        targetType = "Project";
-                        targetName = projectList.find((proj) => proj.projectId === values.projectId)?.projectCode || "Unknown Project";
-                    }
-
 
                     auditeelist();
                     setShowModal(false);
@@ -302,51 +317,10 @@ const AuditeeListComponent = () => {
                                                     <Form>
                                                         <div className="row">
                                                             <div className="col-md-6">
-                                                                <Field name="empId">
-                                                                    {({ field, form }) => (
-                                                                        <Autocomplete
-                                                                            options={empdetails}
-                                                                            getOptionLabel={(employee) => `${employee.empName}, ${employee.empDesigName}`} // Access employee name and designation
-                                                                            renderOption={(props, option) => {
-                                                                                return (
-                                                                                    <CustomMenuItem {...props} key={option.empId}>
-                                                                                        <ListItemText primary={`${option.empName}, ${option.empDesigName}`} />
-                                                                                    </CustomMenuItem>
-                                                                                );
-                                                                            }}
-                                                                            value={empdetails.find((employee) => employee.empId === form.values.empId) || null}
-                                                                            onChange={(event, newValue) => {
-                                                                                form.setFieldValue("empId", newValue ? newValue.empId : "");
-                                                                                form.setFieldValue("headType", ""); // Reset headType when employee is unselected
-                                                                            }}
-                                                                            onBlur={() => form.setFieldTouched("empId", true)}
-                                                                            renderInput={(params) => (
-                                                                                <TextField
-                                                                                    {...params}
-                                                                                    label="Employee"
-                                                                                    size="small"
-                                                                                    error={Boolean(form.touched.empId && form.errors.empId)}
-                                                                                    helperText={form.touched.empId && form.errors.empId}
-                                                                                    fullWidth
-                                                                                    variant="outlined"
-                                                                                    margin="normal"
-                                                                                />
-                                                                            )}
-                                                                            ListboxProps={{
-                                                                                sx: {
-                                                                                    maxHeight: 200,
-                                                                                    overflowY: "auto",
-                                                                                },
-                                                                            }}
-                                                                        />
-                                                                    )}
-                                                                </Field>
-                                                            </div>
-                                                            <div className="col-md-6">
                                                                 {/* Radio Buttons */}
                                                                 <Field name="empId">
                                                                     {({ form }) => (
-                                                                        form.values.empId && (
+                                                                        (
                                                                             <Field name="headType">
                                                                                 {({ field, form }) => (
                                                                                     <div>
@@ -378,6 +352,8 @@ const AuditeeListComponent = () => {
                                                                     )}
                                                                 </Field>
                                                             </div>
+                                                            <div className="col-md-6">
+                                                            </div>
                                                         </div>
 
                                                         {/* Conditionally Render Dropdown Fields */}
@@ -386,7 +362,7 @@ const AuditeeListComponent = () => {
                                                                 {({ form }) => (
                                                                     <>
                                                                         {/* Division Dropdown */}
-                                                                        {form.values.empId && form.values.headType === "D" && (
+                                                                        { form.values.headType === "D" && (
                                                                             <Field name="divisionId">
                                                                                 {({ field }) => (
                                                                                     <Autocomplete
@@ -430,7 +406,7 @@ const AuditeeListComponent = () => {
                                                                         )}
 
                                                                         {/* Group Dropdown */}
-                                                                        {form.values.empId && form.values.headType === "G" && (
+                                                                        { form.values.headType === "G" && (
                                                                             <Field name="groupId">
                                                                                 {({ field }) => (
                                                                                     <Autocomplete
@@ -474,7 +450,7 @@ const AuditeeListComponent = () => {
                                                                         )}
 
                                                                         {/* Project Dropdown */}
-                                                                        {form.values.empId && form.values.headType === "P" && (
+                                                                        {form.values.headType === "P" && (
                                                                             <Field name="projectId">
                                                                                 {({ field }) => (
                                                                                     <Autocomplete

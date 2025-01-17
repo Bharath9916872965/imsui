@@ -133,6 +133,11 @@
   width: 35%;
 }
 
+.width37{
+  width: 37%;
+}
+
+
 .width45{
   width: 45%;
 }
@@ -192,6 +197,11 @@
 .mg-top-10{
   margin-top: 10px !important;
 }
+
+.mg-top-20{
+  margin-top: 20px !important;
+}
+
 
 .p-top-5{
   position: relative;
@@ -449,10 +459,25 @@
   top: 5px;
 }
 
+.bottom-5-rel{
+  position: relative;
+  bottom: 5px;
+}
+
 .attachment{
   text-decoration: underline;
   color: royalblue !important;
   cursor: pointer;
 }
+
+.item-center{
+  display: flex !important;
+  align-items: center !important;
+}
+
+.top-align {
+  vertical-align: top !important;
+}
+
 
   

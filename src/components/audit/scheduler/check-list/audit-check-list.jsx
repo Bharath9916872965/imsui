@@ -20,6 +20,7 @@ const AuditCheckListComponent = ({router}) => {
   const sectionOpenRef = useRef('');
   const [selectOptions,setSelectOptions] = useState([]);
   const [observations, setObservations] = useState(new Map());
+  const [mocDescription, setMocDescription] = useState(new Map());
   const [auditorRemarks, setAuditorRemarks] = useState(new Map());
   const [auditeeRemarks, setAuditeeRemarks] = useState(new Map());
   const [attachmentNames, setAttachmentNames] = useState(new Map());
@@ -46,6 +47,7 @@ const AuditCheckListComponent = ({router}) => {
   const [roleId,setRoleId] = useState(0);
   const [flag,setFlag] = useState('');
   let attachMocId = 0;
+  let attachMocDescription = '';
   let auditorRemarksValid = false
   let lv1MocId ='';
   let leve1MocId ='';
@@ -200,7 +202,9 @@ const AuditCheckListComponent = ({router}) => {
     //setIsAuditor(false)
     setAuditeeRemarksValidation([]);
     setObservations(new Map());
+    setMocDescription(new Map());
     const initialObservations   = new Map();
+    const initialMocDescription   = new Map();
     const initialAuditorRemarks = new Map();
     const initialAuditeeRemarks = new Map();
     const inticheckListIds      = new Map();
@@ -250,6 +254,8 @@ const AuditCheckListComponent = ({router}) => {
           inticheckListIds.set(chapter.mocId,chapter.auditCheckListId);
           inticheckListIds.set(chapter.mocId,chapter.auditCheckListId);
           initialAuditeeRemarks.set(chapter.mocId, chapter.auditeeRemarks);
+          initialMocDescription.set(chapter.mocId,chapter.description);
+          initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, chapter.attachmentName);
           //for only input tags
           if(chapter.auditeeRemarks !== 'NA'){
@@ -266,6 +272,7 @@ const AuditCheckListComponent = ({router}) => {
           initialObservations.set(chapter.mocId, 0);
           initialAuditorRemarks.set(chapter.mocId, 'NA');
           initialAuditeeRemarks.set(chapter.mocId, 'NA');
+          initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, '');
           }
         }
@@ -277,13 +284,16 @@ const AuditCheckListComponent = ({router}) => {
                   //withoutChaild
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
-                  initialAuditeeRemarks.set(chapter1.mocId, '');
+                  initialAuditeeRemarks.set(chapter1.mocId, 'NA');
+                  initialMocDescription.set(chapter1.mocId,chapter1.description);
                   initialAttachmentNames.set(chapter1.mocId, '');
+                  setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter1.mocId])]);
 
                 }else{
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
                   initialAuditeeRemarks.set(chapter1.mocId, 'NA');
+                  initialMocDescription.set(chapter1.mocId,chapter1.description);
                   initialAttachmentNames.set(chapter1.mocId, '');
 
                 }
@@ -292,8 +302,10 @@ const AuditCheckListComponent = ({router}) => {
               if(chapter1.mocParentId === leve1MocId){
                 initialObservations.set(chapter1.mocId, 0);
                 initialAuditorRemarks.set(chapter1.mocId, '');
-                initialAuditeeRemarks.set(chapter1.mocId, '');
+                initialAuditeeRemarks.set(chapter1.mocId, 'NA');
+                initialMocDescription.set(chapter1.mocId,chapter1.description);
                 initialAttachmentNames.set(chapter1.mocId, '');
+                setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter1.mocId])]);
 
               }
             })
@@ -304,6 +316,7 @@ const AuditCheckListComponent = ({router}) => {
     setObservations(initialObservations);
     setAuditorRemarks(initialAuditorRemarks);
     setAuditeeRemarks(initialAuditeeRemarks);
+    setMocDescription(initialMocDescription);
     setAttachmentNames(initialAttachmentNames);
     setIsValidationActive(false)
   }
@@ -490,6 +503,7 @@ const AuditCheckListComponent = ({router}) => {
             auditorRemarksValid = true
           }
         }
+
         if(isAddMode){
           mergedMap.set(key,{
             observation      : value,
@@ -497,6 +511,7 @@ const AuditCheckListComponent = ({router}) => {
             auditeeRemarks   : auditeeRemarks.get(key) || '',
             auditCheckListId : checkListIds.get(key),
             attachment       : attachments.get(key) || '',
+            mocDescription   : mocDescription.get(key) || '',
           })
         }else{
           mergedMap.set(key,{
@@ -518,6 +533,7 @@ const AuditCheckListComponent = ({router}) => {
             auditeeRemarks   : value || '',
             auditCheckListId : 0,
             attachment       : attachments.get(key) || '',
+            mocDescription   : mocDescription.get(key) || '',
           })
         }else{
           mergedMap.set(key,{
@@ -652,7 +668,7 @@ const AuditCheckListComponent = ({router}) => {
   const uploadImage = async()=>{
     if(selectedImage && selectedImage !=null){
       //const response = await uploadCheckListImage(element,selectedImage);
-      const response = await uploadCheckListImage(new CheckListImgDto(attachMocId,element.scheduleId,selectedImage.name,element.iqaNo,element.iqaId),selectedImage);
+      const response = await uploadCheckListImage(new CheckListImgDto(attachMocId,element.scheduleId,selectedImage.name,element.iqaNo,element.iqaId,attachMocDescription),selectedImage);
       if(response.message === 'Image successfully uploaded: null'){
         Swal.fire({
           icon: "success",
@@ -721,7 +737,7 @@ const AuditCheckListComponent = ({router}) => {
                  <Box flex="3%"></Box>
                   {filMainClause.length > 0 &&filMainClause.map(item =>{
                     const fx = 90/filMainClause.length -1;
-                    return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+item.description}</span>} className="mg-down-10">
+                    return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+ (mocDescription.get(item.mocId) || item.description)}</span>} className="mg-down-10">
                       <button className={((flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) && (new Date(schduleDate) <= new Date()) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
                       (auditeeSuccessBtns.includes(item.sectionNo)?'btn btn-sm bg-auditee-success':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')} 
                       onClick={()=>openTable(Number(item.sectionNo))}>{item.sectionNo}</button></Tooltip></Box>)
@@ -734,6 +750,7 @@ const AuditCheckListComponent = ({router}) => {
                   if(Number(chapter.sectionNo) === Number(sectionOpenRef.current)){
                     if(chapter.clauseNo === '8.3.1'){
                       attachMocId = chapter.mocId;
+                      attachMocDescription =  (mocDescription.get(chapter.mocId) || chapter.description);
                     }
                     k = 0;
                     return(
@@ -743,11 +760,11 @@ const AuditCheckListComponent = ({router}) => {
                        
                            <tr>
                             { chapter.clauseNo !== '8.4' && 
-                                <th colSpan={3} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+chapter.description}</th>
+                                <th colSpan={3} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+ (mocDescription.get(chapter.mocId) || chapter.description)}</th>
                             }
                             {chapter.clauseNo === '8.4' &&
                             <>
-                              <th colSpan={2} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+chapter.description}</th>
+                              <th colSpan={2} scope="col" className="text-left">&nbsp;{'Clause '+chapter.clauseNo+' : '+ (mocDescription.get(chapter.mocId) || chapter.description)}</th>
                               <th  scope="col" className="text-right"><button  className="icon-button edit-icon-button me-1" onClick={() => redirecttoProcureComponent(element)} title="Procurement">Procurement Details</button></th>
                             </>
 
@@ -780,7 +797,7 @@ const AuditCheckListComponent = ({router}) => {
                                 if(checksubChapter(chapter1.mocId,masterChapters)){
                                   return(
                                     <tr  className="table-active box-border">
-                                     <td colSpan={3} className="text-left width60 box-border">&nbsp;{toRoman(k)+'. '+chapter1.description}</td>
+                                     <td colSpan={3} className="text-left width60 box-border">&nbsp;{toRoman(k)+'. '+(mocDescription.get(chapter1.mocId) || chapter1.description)}</td>
                                     </tr>
                                    )
                                 }else{
@@ -789,7 +806,7 @@ const AuditCheckListComponent = ({router}) => {
                                     <tr className="table-active box-border">
                                      <td className="text-left width65 box-border">
                                      <Box display="flex" alignItems="center" gap="10px">
-                                     <Box flex="42%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + chapter1.description} </Box>
+                                     <Box flex="42%" className='chapter-sty attach-input'> &nbsp;{toRoman(k) + ". " + (mocDescription.get(chapter1.mocId) || chapter1.description)} </Box>
                                       <Box flex="40%">
                                         <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
@@ -840,7 +857,7 @@ const AuditCheckListComponent = ({router}) => {
                                <tr  className="table-active box-border">
                                 <td className="text-left width65 box-border">
                                  <Box display="flex" alignItems="center" justifyContent="space-between" gap="10px">
-                                 <Box flex="42%" className='chapter-sty attach-input'> &emsp;&nbsp;&nbsp;{toLetter(l-1) + ". " + chapter1.description}</Box>
+                                 <Box flex="42%" className='chapter-sty attach-input'> &emsp;&nbsp;&nbsp;{toLetter(l-1) + ". " + (mocDescription.get(chapter1.mocId) || chapter1.description)}</Box>
                                     <Box flex="40%">
                                       <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}

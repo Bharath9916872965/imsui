@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import withRouter from "common/with-router";
 import {addChapterNameById } from "services/qms.service";
-import { getMocTotalList,CheckListMaster,updateChapterDescById,deleteChapterDescById,addNewChapter,addChapterToMasters,deleteSubChapterDescById,updateCheckListChapters } from "services/audit.service";
+import { getMocTotalList,CheckListMaster,updateChapterDescById,deleteChapterDescById,addNewChapter,addChapterToMasters,deleteSubChapterDescById,updateCheckListChapters,getClosureDate } from "services/audit.service";
 import {Button, Card, CardContent, Grid, IconButton, TextField, Tooltip,Box,Checkbox} from '@mui/material';
 import { Helmet } from 'react-helmet';
 
@@ -18,6 +18,7 @@ import AddChecklistSectionDialog from "./add-checklist-section";
 const CheckListMasterComponent = ({ router }) => {
 
   const [isLoading, setIsLoading] = useState(true);
+  const [isdisable,setIsdisable] = useState(false)
   const [error, setError] = useState(null);
   const [allChapters, setAllChapters] = useState([]);
   const [filChapters, setFilChapters] = useState([]);
@@ -26,7 +27,6 @@ const CheckListMasterComponent = ({ router }) => {
   const [ChapterListSecondLvl, setChapterListSecondLvl] = useState([]);
   const [ChapterListThirdLvl, setChapterListThirdLvl] = useState([]);
   const [ChapterListFourthLvl, setChapterListFourthLvl] = useState([]);
-
   const [editMocId, setEditMocId] = useState(null);
   const [editLv1MocId, setEditLv1MocId] = useState(null);
   const [editLv2MocId, setEditLv2MocId] = useState(null);
@@ -76,6 +76,13 @@ const CheckListMasterComponent = ({ router }) => {
   const getAllChapters = async () => {
       try {
           let allChapters = await getMocTotalList();
+          const closureDate = await getClosureDate();
+          if(closureDate && closureDate.length > 0){
+            const dates = closureDate[0];
+            if(new Date() >= new Date(dates.fromDate) && new Date() <= new Date(dates.completionDate)){
+                setIsdisable(true)
+            }
+          }
           setMocIds(allChapters.filter(data => data.isForCheckList === 'Y').map(data => data.mocId) || []);
           setAllChapters(allChapters);
           allChapters=allChapters.filter(obj =>  Number(obj.clauseNo) === Number(obj.sectionNo) && obj.isActive === 1) 
@@ -392,7 +399,7 @@ const CheckListMasterComponent = ({ router }) => {
            <div id="main-wrapper">
             <div className="subHeadingLink d-flex ">
              <div align='left' className="d-flex flex-column flex-md-row gap-1"><h4>Check List Master</h4></div>
-             <div className="d-flex gap-2"><button onClick={() => updateCheckList()} className="btn btn-success">Submit</button></div> 
+             <div className="d-flex gap-2"><button disabled = {isdisable} onClick={() => updateCheckList()} className="btn btn-success">Submit</button></div> 
              {/* <button className="btn btn-primary" title="Add New Chapter"  onClick={handleOpenUnaddedSections}><i className="material-icons">playlist_add</i></button>*/}
             </div>
             

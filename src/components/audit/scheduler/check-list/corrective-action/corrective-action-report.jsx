@@ -125,6 +125,7 @@ const CorrectiveActionReport = ({router}) => {
         setAuditeeOptions(revisionData)
         if(filAuditee.length > 0){
           const audit =  filAuditee[0];
+          console.log('audit-------- ',audit)
           setAuditeeId(filAuditee[0].auditeeId)
           setAuditeeName(audit.projectShortName !== ''?audit.projectShortName:audit.divisionName !== ''?audit.divisionName:audit.groupName)
           setHeadName(audit.projectShortName !== ''?audit.projectDirectorName:audit.divisionName !== ''?audit.divisionHeadName:audit.groupHeadName)
@@ -182,6 +183,7 @@ const CorrectiveActionReport = ({router}) => {
     }
     const audit = iqaAuditeeList.filter(data => data.auditeeId === Number(value));
     if(audit && audit.length > 0){
+      console.log('audit-------- ',audit)
       setAuditeeName(audit[0].projectShortName !== ''?audit[0].projectShortName:audit[0].divisionName !== ''?audit[0].divisionName:audit[0].groupName)
       setHeadName(audit[0].projectShortName !== ''?audit[0].projectDirectorName:audit[0].divisionName !== ''?audit[0].divisionHeadName:audit[0].groupHeadName)
       setHeadId(audit[0].projectShortName !== ''?audit[0].projectDirectorId:audit[0].divisionName !== ''?audit[0].divisionHeadId:audit[0].groupHeadId)
@@ -551,16 +553,36 @@ const CorrectiveActionReport = ({router}) => {
                        <table className="table table-responsive">
                         <tbody >
                           <tr>
-                          <td  className="text-left  box-border width14"><span className="fn-bold">Attachment{obj.carAttachment !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(obj)}  title= {obj.carAttachment === ''?'Attach Document':obj.carAttachment}> <i className="material-icons"  >download</i></button>}</span></td>
-                          {/* <td  className="text-left  box-border width14"><span className="fn-bold">Attachment : <Box  className="float-right attachment" onClick={() => downloadAtachment(obj)}  title= {obj.carAttachment === ''?'Attach Document':obj.carAttachment}>{obj.carAttachment !== '' && obj.carAttachment}</Box></span></td> */}
-                          <td  className="text-left  box-border width14"><span className="fn-bold">Completion Date </span></td>
-                          <td   className="text-left box-border width13 " ><span className="fn-bold ">Root Cause </span></td>
-                          <td   className="text-left box-border width59" >
-                            <Field name="rootCause" id="standard-basic" as={TextField} label="Root Cause" variant="outlined" fullWidth size="small" margin="normal" 
-                            multiline minRows={1} maxRows={5} error={Boolean(touched.rootCause && errors.rootCause)} helperText={touched.rootCause && errors.rootCause}></Field>
+                          <td  className="text-left  box-border width13 top-align">
+                           <div className="item-center mg-top-20">
+                            <input type="file" ref={fileInputRef}  onChange={(event) => onSelectFile(event)} /> 
+                            <span className="fn-bold">{obj.carAttachment !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(obj)}  title= {obj.carAttachment === ''?'Attach Document':obj.carAttachment}> <i className="material-icons"  >download</i></button>}</span>
+                           </div>
                           </td>
-                        </tr>
-                        <tr>
+                          {/* <td  className="text-left  box-border width14"><span className="fn-bold">Attachment : <Box  className="float-right attachment" onClick={() => downloadAtachment(obj)}  title= {obj.carAttachment === ''?'Attach Document':obj.carAttachment}>{obj.carAttachment !== '' && obj.carAttachment}</Box></span></td> */}
+                          <td  className="text-left  box-border width13 top-align">
+                     
+                            <Field name="completionDate">
+                            {({ field, form }) => (
+                                <LocalizationProvider dateAdapter={AdapterDayjs}>
+                                    <div className="completionDate">
+                                <DatePicker format='DD-MM-YYYY' value={completionDate} label="Completion Date" views={['year', 'month', 'day']}
+                                    onChange={(newValue) => {setFieldValue("completionDate", newValue ? newValue.$d : '');  }}
+                                     slotProps={{ textField: { size: 'small' } }}/></div>
+                                </LocalizationProvider>
+                            )}
+                            </Field>
+                          </td>
+                          <td   className="text-left box-border width37" >
+                            <Field name="rootCause" id="standard-basic" as={TextField} label="Root Cause" variant="outlined" fullWidth size="small" margin="normal" 
+                            multiline minRows={3} maxRows={5} error={Boolean(touched.rootCause && errors.rootCause)} helperText={touched.rootCause && errors.rootCause}></Field>
+                          </td>
+                          <td   className="text-left box-border width37" >
+                          <Field name="correctiveActionTaken" id="standard-basic" as={TextField} label="Corrective Action Taken" variant="outlined" fullWidth size="small" margin="normal"  
+                            multiline minRows={3} maxRows={5} error={Boolean(touched.correctiveActionTaken && errors.correctiveActionTaken)} helperText={touched.correctiveActionTaken && errors.correctiveActionTaken}></Field>
+                          </td>
+                          </tr>
+                        {/* <tr>
                           <td   className="text-left  box-border ">
                               <input type="file" ref={fileInputRef}  onChange={(event) => onSelectFile(event)} /> 
                           </td>
@@ -578,10 +600,10 @@ const CorrectiveActionReport = ({router}) => {
                           </td>
                           <td className="text-left box-border width13" ><span className="fn-bold ">Corrective Action Taken </span></td>
                           <td className="text-left box-border width59" >
-                            <Field name="correctiveActionTaken" id="standard-basic" as={TextField} label="Corrective Action Taken" variant="outlined" fullWidth size="small" margin="normal" 
-                            multiline minRows={1} maxRows={5} error={Boolean(touched.correctiveActionTaken && errors.correctiveActionTaken)} helperText={touched.correctiveActionTaken && errors.correctiveActionTaken}></Field>
+                            <Field name="correctiveActionTaken" id="standard-basic" as={TextField} label="Corrective Action Taken" variant="outlined" fullWidth size="small" margin="normal"  
+                            multiline minRows={3} maxRows={5} error={Boolean(touched.correctiveActionTaken && errors.correctiveActionTaken)} helperText={touched.correctiveActionTaken && errors.correctiveActionTaken}></Field>
                           </td>
-                        </tr>
+                        </tr> */}
                         </tbody>
                        </table>
                        <table className="table table-responsive">
