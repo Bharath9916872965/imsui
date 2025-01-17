@@ -119,6 +119,7 @@
 
   .abbreclass{
     border-bottom: var(--bs-border-width) var(--bs-border-style) #8c8f92 !important;
+    text-align: left;
 } 
 
 .abbreclass:hover{ 
@@ -136,7 +137,14 @@
 
 .abbrename {
    border-bottom: var(--bs-border-width) var(--bs-border-style) #989a9c !important;
+   text-align: left;
 }
+
+.abbrename:hover{ 
+    background-color: rgb(202 153 81);
+    color: white;
+    padding: 27px;
+ }
 
 .form-check-input{
    border: double;

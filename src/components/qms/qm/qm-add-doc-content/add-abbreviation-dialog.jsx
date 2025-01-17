@@ -43,13 +43,16 @@ const getAbbreviationsList = async () => {
         }else if(qspDoc.includes(docType)){
            revistionRecord = await getQspRevistionRecordById(revisionData.revisionRecordId);
         }
-        let abbreviationIds = revistionRecord.abbreviationIdNotReq ? revistionRecord.abbreviationIdNotReq.split(",") : ["0"];
+        let abbreviationIds = revistionRecord.abbreviationIdNotReq ? revistionRecord.abbreviationIdNotReq.split(",").map(Number) : ["0"];
         const mainlist = list.filter((item) => !abbreviationIds.includes(item.abbreviationId));
         let deletedList = list.filter((item) =>
           abbreviationIds.some((id) => String(id) === String(item.abbreviationId))
         );
-        const columns = chunkArray(deletedList, 3);
-        setAbbreviationList(mainlist);
+        // const columns = chunkArray(deletedList, 3);
+        // setAbbreviationList(mainlist);
+        // setDeletedItems(columns);
+        const columns = chunkArray(mainlist, 3);
+        setAbbreviationList(deletedList);
         setDeletedItems(columns);
     } catch (error) {
         setError('An error occurred');
@@ -80,9 +83,9 @@ const handleDelete = async (abbreviationId) => {
 
   let cleanAbbreviationIdNotReq = [];
   cleanAbbreviationIdNotReq = revistionRecord.abbreviationIdNotReq ? revistionRecord.abbreviationIdNotReq.split(",").map(Number) : [0];
-  const combinedData = [...cleanAbbreviationIdNotReq, abbreviationId];
-  combinedData.sort((a, b) => a - b);
-
+  const combinedData = [...cleanAbbreviationIdNotReq, abbreviationId]
+  .filter(id => id !== abbreviationId) 
+  .sort((a, b) => a - b); 
   const isConfirmed = await AlertConfirmation({
     title: 'Are you sure to delete?',
     message: '',
@@ -205,11 +208,13 @@ const handleDelete = async (abbreviationId) => {
     }
 
     const abbIdNotReq = revistionRecord.abbreviationIdNotReq ? revistionRecord.abbreviationIdNotReq.split(",").map(Number) : [0] ;
-    const combinedIds = abbIdNotReq
-                        .filter((id) => !arr.includes(id))
-                        .sort((a, b) => a - b)
-                        .concat([0])
-                        .slice(0, Math.max(1, abbIdNotReq.filter((id) => !arr.includes(id)).length));
+    const combinedIds = [...abbIdNotReq, ...arr];
+    combinedIds.sort((a, b) => a - b);
+    // const combinedIds = abbIdNotReq
+    //                     .filter((id) => !arr.includes(id))
+    //                     .sort((a, b) => a - b)
+    //                     .concat([0])
+    //                     .slice(0, Math.max(1, abbIdNotReq.filter((id) => !arr.includes(id)).length));
                         
     const isConfirmed = await AlertConfirmation({
       title: 'Are you sure to add ?',
@@ -380,7 +385,7 @@ const handleDelete = async (abbreviationId) => {
         </div>
 
       <div className="col-md-4">
-          <h4>Abbreviation List</h4>
+          <h4>Selected Abbreviation List</h4>
           <div className="d-flex justify-content-end mb-3">
             <input
               type="text"
@@ -421,7 +426,7 @@ const handleDelete = async (abbreviationId) => {
 
         {/* Right Side Div */}
        <div className="col-md-7">
-      <h4>Deleted Abbreviations</h4>
+      <h4>All Abbreviation List</h4>
       <div className="row">
         <div className="d-flex justify-content-end mb-3">
           <input
