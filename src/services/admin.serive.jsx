@@ -229,12 +229,7 @@ export const getNotifiList= async () => {
   }
 };
 
-
-
-
-
 export const  updateNotification= async (notificationId) => {
-  console.log("notificationId", notificationId);
   try {
       return (await axios.post(`${API_URL}update-notification`,notificationId,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
   } catch (error) {
@@ -242,6 +237,8 @@ export const  updateNotification= async (notificationId) => {
       throw error;
   }
 };
+
+
 export const getDivisionMasterList = async () => {
   try {
     const response = await axios.get(
@@ -292,5 +289,16 @@ export const getAuditPatchList= async () => {
   } catch (error) {
     console.error('Error occurred in getAuditPatchList:', error);
     throw error;
+  }
+};
+
+
+
+export const  updateAuditPatch= async (values) => {
+  try {
+      return (await axios.post(`${API_URL}update-audit-patch`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+  } catch (error) {
+      console.error('Error occurred in updateAuditPatch:', error);
+      throw error;
   }
 };
