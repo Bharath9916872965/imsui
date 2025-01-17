@@ -74,6 +74,7 @@ console.log('selOpt',selOpt);
       setKpiUnitList(unitList)
       setKpiMasterList(kpiMasterList)
       if(dwpData){
+        setGrpDivId(dwpData.groupDivisionId)
         if(dwpData.docType === 'gwp'){
           setGrpDivType('G');
           const divData = grpDivList.find(data => Number(data.groupDivisionId) === Number(dwpData.groupDivisionId) && data.groupDivisionType === 'G');
@@ -271,11 +272,9 @@ const onGrpDivChange = (selectedOption) => {
             <Datatable columns={columns} data={filKpiMasterList} />
           </div>
           <div>
-            {<button className="btn add btn-name" onClick={kpiAdd}> Add </button>}
+            {<button className="btn add btn-name bt-sty" onClick={kpiAdd}> Add </button>}
             &nbsp; 
-            { <button className="btn btn-dark" onClick={() => kpiMasterPdf(filKpiMasterList,selOpt)}>
-PRINT
-</button>}
+            { <button className="btn btn-dark mg-r-7 bt-sty" onClick={() => kpiMasterPdf(filKpiMasterList,selOpt)}> PRINT </button>}
             {!isMr && <button className="btn backClass" onClick={() => back()}>Back</button>}
           </div>
         </div>

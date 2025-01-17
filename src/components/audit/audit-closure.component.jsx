@@ -19,7 +19,7 @@ import AlertConfirmation from "common/AlertConfirmation.component";
 const AuditClosureComponent = ({router}) => {
 
   const [isReady, setIsReady] = useState(false);
-  const [isComplted, setComplted] = useState(true);
+  const [isComplted, setComplted] = useState(false);
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaOptions,setIqaOptions] = useState([]);
   const [iqaNo,setIqaNo] = useState('');
@@ -403,6 +403,7 @@ const AuditClosureComponent = ({router}) => {
               {isComplted && (isAddMode ?<div className="text-center mg-top-10 mg-down-10"><button onClick={() => closureAdd()} className="btn btn-success bt-sty">Submit</button></div>:
               <div className="text-center mg-top-10 mg-down-10"><button onClick={() => closureAdd()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
              </div>
+             <h6 className="noteColor mg-top-10" >Note : All schedules must be Accepted by the auditee before Audit closure</h6>
             </Box>
             <Box flex="20%"></Box>
           </Box>

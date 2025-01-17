@@ -316,6 +316,10 @@
   margin-right: 10px;
 }
 
+.mg-r-7 {
+  margin-right: 7px;
+}
+
 .box-margin{
   margin-top: 10px !important;
   margin-right: 10px !important;
@@ -333,6 +337,15 @@
 
 .text-center{
   text-align: center !important;
+}
+
+.text-center-btn {
+  text-align: center !important;
+  display: flex; /* Use flexbox for alignment */
+  justify-content: center; /* Center content horizontally */
+  align-items: center; /* Align content vertically */
+  flex-wrap: wrap; /* Ensure buttons wrap if there’s not enough space */
+  gap: 10px; /* Add spacing between buttons */
 }
 
 .bt-color{
