@@ -78,12 +78,7 @@ try {
         margin: [10, 10, 0, 10],
       },
     ];
-    
-    console.log(MyContent);
-    
-    
-
-    // Define the document structure and styles
+      // Define the document structure and styles
     const docDefinition = {
       info: {
         title: `KPI Master Print`,
@@ -149,8 +144,7 @@ try {
       content: MyContent,
       footer: (currentPage, pageCount) => {
         const currentDate = getFormattedDate();
-
-        return [
+      return [
           {
             columns: [
               { text: 'Printed By VEDTS-IMS', alignment: 'left', fontSize: 10 },

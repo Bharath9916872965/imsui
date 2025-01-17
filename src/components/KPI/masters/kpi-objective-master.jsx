@@ -42,7 +42,7 @@ const KpiObjectiveMaster = ({router}) => {
       ratings   : [{ startValue : '', endValue : '',rating : '' }],
     });
 
-console.log('selOpt',selOpt);
+
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
     { name: 'Division/Group/LAB', selector: (row) => row.division, sortable: true, grow: 2, align: 'text-center', width: '15%'  },
@@ -60,7 +60,6 @@ console.log('selOpt',selOpt);
       const kpiMasterList  = await getKpiMasterList();
       const unitList = await getKpiUnitList();
       const grpDivList = await getGroupDivisionList();
-
       setGroupDivisionList(grpDivList)
       setIsMr(true)
       const dwpData = router.location.state?.dwpGwp;
@@ -256,10 +255,7 @@ const onGrpDivChange = (selectedOption) => {
         <div className="card-body text-center">
          <Box display="flex" alignItems="center" gap="10px" className='mg-down-10'>
           <Box flex="80%" className='text-center'><h3>Key Process Indicator</h3></Box>
-          {/* <Box flex="30%">
-               <span className="text-heading">&nbsp;   </span>
-               <button className=" btn-primary"  onClick={() =>kpiMasterPdf(filKpiMasterList)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>
-            </Box> */}
+     
           <Box flex="20%">
             <SelectPicker options={grpDivOptions} label="Division/Group" readOnly = {!isMr} 
             value={grpDivOptions && grpDivOptions.length >0 && grpDivOptions.find(option => option.value === grpDivMainId) || null}

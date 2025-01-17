@@ -24,25 +24,19 @@ const RiskRegisterReport = async (riskregmitmergeList) => {
     function generateRotatedTextImage(text) {
       const canvas = document.createElement('canvas');
       const ctx = canvas.getContext('2d');
-      
       // Define dimensions of the canvas (adjust as necessary)
       const textFontSize = 24; // Text font size in px
       const canvasWidth = 80; // Width before rotation
       const canvasHeight = 150; // Height before rotation
-  
       canvas.width = canvasWidth;
       canvas.height = canvasHeight;
-  
       // Set font and styling
       ctx.font = `bold ${textFontSize}px Roboto`; 
-
       ctx.fillStyle = 'black'; // Text color
-  
       // Translate and rotate canvas context
       ctx.translate(canvasWidth / 2, canvasHeight / 2); // Move to center
       ctx.rotate(-Math.PI / 2); // Rotate 90 degrees counterclockwise
-  
-      // Draw the text in the rotated context
+    // Draw the text in the rotated context
       ctx.textAlign = 'center';
       ctx.textBaseline = 'middle';
       ctx.fillText(text, 0, 0); // Draw at rotated position
@@ -196,17 +190,10 @@ const header = [
         ]);
       }
     });
-
-
     let MyContent = []; 
     MyContent = firstTable; 
     MyContent = [...header, ...MyContent]; 
-    
-
-    
     // Define the PDF content
-
-
     const docDefinition = {
       info: {
         title: `Risk Register Print`,
@@ -214,7 +201,7 @@ const header = [
       pageSize: 'A4',
       pageOrientation: 'landscape',
       pageMargins: [40, 120, 40, 25],
- header: (currentPage) => {
+      header: (currentPage) => {
         return {
           stack: [
             {
