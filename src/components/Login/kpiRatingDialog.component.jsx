@@ -185,7 +185,8 @@ const KpiratingDialog = ({ open, onClose, onConfirm,isAddMode,kpiUnitList,grpDiv
                           </Box>
                           <Box flex="22%">
                             <TextField label="End Value" value={tar.endValue} fullWidth size="small" required
-                              onChange={(e) => {setFieldValue(`ratings[${index}].endValue`, e.target.value);  index < values.ratings.length - 1 && setFieldValue(`ratings[${index+1}].startValue`, Number(e.target.value)+1) }}
+                              //onChange={(e) => {setFieldValue(`ratings[${index}].endValue`, e.target.value);  index < values.ratings.length - 1 && setFieldValue(`ratings[${index+1}].startValue`, Number(e.target.value)+1) }}
+                              onChange={(e) => {setFieldValue(`ratings[${index}].endValue`, e.target.value);}}
                               onBlur={() => setFieldTouched(`ratings[${index}].endValue`, true)} InputProps={{readOnly: flag === 'M'?false:true,}}
                               error={touched.ratings?.[index]?.endValue && Boolean(errors.ratings?.[index]?.endValue)}
                               helperText={touched.ratings?.[index]?.endValue && errors.ratings?.[index]?.endValue} />

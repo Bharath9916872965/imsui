@@ -623,8 +623,9 @@ const CorrectiveActionReport = ({router}) => {
                       </Box>
                       <Box flex="2%"></Box>
                      </Box>
-                     { isAddMode? <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="submit" disabled = {!isValid || isSubmitting  }>Submit</Button></Box>:
-                    <>{['INI','CRH','CMR'].includes(obj.auditStatus) && <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="btn edit bt-sty" disabled = {!isValid || isSubmitting  }>Update</Button>
+                     <Box className='text-center-btn'>
+                      { isAddMode? <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="submit" disabled = {!isValid || isSubmitting  }>Submit</Button></Box>:
+                      <>{['INI','CRH','CMR'].includes(obj.auditStatus) && <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="btn edit bt-sty" disabled = {!isValid || isSubmitting  }>Update</Button>
                       <Button type="button" variant="contained" className="btn back mg-l-10" onClick={forwardCarReport}>Forward</Button></Box>}</>}
                       { obj.auditStatus === 'FWD' && Number(loginEmpId) === Number(headId) && <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="btn edit bt-sty" disabled = {!isValid || isSubmitting  }>Update</Button>
                       <Button type="button" variant="contained" className="btn bt-error-color mg-l-10" onClick={()=> scheduleReturn('R')}>Return</Button>
@@ -632,14 +633,13 @@ const CorrectiveActionReport = ({router}) => {
                       { obj.auditStatus === 'CRM' && isAdmin && <Box className='text-center mg-top-10'><Button type="submit" variant="contained" className="btn edit bt-sty" disabled = {!isValid || isSubmitting  }>Update</Button>
                       <Button type="button" variant="contained" className="btn bt-error-color mg-l-10" onClick={()=> scheduleReturn('R')}>Return</Button>
                       <Button type="button" variant="contained" className="btn bt-success-color mg-l-10" onClick={()=> scheduleReturn('F')}>Approve</Button></Box>}
-                      
+                      <button className="btn btn-dark mg-top-10" type="button" onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData)} title="Print" aria-label="Print AuditSchedule" >
+                          PRINT </button>
+                     </Box>
                      </Form>
                     )}
                     </Formik>
                     <Box > 
-                  <button className="btn btn-dark" onClick={() => CarReportPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate,carId,auditeeName,headName,initEmpData,recEmpData,approvedEmpData)} title="Print" aria-label="Print AuditSchedule" >
-                  PRINT
-                </button>
                       </Box>
                      </td>
                      </tr>

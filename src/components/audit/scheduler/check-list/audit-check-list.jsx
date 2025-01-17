@@ -258,7 +258,7 @@ const AuditCheckListComponent = ({router}) => {
           initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, chapter.attachmentName);
           //for only input tags
-          if(chapter.auditeeRemarks !== 'NA'){
+          if(chapter.auditeeRemarks !== 'NA' || element.scheduleStatus !== 'AAA'){
             setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter.mocId])]);
           }
         }
@@ -810,7 +810,7 @@ const AuditCheckListComponent = ({router}) => {
                                       <Box flex="40%">
                                         <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
-                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly :  (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
+                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly :  (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA','AES'].includes(element.scheduleStatus))}}
                                          sx={{
                                              '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAuditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
                                              "& .MuiOutlinedInput-root": {
@@ -821,7 +821,7 @@ const AuditCheckListComponent = ({router}) => {
                                            "& .MuiInputLabel-root.Mui-focused": {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',}}}/>
                                       </Box>
                                       <Box flex="10%" >
-                                        <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  />
+                                        <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA','AES'].includes(element.scheduleStatus))}  />
                                       </Box>
                                       <Box flex="8%" >
                                         {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}
@@ -861,7 +861,7 @@ const AuditCheckListComponent = ({router}) => {
                                     <Box flex="40%">
                                       <TextField className="form-control w-100" label="Auditee Remarks" variant="outlined" size="small" value={auditeeRemarks.get(chapter1.mocId) || ''}
                                          onChange={(e) => onAuditeeRemarksChange(e.target.value, chapter1.mocId)}
-                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}}
+                                         InputLabelProps={{ style: {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',},}} inputProps={{readOnly : (flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA','AES'].includes(element.scheduleStatus))}}
                                          sx={{
                                            '& .MuiInputBase-input': { color: isAuditeeAdd ? '#002CCD' : 'inherit',backgroundColor: (isAuditor || element.scheduleStatus === 'ARS') ? 'rgb(229, 229, 229)' : '#fff',},
                                            "& .MuiOutlinedInput-root": {
@@ -872,7 +872,7 @@ const AuditCheckListComponent = ({router}) => {
                                            "& .MuiInputLabel-root.Mui-focused": {color: isValidationActive && !auditeeRemarksValidation.includes(chapter1.mocId) ? 'red' : isAuditeeAdd ? '#002CCD' : 'inherit',}, }}/>
                                     </Box>
                                     <Box flex="10%">
-                                      <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus))}  />
+                                      <input  type="file" ref={(el) => (fileInputRefs.current[chapter1.mocId] = el)} className='auditee-color'  onChange={(event) => handleFileChange(chapter1.mocId, event)} disabled = {(flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA','AES'].includes(element.scheduleStatus))}  />
                                     </Box>
                                     <Box flex="8%">
                                       {attachmentNames.get(chapter1.mocId) !== '' && <button type="button" className=" btn btn-outline-success btn-sm me-1 float-right" onClick={() => downloadAtachment(attachmentNames.get(chapter1.mocId))}  title= {attachmentNames.get(chapter1.mocId)}> <i className="material-icons"  >download</i></button>}
