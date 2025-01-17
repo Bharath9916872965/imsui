@@ -746,7 +746,7 @@ export const auditorForward = async (values)=>{
     try {
         return (await axios.post(`${API_URL}auditcheck-list-byObsIds`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
-        console.error('Error occurred in getScheduleApprovalList:', error);
+        console.error('Error occurred in auditcheck-list-byObsIds:', error);
         throw error;
     }
 }

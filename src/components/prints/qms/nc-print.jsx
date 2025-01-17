@@ -34,7 +34,7 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
-       
+        { text: 'Status', bold: true, alignment: 'center', style: 'superheader' },
        ],
     ];
 
@@ -47,6 +47,7 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
             { text: item.clauseNo || '-', style: 'normal', alignment: 'left' },
             { text: item.description || '-', style: 'normal', alignment: 'left' },
             { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left' },
+            { text: item.carStatus || '-', style: 'normal', alignment: 'left' },
           ]);
         }
       });
@@ -59,7 +60,7 @@ const NcPrint = async (data,iqaNo,iqaFromDate,iqaToDate) => {
       {
         style: 'tableExample',
         table: {
-          widths: [20, 120, 100, 250, 150],
+          widths: [20, 120, 100, 250, 100,100],
           body: tableBody,
         },
         margin: [10, 10, 0, 10],

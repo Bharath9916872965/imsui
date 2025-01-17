@@ -63,7 +63,7 @@ const GenerateCombinedPDF = async (
         { text: 'Clause No', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Description', bold: true, alignment: 'center', style: 'superheader' },
         { text: 'Auditor Remarks', bold: true, alignment: 'center', style: 'superheader' },
-       
+        { text: 'Status', bold: true, alignment: 'center', style: 'superheader' },
        ],
     ];
 
@@ -74,7 +74,7 @@ const GenerateCombinedPDF = async (
         { text: item.clauseNo || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
         { text: item.description || '-', style: 'normal', alignment: 'left' ,margin: [0, 0, 0, 0]},
         { text: item.auditorRemarks || '-', style: 'normal', alignment: 'left',margin: [0, 5, 0, 0] },
-        
+       { text: item.carStatus || '-', style: 'normal', alignment: 'left' }, 
       ]);
     });
     //for OBS
@@ -134,7 +134,7 @@ const GenerateCombinedPDF = async (
     const ncContent = {
       style: 'tableExample',
       table: {
-        widths: [20, 120, 100, 250, 150],
+        widths: [20, 120, 100, 250, 100,100],
         body: ncTableBody,
       },
       margin: [10, 10, 0, 10],

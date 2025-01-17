@@ -34,15 +34,14 @@ const AuditSummaryReport = () => {
 
       const location = useLocation();
  
-  
+
 
       const fetchData = async () => {
          try {
            const scdList        = await getScheduleList();
            const iqaList        = await getIqaDtoList();
           const chListByObsIds= await getAuditCheckListbyObs();
-      
-
+ 
            setfullchListByObsIds(chListByObsIds);
            setIqaFullList(iqaList);
            setScheduleList(scdList);
@@ -183,8 +182,10 @@ const AuditSummaryReport = () => {
             { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
             { name: 'NC No', selector: (row) => row.carRefNo, sortable: true, grow: 1, align: 'text-center', width: '15%'  },
             { name: 'ClauseNo', selector: (row) => row.clauseNo, sortable: true, grow: 2, align: 'text-center', width: '10%'  },
-            { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '50%'  },
-            { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '25%'  },
+            { name: 'Description', selector: (row) => row.description, sortable: true, grow: 2, align: 'text-left', width: '45%'  },
+            { name: 'Auditor Remarks', selector: (row) => row.auditorRemarks, sortable: true, grow: 2, align: 'text-left', width: '20%'  },
+            { name: 'Status', selector: (row) => row.carStatus, sortable: true, grow: 2, align: 'text-left', width: '12%'  },
+            
           ];
           const obsColumns = [
             { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
@@ -268,16 +269,24 @@ setFilScheduleList(mappedData);
       setfilNc([{ message: "No data available." }]);
       return;
     }
-    const mappedData = list.map((item,index)=>({
+    const carStatusMap = {
+      CAP: "Approved",
+      CRM: "Recommended",
+      FWD: "Forwarded",
+      INI: "Initiated",
+      CRH: "Returned By Head",
+      CMR: "Returned By MR",
+    };
+    const mappedData = list.map((item, index) => ({
       sn: index + 1,
       carRefNo: item.carRefNo || '-',
       clauseNo: item.clauseNo || '-',
       description: item.description || '-',
-      auditorRemarks: item.auditorRemarks || '-'
+      auditorRemarks: item.auditorRemarks || '-',
+      carStatus: carStatusMap[item.carStatus] || item.carStatus || '-', // Map or default
     }));
-
-        setfilNc(mappedData);
-    
+setfilNc(mappedData);
+  
 }
 const setObs = (list)=>{
  
@@ -286,7 +295,8 @@ const setObs = (list)=>{
     carRefNo: item.carRefNo || '-',
     clauseNo: item.clauseNo || '-',
     description: item.description || '-',
-    auditorRemarks: item.auditorRemarks || '-'
+    auditorRemarks: item.auditorRemarks || '-',
+
   }));
 
   setfilObs(mappedData);
