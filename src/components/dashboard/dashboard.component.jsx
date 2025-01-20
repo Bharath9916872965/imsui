@@ -2,30 +2,33 @@ import React, { useEffect, useState } from "react";
 import { Link } from "react-router-dom"; 
 import Navbar from "../Navbar/Navbar";
 import "./dashboard.css";
-import { Autocomplete, TextField, Box, ListItemText } from '@mui/material';
+import { Autocomplete, TextField, Box, ListItemText, Typography } from '@mui/material';
 import { CustomMenuItem } from 'services/auth.header';
 import { format } from "date-fns";
 import { AgCharts } from 'ag-charts-react'; 
 import Datatable from "components/datatable/Datatable";
-
 import QmDocPrintDashboard from "components/prints/qms/qm-doc-print-dashboard";
 import QspDocPrint from "components/prints/qms/qsp-doc-print";
 import DwpDocPrint from "components/prints/qms/dwp-doc-print";
-
 import {getIqaAuditeeList,getAuditeeTeamDtoList,getScheduleList} from "services/audit.service";
-
 import {getKpiMasterList,getKpiObjRatingList } from "services/kpi.service";
-
 import {getIqaDtoListForDahboard,getQmDashboardDetailedList,getActiveAuditorsCount,getActiveAuditeeCount, getTotalChecklistObsCountByIqa
  ,getCheckListByObservation,getAllVersionRecordDtoList,getAllActiveDwpRecordList
 ,getProjectListOfPrjEmps,getDivGroupListOfDivEmps,getDivisionListOfDivEmps,getProjectListOfPrjDir,getDivisionListOfDH,getDivisionListOfGH,getAllActiveDivisionList}
    from "services/dashboard.service";
+import {qspDocumentList} from "services/qms.service";
+import Bowser from "bowser";
 
-   import {qspDocumentList} from "services/qms.service";
+  // Detect browser compatibility
+  const browser = Bowser.getParser(window.navigator.userAgent);
+  const browserName = browser.getBrowserName();
+  const browserVersion = parseFloat(browser.getBrowserVersion());
 
-
-   
-
+  const isCompatible =
+    (browserName === "Chrome" && browserVersion >= 100) ||
+    (browserName === "Edge" && browserVersion >= 100) ||
+    (browserName === "Firefox" && browserVersion >= 90) ||
+    (browserName === "Safari" && browserVersion >= 14);
 
 const labelColorsChecklist = {
   // NC: '#E2122A', 
@@ -34,16 +37,11 @@ const labelColorsChecklist = {
   OFI: '#f2c45f', 
 };
 
-
-
-
 const Dashboard = () => {
   const [selectedItem, setSelectedItem] = useState(null);
   let currentLoggerRoleName = localStorage.getItem('roleName');
   let currentLoggerRoleId =   localStorage.getItem('roleId');
   let currentLoggerEmpId =    localStorage.getItem('empId');
-
- 
   const [isReady, setIsReady] = useState(false);
   const [iqaFullList,setIqaFullList] = useState([]);
   const [iqaAuditeeFullList, setIqaAuditeeFullList] = useState([]);
@@ -63,7 +61,6 @@ const Dashboard = () => {
 
   const [scheduleFullList,setScheduleFullList] = useState([]);
   const [filteredScheduleList,setFilteredScheduleList] = useState([]);
-
 
   const [qmRecordList, setQMRecordList] = useState([]);
   const [qspRecordList, setQSPRecordList] = useState([]);
@@ -89,8 +86,12 @@ const Dashboard = () => {
   const [selectedType, setSelectedType] = useState('div'); // Default to 'Division'
   const [agChartCheckListOptions, setAgChartChecklistOptions] = useState({});
 
+    // State to track the theme (dark or light mode)
+    const [isDarkMode, setIsDarkMode] = useState(false);
 
-  
+    const toggleTheme = () => {
+      setIsDarkMode(!isDarkMode);
+    };
 
     //const [activeAuditeesCount,setActiveAuditeesCount] = useState(0);
     //const [activeTeamsCount,setActiveTeamsCount] = useState(0);
@@ -99,10 +100,6 @@ const Dashboard = () => {
     // const [teamsCountBasedOnIqaSel,setTeamsCountBasedOnIqaSel] = useState(0);
     // const [schedulesCountBasedOnIqaSel,setSchedulesCountBasedOnIqaSel] = useState(0);
     //const isHidden =currentLoggerRoleName && (currentLoggerRoleName.trim() === 'Admin' || currentLoggerRoleName.trim() === 'Director'  || currentLoggerRoleName.trim() === 'MR' );
-
-
-
-
 
   const handleTabClick = async (value) => {
     setSelectedType(value);
@@ -796,6 +793,8 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
         
               // Set the chart options
               setAgChartChecklistOptions({
+                autoSize: true,
+                height: window.innerHeight >= 3840 ? 900 : 400, // Example height adju
                 title: {
                   text: `Internal Quality Audit ${modifiedIqaNo}`,
                 },
@@ -829,8 +828,6 @@ if (ScheduleDtoList && ScheduleDtoList.length > 0) {
                     fill: labelColorsChecklist.OFI, 
                   },
                 ],
-                height: 310, // Adjust the height
-                pixelRatio: window.devicePixelRatio || 1,
               });
 
             }
@@ -1073,6 +1070,22 @@ const onIqaChange = async (selectedIqaId,selectedTypeData) => {
         fetchData();
       }, []);
 
+      // useEffect(() => {
+      //   const originalDetect = window.AgCharts && window.AgCharts.BrowserUtils.detect;
+      //   if (originalDetect) {
+      //     window.AgCharts.BrowserUtils.detect = function () {
+      //       return {
+      //         isChrome: true, 
+      //         isEdge: false,
+      //       };
+      //     };
+      //   }
+      //   fetchData();
+      //   if (originalDetect) {
+      //     window.AgCharts.BrowserUtils.detect = originalDetect;
+      //   }
+      // }, []);
+
 
       useEffect(() => {
         if (isReady) {
@@ -1313,33 +1326,47 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
 
 
   return (
-    <div className="dashboard-body">
+    <div 
+    className={`dashboard-body ${isDarkMode ? 'bg-dark text-white' : 'bg-light text-dark'}`} 
+    style={{ minHeight: '100vh' }} // Ensure full page height
+  >
    <Navbar/>
       {/* <HeaderComponent /> */}
 
       {/* Main Content Below Header */}
       
-  <div className="container-fluid page-body-wrapper dashboard-container"    sx={{
-    height: "calc(100vh - 100px)", 
-    overflowY: "auto",             
-    overflowX: "hidden", 
-    padding: '1.5rem 1.5rem',
-    paddingTop: '0.5em',          
-    background: "#f8f9fa",         
-  }}>
-        <div className="main-panel">
-        {/* style={{ display: 'none' }} */}
-        <div className="content-wrapper dashboard-wrapper pb-0"
-          // style={{ display: isHidden ? 'block' : 'none' }}
-          >
+      <div 
+        className={`container-fluid page-body-wrapper dashboard-container ${isDarkMode ? 'bg-dark' : 'bg-light'}`} 
+        style={{ minHeight: '100vh' }} // Ensure full page height for the container
+      >
 
-{/************************************ HEADER START ***************************************/}
-<div className="page-header row mb-4">
+<div 
+        className={`content-wrapper dashboard-content-wrapper ${isDarkMode ? 'bg-dark' : 'bg-light'}`} 
+        style={{ minHeight: '100vh', transition: 'background-color 0.3s ease' }} // Ensure smooth transition for container background
+      >
+
+
+{/************************************DASHBOARD HEADER START ***************************************/}
+<div className="dashboard-header  row ">
   {/* Column for the heading like welcome something*/}
   <div className="col-md-6 d-flex align-items-center">
     <h5 className="mb-0">
       <span className="ps-0 h6 ps-sm-2 text-muted d-inline-block"></span>
     </h5>
+     {/* Switch for Dark/Light Mode */}
+     {/* <div className="form-check form-switch">
+                <input 
+                  className="form-check-input" 
+                  type="checkbox" 
+                  id="themeSwitch" 
+                  checked={isDarkMode} 
+                  onChange={toggleTheme} 
+                  style={{ cursor: 'pointer' }}
+                />
+                <label className="form-check-label" htmlFor="themeSwitch">
+                  {isDarkMode ? 'Light Mode' : 'Dark Mode'}
+                </label>
+              </div> */}
   </div>
 
     {/* Column for the label */}
@@ -1373,30 +1400,29 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
         renderInput={(params) => (
           <TextField
             {...params}
-            // label="IQA No"
             variant="standard"
             size="small"
             sx={{
               input: {
-                color: '#2b2f32', // Set text color inside input field (selected value)
-                padding: '5px 12px', // Adjust input padding if needed
+                color: '#2b2f32', 
+                padding: '5px 12px',
                 fontWeight: '600',
               },
               root: {
                 '& .MuiOutlinedInput-root': {
                   border: 'none',
                   boxShadow: 'none',
-                  color: 'black', // Ensure input text is black
+                  color: 'black', 
                 },
                 '& .MuiInputLabel-root': {
-                  color: 'darkblue', // Label color
+                  color: 'darkblue',
                 },
               },
             }}
             
           />
         )}
-        disableClearable // Disable the clear button
+        disableClearable 
       />
     </div>
   </div>
@@ -1492,382 +1518,322 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
         },
       }}
     />
-  )}
-  disableClearable
-/>
-
-
-
-    </div>
+     )}
+     disableClearable
+    />
+   </div>
   </div>
-
-</div>
-
-
-{/************************************ HEADER END ***************************************/}   
-
-{/************************************ ROW START ***************************************/}
-<div className="row">
-
-
-  <div className="col-xl-12 col-lg-12 stretch-card grid-margin  ">
-              
-              <div className="card audit-graphs-card">
-                 <div className="row">
-
-          <div className="col-md-2  docs-panel">
-          
-          <div className="row docs-row" >
-
-
-          <div className="docs-div qm">
-  {qmRecordList.map((item, index) => (
-    <div 
-      key={index} 
-      className="docs-content" 
-      onClick={() => handleQMClick(item)}
-
-    >
-        {selectedItem && (
-        <QmDocPrintDashboard
-          revisionElements={selectedItem}
-          openInNewTab={true} // You can pass this prop to control new tab opening
-        />
-      )}
-      <span className="docs-label">QM</span>
-    </div>
-  ))}
-</div>
- 
-
-   
-
-
-
-            {/* <div className="docs-div qm " onClick={() => openQMPopUpModal()}> 
-                <div className="docs-content">
-                    <span className="docs-label">QM</span> 
-                </div>
-                </div>
-
-             {showQMModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">QM </h5>
-                    <button type="button" className="btn btn-danger" onClick={handleQMClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height dasdboard-doc-model">
-
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsQM} data={mappedDataQM} />
-                  </div>
-                  
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}   */}
-      
-        
-            <div className="docs-div qsp " onClick={() => openQSPPopUpModal()}>
-                <div className="docs-content">
-                    <span className="docs-label">QSP</span> 
-                </div>
-            </div>
-            {showQSPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal" >
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">QSP</h5>
-                    <button type="button" className="btn btn-danger" onClick={handleQSPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height dasdboard-doc-model">
-                 
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsQSP} data={mapQspData} />
-                  </div>
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}
-        
-        </div>
-        <div className="row docs-row">
-
-            <div className="docs-div dwp" onClick={() => openDWPPopUpModal()}>
-
-                <div className="docs-content">
-                    <span className="docs-label">DWP</span>
-                </div>
-            </div>
-      
-            {showDWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block'}} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal"  >
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">DWP </h5>
-                    <button type="button" className="btn btn-danger" onClick={handleDWPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height dasdboard-doc-model">
-                 
-                
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsDWP} data={mappedDataDWP} />
-                  </div>
-
-
-                  </div>
-                </div>
-              </div>
-            </div>
-
-          )}
-
-
-
-
-
-            <div className="docs-div gwp" onClick={() => openGWPPopUpModal()}>
-                <div className="docs-content">
-                    <span className="docs-label">GWP</span>
-                </div>
-            </div>
-            {showGWPModal && (
-            <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
-              <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal">
-                <div className="modal-content" >
-                  <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
-                    <h5 className="modal-title">GWP</h5>
-                    <button type="button" className="btn btn-danger" onClick={handleGWPClose} aria-label="Close">
-                      <span aria-hidden="true">&times;</span>
-                    </button>
-                  </div>
-
-                  <div className="modal-body model-max-height dasdboard-doc-model">
-
-                  <div id="card-body customized-card">
-                    <Datatable columns={columnsGWP} data={mappedDataGWP} />
-                  </div>
-
-                  </div>
-
-                </div>
-              </div>
-            </div>
-
-          )}
-     
-    </div>
-    
-</div>
-
-
-               
-
- <div className="col-md-8 counter-row">
-
-  <div className="col-md-2 imsCounter">
-    {currentLoggerRoleName &&
-    ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
-      <div className="counter auditor no-link">
-        <h3>Active Auditors</h3>
-        <span className="counter-value">{activeAuditorsCount}</span>
-      </div>
-    ) : (
-      <a className="dashboard-links" href="/auditor-list">
-        <div className="counter auditor">
-          <h3>Active Auditors</h3>
-          <span className="counter-value">{activeAuditorsCount}</span>
-        </div>
-      </a>
-    )}
-  </div>
-
-
-
-  <div className="col-md-2 imsCounter">
-  {currentLoggerRoleName &&
-  ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
-    <div className="counter auditee no-link">
-      <h3>{iqaNoSelected} Auditees</h3>
-      <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
-    </div>
-  ) : (
-    <a
-      className="dashboard-links"
-      href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`}
-    >
-      <div className="counter auditee">
-        <h3>{iqaNoSelected} Auditees</h3>
-        <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
-      </div>
-    </a>
-  )}
-</div>
-
-
-
-      
-     {/* <div className="col-md-2 col-sm-6 imsCounter">
-      <a className="dashboard-links" 
-      href={`/audit-team-list?iqaIdFromDashboard=${encodeURIComponent(iqaId)}&iqaNoFromDashboard=${encodeURIComponent(iqaNo)}`}
-      >
-          <div className="counter team">
-              <h3>{iqaNo} Teams</h3>
-              <span className="counter-value">{teamsCountBasedOnIqaSel}</span>
-          </div>
-          </a>
-      </div>
-
-      <div className="col-md-2 col-sm-6 imsCounter">
-      <a className="dashboard-links" href="/schedule-list">
-          <div className="counter schedule">
-              <h3>{iqaNo} Schedules</h3>
-              <span className="counter-value">{schedulesCountBasedOnIqaSel}</span>
-          </div>
-          </a>
-      </div> */}
-
-<div className="col-md-2 imsCounter">
-      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=N`}> 
-          <div className="counter team">
-              {/* <div className="counter-icon">
-                  <span> <BiLogoMicrosoftTeams  color="White" className="counter-icons"  /></span>
-              </div> */}
-              <h3>{iqaNoSelected} Total NC</h3>
-              <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountNC}</span>
-          </div>
-          </a>
-      </div>
-
-      <div className="col-md-2  imsCounter">
-      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=B`}>
-          <div className="counter schedule">
-              {/* <div className="counter-icon">
-                  <span> <MdScheduleSend  color="White" className="counter-icons"  /></span>
-              </div> */}
-              <h3>{iqaNoSelected} Total OBS</h3>
-              <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountOBS}</span>
-          </div>
-          </a>
-      </div>
-
-      <div className="col-md-2 imsCounter">
-      <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=O`}>
-          <div className="counter ofi">
-              {/* <div className="counter-icon">
-                  <span> <MdScheduleSend  color="White" className="counter-icons"  /></span>
-              </div> */}
-              <h3>{iqaNoSelected} Total OFI</h3>
-              <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountOFI}</span>
-          </div>
-          </a>
-      </div>
  </div>
+
+
+{/************************************DASHBOARD HEADER END ***************************************/}   
+
+{/************************************DASHBOARD CONTENT  START ***************************************/}
+<div className="row dashboard-content">
+
+{/************************************************ TOP CONTENT START******************************************************************************/}
+ <div className="top-content-grid col-xl-12 col-lg-12 stretch-card grid-margin  ">
+    <div className="card top-content-card">
+      <div className="row ">
+            
+        {/*__________________________ Col-md-2 START________________________*/}
+           <div className="col-md-2  documnets-panel">
+                {/* ----------FIRST ROW START-----------*/}
+                 <div className="row docs-row first-row " >
+                      {/**************  QM DOCUMENT ***************/}
+                      <div className="docs-div qm">
+                         {qmRecordList.map((item, index) => (
+                           <div key={index} className="docs-content" 
+                             onClick={() => handleQMClick(item)} >
+                              {selectedItem && (
+                                 <QmDocPrintDashboard
+                                   revisionElements={selectedItem}
+                                   openInNewTab={true} 
+                                 />
+                              )}
+                              <span className="docs-label">QM</span>
+                           </div>
+                         ))}
+                       </div>
+                       {/**************  QSP DOCUMENT ***************/}
+                     <div className="docs-div qsp " onClick={() => openQSPPopUpModal()}>
+                          <div className="docs-content">
+                            <span className="docs-label">QSP</span> 
+                          </div>
+                      </div>
+                      {showQSPModal && (
+                        <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
+                          <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal" >
+                            <div className="modal-content" >
+
+                              <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
+                                <h5 className="modal-title">QSP</h5>
+                                <button type="button" className="btn btn-danger" onClick={handleQSPClose} aria-label="Close">
+                                  <span aria-hidden="true">&times;</span>
+                                </button>
+                             </div>
+
+                             <div className="modal-body model-max-height dasdboard-doc-model">
+                                <div id="card-body customized-card">
+                                 <Datatable columns={columnsQSP} data={mapQspData} />
+                               </div>
+                             </div>
+
+                           </div>
+                          </div>
+                         </div>
+                      )}
+        
+                    </div>
+                   {/*----------  FIRST ROW END ----------*/}
+                   {/*---------- SECOND ROW START----------*/}
+                    <div className="row docs-row second-row">
+                      {/**************  DWP DOCUMENT ***************/}
+                       <div className="docs-div dwp" onClick={() => openDWPPopUpModal()}>
+                          <div className="docs-content">
+                             <span className="docs-label">DWP</span>
+                          </div>
+                       </div>
+                      {showDWPModal && (
+                       <div className={`modal fade show modal-visible`} style={{ display: 'block'}} aria-modal="true" role="dialog">
+                         <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal"  >
+                           <div className="modal-content" >
+                              <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
+                                  <h5 className="modal-title">DWP </h5>
+                                  <button type="button" className="btn btn-danger" onClick={handleDWPClose} aria-label="Close">
+                                    <span aria-hidden="true">&times;</span>
+                                  </button>
+                               </div>
+                               <div className="modal-body model-max-height dasdboard-doc-model">
+                                <div id="card-body customized-card">
+                                  <Datatable columns={columnsDWP} data={mappedDataDWP} />
+                                </div>
+                              </div>
+                           </div>
+                         </div>
+                       </div>
+                      )}
+                     {/**************  GWP DOCUMENT ***************/}
+                   <div className="docs-div gwp" onClick={() => openGWPPopUpModal()}>
+                       <div className="docs-content">
+                         <span className="docs-label">GWP</span>
+                        </div>
+                   </div>
+                  {showGWPModal && (
+                    <div className={`modal fade show modal-visible`} style={{ display: 'block' }} aria-modal="true" role="dialog">
+                      <div className="modal-dialog modal-lg modal-xl-custom docDashboardModal">
+                         <div className="modal-content" >
+                             <div className="modal-header bg-secondary d-flex justify-content-between bg-primary text-white">
+                               <h5 className="modal-title">GWP</h5>
+                               <button type="button" className="btn btn-danger" onClick={handleGWPClose} aria-label="Close">
+                                <span aria-hidden="true">&times;</span>
+                               </button>
+                             </div>
+                          <div className="modal-body model-max-height dasdboard-doc-model">
+                            <div id="card-body customized-card">
+                               <Datatable columns={columnsGWP} data={mappedDataGWP} />
+                           </div>
+                         </div>
+                       </div>
+                      </div>
+                    </div>
+                  )}
+             </div>
+               {/*---------- SECOND ROW END ----------*/}
+          </div>
+        {/*__________________________ Col-md-2 END__________________________ */}
          
+          
+        {/*__________________________ Col-md-8 START__________________________ */}
+         <div className="col-md-8 counters-panel">
+           {/*----------COUNTER 1 START ----------*/}
+           <div className="col-md-2 imsCounter">
+              {currentLoggerRoleName &&
+                ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+                 <div className="counter auditor no-link">
+                    <h3>Active Auditors</h3>
+                    <span className="counter-value">{activeAuditorsCount}</span>
+                 </div>
+               ) : (
+               <a className="dashboard-links" href="/auditor-list">
+                 <div className="counter auditor">
+                     <h3>Active Auditors</h3>
+                     <span className="counter-value">{activeAuditorsCount}</span>
+                  </div>
+               </a>
+             )}
+           </div>
+           {/*---------- COUNTER 1 END ----------*/}
+           {/*---------- COUNTER 2 START----------*/}
+           <div className="col-md-2 imsCounter">
+              {currentLoggerRoleName &&
+              ['Divisional MR', 'Auditee', 'Auditor'].includes(currentLoggerRoleName.trim()) ? (
+               <div className="counter auditee no-link">
+                 <h3>{iqaNoSelected} Auditees</h3>
+                 <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+               </div>
+              ) : (
+              <a className="dashboard-links" href={`/iqa-auditee-list?iqaIdSel=${iqaIdSelected}`} >
+               <div className="counter auditee">
+                 <h3>{iqaNoSelected} Auditees</h3>
+                 <span className="counter-value">{auditeeCountBasedOnIqaSel}</span>
+               </div>
+             </a>
+              )}
+           </div>
+           {/*---------- COUNTER 2 END----------*/}
+           {/*----------COUNTER 3 START----------*/}
+           <div className="col-md-2 imsCounter">
+               <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=N`}> 
+                 <div className="counter total-nc">
+                   <h3>{iqaNoSelected} Total NC</h3>
+                   <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountNC}</span>
+                 </div>
+               </a>
+           </div>
+           {/*---------- COUNTER 3 END----------*/}
+           {/*---------- COUNTER 4 START----------*/}
+           <div className="col-md-2  imsCounter">
+                 <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=B`}>
+                  <div className="counter total-obs">
+                     <h3>{iqaNoSelected} Total OBS</h3>
+                     <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountOBS}</span>
+                  </div>
+                </a>
+           </div>
+           {/*---------- COUNTER 4 END ----------*/}
+           {/*---------- COUNTER 5 START----------*/}
+            <div className="col-md-2 imsCounter">
+             <a className="dashboard-links"  href={`/audit-summary-report?iqaIdSel=${iqaIdSelected}&obsTypeSel=O`}>
+               <div className="counter total-ofi">
+                 <h3>{iqaNoSelected} Total OFI</h3>
+                 <span className="counter-value">{totalObsCountBasedOnIqaSel.totalCountOFI}</span>
+               </div>
+             </a>
+             </div>
+           {/*----------COUNTER 5 END ----------*/}
+         </div>
+        {/*__________________________ Col-md-8 END__________________________ */}
     
-     
-
-      <div className="col-md-2 col-sm-6 ">
-      {auditeeValSel === 0 ? (
-      <ul className="toggleIms-tabs" >
-      <li
-        role="presentation"
-        onClick={() => handleTabClick('div')}
-    >
-        <a className={selectedType === 'div' ? 'currentSel' : ''}>Div</a>
-    </li>
-    <li
-        role="presentation"
-        onClick={() => handleTabClick('grp')}
-    >
-        <a  className={selectedType === 'grp' ? 'currentSel' : ''}>Grp</a>
-    </li>
-    <li
-        role="presentation"
-        onClick={() => handleTabClick('prj')}
-    >
-        <a className={selectedType === 'prj' ? 'currentSel' : ''}>Proj</a>
-    </li>              
-    </ul>
-     
-       ) : null
-             
-      }
-    </div>
-
-
+        {/*__________________________ Col-md-6 START__________________________ */}
+        <div className="col-md-2 selector-panel ">
+           {auditeeValSel === 0 ? (
+           <ul className="toggleIms-tabs" >
+             <li role="presentation" onClick={() => handleTabClick('div')} >
+               <a className={selectedType === 'div' ? 'currentSel' : ''}>Div</a>
+             </li>
+             <li role="presentation"  onClick={() => handleTabClick('grp')}>
+               <a  className={selectedType === 'grp' ? 'currentSel' : ''}>Grp</a>
+              </li>
+              <li role="presentation" onClick={() => handleTabClick('prj')} >
+                <a className={selectedType === 'prj' ? 'currentSel' : ''}>Proj</a>
+              </li>              
+           </ul>
+           ) : null
+          }
+       </div>
+        {/*__________________________ Col-md-6 END__________________________ */}
+     </div>
    </div>
  </div>
+ {/************************************************ TOP CONTENT END******************************************************************************/}
 
-
-
-
-          
-
-
-            </div>
-
-
- <div className="col-xl-12 col-lg-12 stretch-card grid-margin graphs-div">
-  <div className="row">
-    <div className="card common-graphs-card">
-
-      {auditeeValSel === 0 ? (
-       
-       <div className="row master-graphs">
-          <AgCharts options={agChartCheckListOptions} />
-        </div>
-
+{/************************************************ BOTTOM CONTENT START******************************************************************************/}
+  <div className="bottom-content-grid col-xl-12 col-lg-12 stretch-card grid-margin ">
+     <div className="card bottom-content-card">
+         <div className="row ">
+           {auditeeValSel === 0 ? (
+             <div className="row master-graphs">
+                {isCompatible ? (
+        <AgCharts options={agChartCheckListOptions} />
       ) : (
-        
-        <div className="row user-graphs">
-          
-          <div className="col-md-3">
-          <AgCharts options={AgChartObsForAuditeeSelOption} />
-          </div>
-
-          <div className="col-md-9">
-          <AgCharts options={AgChartKPIForAuditeeSelOption} />
-          </div>
-
-         
-        
-        </div>
-
+        <Box 
+        display="flex" 
+        justifyContent="center" // Centers horizontally
+        alignItems="center" // Centers vertically
+      >
+        <Typography className="chartErrorMessage" variant="h6" color="error">
+          Chart is not displayed due to browser incompatibility. Please upgrade
+          your browser.
+        </Typography>
+        </Box>
       )}
-    </div>
+        
+            </div>
+           ) : (
+             <div className="row user-graphs">
+                <div className="col-md-3">
+                 {/* <AgCharts options={AgChartObsForAuditeeSelOption} /> */}
+                 {isCompatible ? (
+        <AgCharts options={AgChartObsForAuditeeSelOption} />
+      ) : (
+        <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center"
+      >
+        <Typography className="chartErrorMessage" variant="h6" color="error">
+          Chart is not displayed due to browser incompatibility. Please upgrade
+          your browser.
+        </Typography>
+        </Box>
+      )}
+                </div>
+               <div className="col-md-9">
+                 {/* <AgCharts options={AgChartKPIForAuditeeSelOption} /> */}
+                 {isCompatible ? (
+        <AgCharts options={AgChartKPIForAuditeeSelOption} />
+      ) : (
+        <Box 
+        display="flex" 
+        justifyContent="center" 
+        alignItems="center"
+      >
+        <Typography className="chartErrorMessage" variant="h6" color="error">
+          Chart is not displayed due to browser incompatibility. Please upgrade
+          your browser.
+        </Typography>
+        </Box>
+      )}
+               </div>
+             </div>
+           )}
+         </div>
+       </div>
+
+   </div>
+{/************************************************ BOTTOM CONTENT START******************************************************************************/}
+{/************************************ DASHBOARD CONTENT END ***************************************/}
+ </div>
+ </div>
   </div>
 </div>
+ );
+};
+
+export default Dashboard;
 
 
-</div>
-{/************************************ ROW END ***************************************/}
+      //     <div className="col-md-2 col-sm-6 imsCounter">
+      // <a className="dashboard-links" 
+      // href={`/audit-team-list?iqaIdFromDashboard=${encodeURIComponent(iqaId)}&iqaNoFromDashboard=${encodeURIComponent(iqaNo)}`}
+      // >
+      //     <div className="counter team">
+      //         <h3>{iqaNo} Teams</h3>
+      //         <span className="counter-value">{teamsCountBasedOnIqaSel}</span>
+      //     </div>
+      //     </a>
+      // </div>
 
+      // <div className="col-md-2 col-sm-6 imsCounter">
+      // <a className="dashboard-links" href="/schedule-list">
+      //     <div className="counter schedule">
+      //         <h3>{iqaNo} Schedules</h3>
+      //         <span className="counter-value">{schedulesCountBasedOnIqaSel}</span>
+      //     </div>
+      //     </a>
+      // </div> 
 
-
-
-          </div>
-        </div>
-      </div>
-    </div>
         // function getData() {
         //   return [
         //     {
@@ -2256,8 +2222,3 @@ const mappedDataGWP = gwpRecordList.map((item, index) => ({
         //     },
         //   ];
         // }
-  
-  );
-};
-
-export default Dashboard;
