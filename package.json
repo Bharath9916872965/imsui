@@ -15,13 +15,17 @@
     "ag-charts-react": "^11.0.3",
     "axios": "^1.7.7",
     "bootstrap": "^5.3.3",
+    "bowser": "^2.11.0",
+    "core-js": "^3.40.0",
     "date-fns": "^4.1.0",
     "dayjs": "^1.11.13",
     "file-saver": "^2.0.5",
     "font-awesome": "^4.7.0",
     "formik": "^2.4.6",
-    "html-to-pdfmake": "^2.5.14",
+    "html-docx-js": "^0.3.1",
+    "html-to-pdfmake": "^2.5.20",
     "jquery": "^3.7.1",
+    "jspdf": "^2.5.2",
     "jwt-decode": "^4.0.0",
     "material-design-icons-iconfont": "^6.7.0",
     "pdfmake": "^0.2.15",
@@ -31,6 +35,7 @@
     "react-icons": "^5.3.0",
     "react-router-dom": "^6.27.0",
     "react-scripts": "5.0.1",
+    "regenerator-runtime": "^0.14.1",
     "summernote": "^0.9.1",
     "sweetalert2": "^11.14.5",
     "sweetalert2-react-content": "^5.0.7",
@@ -56,14 +61,16 @@
   },
   "browserslist": {
     "production": [
-      ">0.2%",
+      "last 2 versions",
       "not dead",
-      "not op_mini all"
+      "> 0.2%",
+      "chrome >= 100"
     ],
     "development": [
       "last 1 chrome version",
       "last 1 firefox version",
-      "last 1 safari version"
+      "last 1 safari version",
+      "last 1 edge version"
     ]
   }
 }

@@ -2,3 +2,10 @@
     background-color:transparent;
     margin-top:50px!important;
   }
+
+  .chartErrorMessage{
+    font-size:0.8rem!important;
+    padding:10px 20px!important;
+    text-align: center;
+  }
+  
