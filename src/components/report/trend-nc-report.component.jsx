@@ -18,7 +18,7 @@ import { Box, Typography } from "@mui/material";
   const isCompatible =
     (browserName === "Chrome" && browserVersion >= 100) ||
     (browserName === "Edge" && browserVersion >= 100) ||
-    (browserName === "Firefox" && browserVersion >= 90) ||
+    (browserName === "Firefox" && browserVersion >= 100) ||
     (browserName === "Safari" && browserVersion >= 14);
 
 const TrendNCAndOBSReport = () => {
