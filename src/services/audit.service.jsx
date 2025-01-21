@@ -1001,37 +1001,34 @@ export const getAssignedData = async (committeeType)=>{
 
   export const getActiveProcurementList = async ()=>{
     try {
-        const response = await axios({
-          method: 'get',
-          url: `${environment.PFTS_URL   }`, 
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
-          },
-          responseType: 'json',
-        });
-        return response.data;
-      } catch (error) {
-        console.warn('Unable to fetch the procurement list. Returning fallback value.');
-        return [];
-      }
+        return (await axios.post(`${API_URL}get-active-procurement-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in getActiveProcurementList:', error);
+        throw error;
+    }
     };
 
 
-    export const getSupplyOrderList = async ()=>{
+    export const getSupplyOrderList = async (labCode)=>{
         try {
-            const response = await axios({
-              method: 'get',
-              url: `${environment.IBAS_URL   }`,
-              headers: {
-                'Content-Type': 'application/json',
-                'Authorization': `Bearer ${JSON.parse(localStorage.getItem('user')).token}`,  
-              },
-              responseType: 'json', 
-            });
-            return response.data;
-          } catch (error) {
-            console.warn('Unable to fetch the supply order list. Returning fallback value.');
-            return []; 
-          }
-        };
+            const data = { labCode };
+             const response= (await axios.post(`${API_URL}get-supply-order-list`,
+                data,
+                {headers : {'Content-Type': 'application/json', ...authHeader()}}));
+                return response.data;
+        } catch (error) {
+            console.error('Error occurred in getSupplyOrderList:', error);
+            throw error;
+        }
+    }
+
+
+    export const getItemReceivedList = async ()=>{
+        try {
+            return (await axios.post(`${API_URL}get-item-received-list`,{},{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        } catch (error) {
+            console.error('Error occurred in getIqaScheduleList:', error);
+            throw error;
+        }
+      }
+    

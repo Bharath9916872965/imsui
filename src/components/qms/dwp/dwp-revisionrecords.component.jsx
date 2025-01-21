@@ -93,7 +93,6 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
       const empIdAsNum = Number(selectedempId);
       const userManagerList = await getUserManagerList();
       const seldivisionId=userManagerList.find(data => data.empId===empIdAsNum && data.formRoleName===divroleName);
-      console.log('seldivisionId',seldivisionId);
       setSelDivId(seldivisionId);
 
       setUserManagerList(userManagerList);
@@ -358,7 +357,8 @@ const DwpRevisionRecordsComponent = ({ router, docName }) => {
   };
 
   const fileteredApproveList = (list, employee,versionRecorList) => {
-    const filtEmpByDiv = employee.filter(data => list.has(data.empId))
+    //const filtEmpByDiv = employee.filter(data => list.has(data.empId))
+    const filtEmpByDiv = employee;
     setDwpGwpList(filtEmpByDiv);
     if (filtEmpByDiv && filtEmpByDiv.length > 0) {
       setInitialValues(prev => ({

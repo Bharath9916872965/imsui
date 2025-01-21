@@ -4,6 +4,7 @@ import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDe
 import htmlToPdfmake from 'html-to-pdfmake';
 import { getEmployeesList } from 'services/header.service';
 import { format } from 'date-fns';
+import { openLoadingTab } from 'services/auth.service';
 
 const QmDocPrintDashboard = ({ revisionElements, openInNewTab }) => {
   const [today, setToday] = useState(new Date());
@@ -778,11 +779,21 @@ const handlePdfGeneration = () => {
   }
 
 
-    pdfMake.createPdf(docDefinition).open();
+// Open the loading tab with a custom message and spinner color
+const loadingTab = openLoadingTab({
+  message: 'Generating your PDF, please wait...',
+  spinnerColor: '#ff5733', // Optional: Customize spinner color
+});
 
-  
+// Simulate PDF generation
+setTimeout(() => {
+  pdfMake.createPdf(docDefinition).getBlob((blob) => {
+    // Set the generated PDF in the new tab
+    loadingTab.setPdfContent(blob);
+  });
+}, 500); // Simulate PDF generation delay (adjust as needed)
 
-
+    
 }
 
  

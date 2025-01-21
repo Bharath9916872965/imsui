@@ -294,11 +294,56 @@ export const getAuditPatchList= async () => {
 
 
 
-export const  updateAuditPatch= async (values) => {
+export const updateAuditPatch = async (formData) => {
   try {
-      return (await axios.post(`${API_URL}update-audit-patch`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+      const response = await axios.post(
+          `${API_URL}update-audit-patch`, 
+          formData, 
+          {
+              headers: {
+                  'Content-Type': 'multipart/form-data',
+                  ...authHeader(), 
+              },
+          }
+      );
+      return response.data; 
   } catch (error) {
       console.error('Error occurred in updateAuditPatch:', error);
       throw error;
   }
 };
+
+
+export const downloadAuditAttach = async (item) => {
+  try {
+      // Ensure the data is in Blob format
+      let blob;
+      if (typeof item.attachment === 'string') {
+          // Assuming the attachment is base64-encoded
+          const byteCharacters = atob(item.attachment); // Decode base64
+          const byteNumbers = Array.from(byteCharacters, char => char.charCodeAt(0));
+          const byteArray = new Uint8Array(byteNumbers);
+          blob = new Blob([byteArray], { type: 'text/plain' }); // Adjust MIME type as needed
+      } else {
+          // If it's already a binary blob
+          blob = new Blob([item.attachment], { type: 'text/plain' }); // Adjust MIME type as needed
+      }
+
+      // Create a URL and trigger the download
+      const downloadUrl = window.URL.createObjectURL(blob);
+      const link = document.createElement('a');
+      link.href = downloadUrl;
+      link.setAttribute('download', `patch_${item.auditPatchesId}.txt`);
+      document.body.appendChild(link);
+      link.click();
+
+      // Clean up
+      document.body.removeChild(link);
+      window.URL.revokeObjectURL(downloadUrl);
+  } catch (error) {
+      console.error('Error occurred while downloading attachment:', error);
+      throw error;
+  }
+};
+
+

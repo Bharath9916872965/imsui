@@ -127,3 +127,75 @@ export const customAuditStampingLogout = async (username, logoutType) => {
       throw error;
     }
   };
+
+
+  // utils/loadingTab.js
+
+  export const openLoadingTab = ({ 
+    message = 'Please wait...', 
+    spinnerColor = '#3498db', 
+  }) => {
+    const newTab = window.open('', '_blank');
+    if (!newTab) {
+      alert('Please allow pop-ups for this site.');
+      return;
+    }
+  
+    // Write loading animation to the new tab
+    newTab.document.write(`
+      <html>
+        <head>
+          <title>Loading...</title>
+          <style>
+            body {
+              display: flex;
+              flex-direction: column;
+              justify-content: center;
+              align-items: center;
+              height: 100vh;
+              margin: 0;
+              background-color: rgb(248, 244, 244);
+              font-family: Arial, sans-serif;
+            }
+            .spinner {
+              border: 6px solid rgba(0, 0, 0, 0.1);
+              border-top: 6px solid ${spinnerColor};
+              border-radius: 50%;
+              width: 50px;
+              height: 50px;
+              animation: spin 1s linear infinite;
+            }
+            @keyframes spin {
+              from { transform: rotate(0deg); }
+              to { transform: rotate(360deg); }
+            }
+            p {
+              margin-top: 20px;
+              font-size: 18px;
+              color: black;
+            }
+          </style>
+        </head>
+        <body>
+          <div class="spinner"></div>
+          <p><br>${message}</p>
+        </body>
+      </html>
+    `);
+  
+    // Close document to ensure the page is rendered properly
+    newTab.document.close();
+  
+    // Return an object with setPdfContent to allow setting the PDF content
+    return {
+      setPdfContent: (pdfBlob) => {
+        // Once the PDF is ready, load it into the new tab
+        const pdfUrl = URL.createObjectURL(pdfBlob);
+        newTab.location.href = pdfUrl;
+      }
+    };
+  };
+  
+  
+
+  
