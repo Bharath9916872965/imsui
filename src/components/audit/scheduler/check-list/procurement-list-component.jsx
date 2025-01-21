@@ -138,7 +138,7 @@ const ProcurementListComponent = ({ router }) => {
             <div className="card-body">
                 <div className="row">
                     <div className="col-md-12 text-center">
-                        <h3>Procurement Details</h3>
+                        <h3>Procurement Details (Last Six Months)</h3>
                         <br />
                         <Tabs className="max-h35" value={selectedTab} onChange={handleTabChange} aria-label="inspection tabs"  variant="fullWidth" >
                             <Tab className='mgt8' icon={<i className="material-icons">sort</i>} iconPosition="start"  label={ <span style={{ display: 'flex', alignItems: 'center' }}>Active Procurement List<Badge showZero badgeContent = {selfinalProcurementList}  color="error" className="badge-position"/></span>}  />
