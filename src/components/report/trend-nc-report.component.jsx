@@ -6,6 +6,20 @@ import dayjs from 'dayjs';
 import { AgCharts } from 'ag-charts-react';
 import { getTrendNCAndObsList } from "services/dashboard.service";
 import "./trend-nc-report.css";
+import Bowser from "bowser";
+import { Box, Typography } from "@mui/material";
+
+
+  // Detect browser compatibility
+  const browser = Bowser.getParser(window.navigator.userAgent);
+  const browserName = browser.getBrowserName();
+  const browserVersion = parseFloat(browser.getBrowserVersion());
+
+  const isCompatible =
+    (browserName === "Chrome" && browserVersion >= 100) ||
+    (browserName === "Edge" && browserVersion >= 100) ||
+    (browserName === "Firefox" && browserVersion >= 90) ||
+    (browserName === "Safari" && browserVersion >= 14);
 
 const TrendNCAndOBSReport = () => {
   const [error, setError] = useState(null);
@@ -224,7 +238,21 @@ obs: item.totalCountOBS || 0, // Same for OBS count
               />
             </div>
             <div className="trendGraph">
-              <AgCharts options={AgChartTrendOfNCandOBSOption} />
+              {/* <AgCharts options={AgChartTrendOfNCandOBSOption} /> */}
+              {isCompatible ? (
+        <AgCharts options={AgChartTrendOfNCandOBSOption} />
+      ) : (
+        <Box 
+        display="flex" 
+        justifyContent="center" // Centers horizontally
+        alignItems="center" // Centers vertically
+      >
+        <Typography className="chartErrorMessage" variant="h6" color="error">
+          Chart is not displayed due to browser incompatibility. Please upgrade
+          your browser.
+        </Typography>
+        </Box>
+      )}
             </div>
           </div>
         </div>
