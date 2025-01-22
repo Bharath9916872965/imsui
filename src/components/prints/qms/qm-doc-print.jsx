@@ -4,6 +4,7 @@ import { getQmAllChapters, getDocSummarybyId, getDocTemplateAttributes, getLabDe
 import htmlToPdfmake from 'html-to-pdfmake';
 import { getEmployeesList } from 'services/header.service';
 import { format } from 'date-fns';
+import { openLoadingTab } from 'services/auth.service';
 
 const QmDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
@@ -795,12 +796,23 @@ function generateRotatedTextImage(text) {
     } else if (action === 'print') {
       pdfMake.createPdf(docDefinition).print();
     } else {
-      pdfMake.createPdf(docDefinition).open();
+
+     const loadingTab = openLoadingTab({
+       message: 'Generating your PDF, please wait...',
+       spinnerColor: '#ff5733', // Optional: Customize spinner color
+     });
+     
+     // Simulate PDF generation
+     setTimeout(() => {
+       pdfMake.createPdf(docDefinition).getBlob((blob) => {
+         // Set the generated PDF in the new tab
+         loadingTab.setPdfContent(blob);
+       });
+     }, 500);
 
     }
-    //  };
-
   }
+    
 
   if (buttonType==='Button') {
     return <button className='print' onClick={changeTriggerEffect}  >Print <i className="material-icons" style={{fontSize : "1.2em"}}  >print</i></button> ;

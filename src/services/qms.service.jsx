@@ -757,3 +757,12 @@ export const addNewAbbreviations = async (abbreData) => {
         throw error;
     }
 }
+
+export const getDwpVersionRecordDtoPrintList = async (qmsDocTypeDto) => {
+    try {
+        return (await axios.post(`${API_URL}get-dwp-version-record-print-list`, qmsDocTypeDto, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+    } catch (error) {
+        console.error('Error occurred in getDwpVersionRecordDtoList() ', error);
+        throw error;
+    }
+}

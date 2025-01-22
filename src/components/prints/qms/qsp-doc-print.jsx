@@ -4,6 +4,7 @@ import htmlToPdfmake from 'html-to-pdfmake';
 import { getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getLabDetails, getLogoImage, getQspAllChapters, getQspDocSummarybyId, getQspRevistionRecordById, qspDocumentList, qspRevisionTran } from 'services/qms.service';
 import { format } from 'date-fns';
 import { getEmployeesList } from 'services/header.service';
+import { openLoadingTab } from 'services/auth.service';
 
 
 const QspDocPrint = ({ action, revisionElements, buttonType }) => {
@@ -818,9 +819,22 @@ function generateRotatedTextImage(text) {
     } else if (action === 'print') {
       pdfMake.createPdf(docDefinition).print();
     } else {
-      pdfMake.createPdf(docDefinition).open();
 
-    }
+       // Open a new tab
+        const loadingTab = openLoadingTab({
+        message: 'Generating your PDF, please wait...',
+        spinnerColor: '#ff5733', // Optional: Customize spinner color
+        });
+
+        // Simulate PDF generation
+        setTimeout(() => {
+        pdfMake.createPdf(docDefinition).getBlob((blob) => {
+        // Set the generated PDF in the new tab
+        loadingTab.setPdfContent(blob);
+        });
+        }, 500);
+
+         }
     //  };
 
   }

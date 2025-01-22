@@ -2,11 +2,12 @@ import React, { useEffect, useState } from 'react';
 import pdfMake from "pdfmake/build/pdfmake";
 import pdfFonts from "pdfmake/build/vfs_fonts";
 import htmlToPdfmake from 'html-to-pdfmake';
-import { dwprevisionTran, getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getDwpVersionRecordDtoList, getLabDetails, getLogoImage } from 'services/qms.service';
+import { dwprevisionTran, getAbbreviationsByIdNotReq, getDocTemplateAttributes, getDrdoLogo, getDwpAllChapters, getDwpDocSummarybyId, getDwpRevistionRecordById, getDwpVersionRecordDtoList, getDwpVersionRecordDtoPrintList, getLabDetails, getLogoImage } from 'services/qms.service';
 import { getEmployeesList } from 'services/header.service';
 import { format } from 'date-fns';
 import {RiskRegisterMitigation } from "services/risk.service";
 import { getKpiMasterList } from "services/kpi.service";
+import { openLoadingTab } from 'services/auth.service';
 
 const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
   const [error, setError] = useState(null);
@@ -45,7 +46,7 @@ const DwpDocPrint = ({ action, revisionElements, buttonType }) => {
          setfilKpiMasterList(filteredKpiMasterList);
        const revision = await getDwpRevistionRecordById(revisionElements.revisionRecordId);
         setRevisionRecordData(revision);
-        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq("0"), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
+        Promise.all([getLabDetails(), getLogoImage(), getDrdoLogo(), getAbbreviationsByIdNotReq("0"), getDwpAllChapters(qmsDocTypeDto), getDwpDocSummarybyId(revisionElements.revisionRecordId), getDocTemplateAttributes(), getDwpVersionRecordDtoPrintList(qmsDocTypeDto),  getEmployeesList(), dwprevisionTran(revisionElements.revisionRecordId)]).then(([labDetails, logoimage, drdoLogo, docAbbreviationsResponse, allChaptersLists, DocumentSummaryDto, DocTemplateAttributes, dwpRevisionRecordData, employeeData, dwpTransactionData]) => {
           setLabDetails(labDetails);
           setLogoimage(logoimage);
           setDrdoLogo(drdoLogo);
@@ -375,11 +376,11 @@ const rotatedImage = generateRotatedTextImageRisk('ISO-9001:2015');
 
     // ----------revision table start----------------
     var header1 = [
-      { rowSpan: 2, text: 'Version', style: 'tableLabel' },
+      { rowSpan: 2, text: 'Sl.No', style: 'tableLabel' },
       { rowSpan: 2, text: 'Nature/Details of Revision', style: 'tableLabel' },
-      { colSpan: 2, text: 'Version/Release Number', style: 'tableLabel' }, {},
-      { rowSpan: 2, text: 'Issue date', style: 'tableLabel' },
-      { rowSpan: 2, text: 'Reference No. Approval', style: 'tableLabel' }
+      { colSpan: 2, text: 'Issue/Revision Number', style: 'tableLabel' }, {},
+      { rowSpan: 2, text: 'Date of Revision', style: 'tableLabel' },
+      { rowSpan: 2, text: 'Reference No.of Revision Approval', style: 'tableLabel' }
     ];
 
     var header2 = [
@@ -435,11 +436,11 @@ const rotatedImage = generateRotatedTextImageRisk('ISO-9001:2015');
 
       for (let i = 0; i < filteredData.length; i++) {
       var value = [
-        { text: filteredData[i].revisionNo, style: 'tdData', alignment: 'center' },
+        { text: (i+1), style: 'tdData', alignment: 'center' },
         { text: filteredData[i].description, style: 'tdData' },
         { text: i > 0 ? 'I' + filteredData[i - 1].issueNo + '-R' + filteredData[i - 1].revisionNo : '--', style: 'tdData', alignment: 'center', },
         { text: 'I' + filteredData[i].issueNo + '-R' + filteredData[i].revisionNo, style: 'tdData', alignment: 'center', },
-        { text: format(new Date(filteredData[i].dateOfRevision), 'dd-MM-yyyy') || '-', alignment: 'center', style: 'tdData' },
+        { text: format(new Date(filteredData[i].dateOfRevision), 'MMM yyyy') || '-', alignment: 'center', style: 'tdData' },
         { text: 'I' + filteredData[i].issueNo + '-R' + filteredData[i].revisionNo, style: 'tdData', alignment: 'center', },
       ];
   
@@ -1053,7 +1054,20 @@ for (let i = 0; i < kpiMasterfilList.length; i++) {
     } else if (action === 'print') {
       pdfMake.createPdf(docDefinition).print();
     } else {
-      pdfMake.createPdf(docDefinition).open();
+      // Open a new tab
+
+        const loadingTab = openLoadingTab({
+          message: 'Generating your PDF, please wait...',
+          spinnerColor: '#ff5733', // Optional: Customize spinner color
+        });
+        
+        // Simulate PDF generation
+        setTimeout(() => {
+          pdfMake.createPdf(docDefinition).getBlob((blob) => {
+            // Set the generated PDF in the new tab
+            loadingTab.setPdfContent(blob);
+          });
+        }, 500);
 
     }
     //  };

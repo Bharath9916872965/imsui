@@ -3,7 +3,7 @@ import Datatable from "../datatable/Datatable";
 import Navbar from "../Navbar/Navbar";
 import Swal from "sweetalert2";
 import AlertConfirmation from "../../common/AlertConfirmation.component";
-import { getAuditPatchList, updateAuditPatch } from "services/admin.serive";
+import { downloadAuditAttach, getAuditPatchList, updateAuditPatch } from "services/admin.serive";
 import { format } from "date-fns";
 import { Field, Form, Formik } from "formik";
 import { TextField } from "@mui/material";
@@ -17,6 +17,44 @@ const AuditPatchComponent = () => {
         versionNo: "", 
         description: "", 
     });
+
+    const [file, setFile] = useState(null);
+
+    const handleFileChange = (event) => {
+      const file = event.target.files[0];
+  
+      if (file) {
+          const allowedExtensions = ['.txt', '.sql'];
+          const fileExtension = file.name.slice(file.name.lastIndexOf('.')).toLowerCase();
+          const maxFileSize = 100 * 1024; // 100 KB in bytes
+  
+          // Check file extension
+          if (!allowedExtensions.includes(fileExtension)) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'Invalid File Type',
+                  text: 'Please upload only .txt or .sql files.',
+              });
+              event.target.value = ''; // Reset the file input
+              return;
+          }
+  
+          // Check file size
+          if (file.size > maxFileSize) {
+              Swal.fire({
+                  icon: 'error',
+                  title: 'File Too Large',
+                  text: 'The file size must not exceed 100 KB.',
+              });
+              event.target.value = ''; // Reset the file input
+              return;
+          }
+  
+          // If the file passes all checks, update state
+          setFile(file);
+      }
+  };
+
     const [auditPatchesId, setAuditPatchesId] = useState('');
     useEffect(() =>{
         auditpatchList();
@@ -51,6 +89,11 @@ const AuditPatchComponent = () => {
             action: (
              <>
              <button className=" btn btn-outline-warning btn-sm me-1" onClick={() => editAuditPatch(item)} title="Edit"> <i className="material-icons"  >edit_note</i></button>
+             {item.attachment && (
+              <button className="btn btn-outline-success btn-sm me-1" onClick={() => handleDownload(item)} title="Download">
+              <i className="material-icons">file_download</i>
+              </button>
+             )}
              </>
             ),
           }
@@ -58,6 +101,9 @@ const AuditPatchComponent = () => {
         setTblAuditPatchList(mappedData);
       }
       
+      const handleDownload = async(item) =>{
+        const downloadAttach = await downloadAuditAttach(item);
+      }
       const editAuditPatch = async(item) =>{
         setShowModal(true);
         setInitialValues({
@@ -69,22 +115,35 @@ const AuditPatchComponent = () => {
 
 
       const handleSubmit = async (values) => {
-        const finalvalue = {
+        const finalValue = {
             ...values,
             auditPatchesId,
         };
-        const successMessage = "Audit Patch Updated Successfully!" ;
-        const unsuccessMessage = "Audit Patch Update Unsuccessful!" ;
-        const Title =  "Are you sure to Update ?" ;
+    
+        const successMessage = "Audit Patch Updated Successfully!";
+        const unsuccessMessage = "Audit Patch Update Unsuccessful!";
+        const Title = "Are you sure to Update ?";
+        
         const confirm = await AlertConfirmation({
             title: Title,
             message: '',
         });
-
-        // if (!confirm.isConfirmed) return;
+    
         if (confirm) {
             try {
-                const result = await updateAuditPatch(finalvalue);
+                // Collect the file input
+                const fileInput = document.querySelector('input[type="file"]'); // Assuming your file input is <input type="file">
+                const file = fileInput ? fileInput.files[0] : null;
+    
+                // Construct FormData
+                const formData = new FormData();
+                formData.append('file', file); // Add the file to FormData
+                formData.append('versionNo', finalValue.versionNo); // Add other fields
+                formData.append('description', finalValue.description);
+                formData.append('auditPatchesId', finalValue.auditPatchesId);
+    
+                const result = await updateAuditPatch(formData);
+    
                 if (result === 200) {
                     auditpatchList();
                     setShowModal(false);
@@ -108,11 +167,12 @@ const AuditPatchComponent = () => {
                     });
                 }
             } catch (error) {
-                console.error('Error Edit Audit Patch :', error);
-                Swal.fire('Error!', 'There was an issue Edit Audit Patch Update.', 'error');
+                console.error('Error Edit Audit Patch:', error);
+                Swal.fire('Error!', 'There was an issue with the Edit Audit Patch Update.', 'error');
             }
         }
     };
+    
 
     return(
         <div>
@@ -128,8 +188,8 @@ const AuditPatchComponent = () => {
               {/* Backdrop */}
               <div className="modal-backdrop show" style={{ zIndex: 1040 }}></div>
               <div className="modal fade show" style={{ display: "block" }}>
-                <div className="modal-dialog modal-lg modal-lg-custom">
-                  <div className="modal-content modal-content-custom">
+                <div className="modal-dialog modal-lg modal-lg-custom" >
+                  <div className="modal-content modal-content-custom" >
                     <div className="modal-header bg-secondary d-flex justify-content-between text-white modal-header-custom">
                       <h5 className="modal-title">Audit Patch Edit</h5>
                       <button type="button" className="btn btn-danger modal-header-danger-custom" onClick={() => setShowModal(false)}>
@@ -141,7 +201,7 @@ const AuditPatchComponent = () => {
                       {({ values, setFieldValue }) => (
                         <Form>
                             <div className="row">
-                                <div className="col-md-12">
+                                <div className="col-md-6">
                                     <Field name="versionNo">
                                         {({ field, form }) => (
                                             <TextField
@@ -159,6 +219,26 @@ const AuditPatchComponent = () => {
                                             />
                                         )}
                                     </Field>
+                                </div>
+                                <div className="col-md-6">
+                                  <Field name="file">
+                                    {({ field, form }) => (
+                                      <>
+                                        <input
+                                          id="file"
+                                          name="file"
+                                          type="file"
+                                          className="form-control"
+                                          onChange={handleFileChange}
+                                        />
+                                        {form.errors.file && form.touched.file && (
+                                          <div className="invalid-feedback d-block">
+                                            {form.errors.file}
+                                          </div>
+                                        )}
+                                      </>
+                                    )}
+                                  </Field>
                                 </div>
                             </div><br />
                             <div className="row">
@@ -183,8 +263,12 @@ const AuditPatchComponent = () => {
                                         )}
                                     </Field>
                                 </div>
-                            </div><br />
-                            <div className="col text-center subclass">
+                            </div><br/>
+                            <div className="col text-start">
+                              <span style={{color:'red'}}>*Please attach .sql or .txt file only</span><br/>
+                              <span style={{color:'red'}}>*Attachment size should be less than 100KB</span>
+                            </div>
+                            <div className="col text-center" style={{marginTop:"70px"}}>
                                 <button type="submit" className="btn btn-warning">
                                     Update
                                 </button>
