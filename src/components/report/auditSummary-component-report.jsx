@@ -53,7 +53,7 @@ const AuditSummaryReport = () => {
              const iqa = iqaList[0];
              setIqaNo(iqa.iqaNo)
              setIqaId(iqa.iqaId)
-              setIqaFromDate(dayjs(new Date(iqa.fromDate)))
+             setIqaFromDate(dayjs(new Date(iqa.fromDate)))
              setIqaToDate(dayjs(new Date(iqa.toDate)))
             const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
             setDataTable(scList);
@@ -144,7 +144,6 @@ const AuditSummaryReport = () => {
               )
           );
           
-          console.log('maxAuditors',maxAuditors)
           const InAuditorTeamscolumns = [
               { name: 'SN', selector: (row) => row[0], sortable: true, grow: 1, align: 'text-center', width: '3%' },
               { name: 'Teams', selector: (row) => row[1], sortable: true, grow: 2, align: 'text-left', width: '11%' },
