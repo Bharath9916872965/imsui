@@ -53,7 +53,7 @@ const AuditSummaryReport = () => {
              const iqa = iqaList[0];
              setIqaNo(iqa.iqaNo)
              setIqaId(iqa.iqaId)
-              setIqaFromDate(dayjs(new Date(iqa.fromDate)))
+             setIqaFromDate(dayjs(new Date(iqa.fromDate)))
              setIqaToDate(dayjs(new Date(iqa.toDate)))
             const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
             setDataTable(scList);
@@ -225,7 +225,17 @@ const AuditSummaryReport = () => {
         setIqaToDate(dayjs(new Date(selectedIqa.toDate)))
      }
      
-    const scList = scheduleList.filter(data => data.iqaId === iqaId)
+    //const scList = scheduleList.filter(data => data.iqaId === iqaId).sort((a, b) => a.teamCode.localeCompare(b.teamCode));
+    const scList = scheduleList
+    .filter(data => data.iqaId === iqaId) // Filter by `iqaId`
+    .sort((a, b) => {
+        const teamCodeComparison = a.teamCode.localeCompare(b.teamCode);
+        if (teamCodeComparison !== 0) {
+            return teamCodeComparison;
+        }
+        return new Date(a.scheduleDate) - new Date(b.scheduleDate);
+    });
+
       setDataTable(scList)
      
       //for NC On change
