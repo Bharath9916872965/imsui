@@ -84,26 +84,26 @@ const filCarList = data ? data.filter(item => carId === item.correctiveActionId)
           widths: [165, 165, 165],
           body: [
             [  {  stack: [
-                { text: initEmpData.length > 0 ? `${initEmpData[0]}\n` : '',  style: 'normal',  },
-                { text: initEmpData.length > 0 ? format(initEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+                { text: initEmpData.length > 0 ? `${initEmpData[0]}\n` : '',  style: 'normal',alignment: 'center'  },
+                { text: initEmpData.length > 0 ? format(initEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize',alignment: 'center', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
               ].filter(Boolean) 
             },
             {  stack: [
-              { text: recEmpData.length > 0 ? `${recEmpData[0]}\n` : '',  style: 'normal',  },
-              { text: recEmpData.length > 0 ? format(recEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+              { text: recEmpData.length > 0 ? `${recEmpData[0]}\n` : '',  style: 'normal',alignment: 'center'  },
+              { text: recEmpData.length > 0 ? format(recEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize',alignment: 'center', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
             ].filter(Boolean) 
           },
           {  stack: [
-            { text: approvedEmpData.length > 0 ? `${approvedEmpData[0]}\n` : '',  style: 'normal',  },
-            { text: approvedEmpData.length > 0 ? format(approvedEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
+            { text: approvedEmpData.length > 0 ? `${approvedEmpData[0]}\n` : '',  style: 'normal',alignment: 'center'  },
+            { text: approvedEmpData.length > 0 ? format(approvedEmpData[1], 'MMM dd, yyyy hh:mm a') : '', style: 'datefontsize',alignment: 'center', color: 'blue',margin: [0, 5, 0, 0], }, '\n', // Add spacing between elements
           ].filter(Boolean) 
         },
                          ],
 
               [   
-                { text: 'Signature of Primary Executive', style: 'superheader' },
-                { text: 'Signature of Project Director ', style: 'superheader' }, 
-                { text: 'Signature of MR ', style: 'superheader' },
+                { text: 'Signature of Primary Executive', style: 'superheader',alignment: 'center' },
+                { text: 'Signature of Project Director ', style: 'superheader',alignment: 'center' }, 
+                { text: 'Signature of MR ', style: 'superheader',alignment: 'center' },
               ],
            ]
         },
@@ -118,7 +118,7 @@ const filCarList = data ? data.filter(item => carId === item.correctiveActionId)
                   { },
               
               ],
-              [    { text: '7. Target date for completion of correction and corrective ', style: 'superheader' }, 
+              [    { text: '7. Target date for completion of correction and corrective action', style: 'superheader' }, 
                      {text: filCarList[0]?.textcorrectiveActionTaken || '-', style: 'normal'},
               
               ],

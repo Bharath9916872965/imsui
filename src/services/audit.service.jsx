@@ -100,7 +100,13 @@ export class AuditClosureDTO{
         this.oldAttchmentName = oldAttchmentName;
     }
 }
-
+export class AuditClosuredto{
+    constructor(iqaId,iqaNo){
+        this.iqaId   = iqaId;
+        this.iqaNo=iqaNo;
+     
+    }
+}
 
 export const givePreview = (EXT, data, name) => {
     let blob;
@@ -986,7 +992,7 @@ export const getAssignedData = async (committeeType)=>{
             return response.data;
         } catch (error) {
             console.error('Error occurred in downloadAuditClosureFile:', error);
-            throw error;
+            throw error;    
         }
     }
 
@@ -1031,4 +1037,12 @@ export const getAssignedData = async (committeeType)=>{
             throw error;
         }
       }
-    
+      export const getAttachPdfList = async (iqaId,iqaNo)=>{
+      try {
+           const data = new AuditClosuredto(iqaId,iqaNo);
+            return (await axios.post(`${API_URL}get-attach-pdf-list`,data,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        } catch (error) {
+            console.error('Error occurred in getAttachPdfList:', error);
+            throw error;
+        }
+    }
