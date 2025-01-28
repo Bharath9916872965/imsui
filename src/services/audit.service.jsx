@@ -101,6 +101,15 @@ export class AuditClosureDTO{
     }
 }
 
+export class CarDto{
+    constructor(correctiveActionId,action,employee,targetDate){
+        this.correctiveActionId = correctiveActionId;
+        this.action = action;
+        this.employee = employee;
+        this.targetDate = targetDate;
+    }
+}
+
 
 export const givePreview = (EXT, data, name) => {
     let blob;
@@ -772,6 +781,15 @@ export const insertCorrectiveAction = async (values)=>{
         return (await axios.post(`${API_URL}add-corrective-action`,valuesToSend,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
     } catch (error) {
         console.error('Error occurred in insertCorrectiveAction:', error);
+        throw error;
+    }
+  }
+
+  export const editCorrectiveAction = async (values)=>{
+    try {
+        return (await axios.post(`${API_URL}edit-corrective-action`,values,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        console.error('Error occurred in editCorrectiveAction:', error);
         throw error;
     }
   }
