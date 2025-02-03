@@ -26,7 +26,7 @@ import Bowser from "bowser";
 
   const isCompatible =
     (browserName === "Chrome" && browserVersion >= 100) ||
-    (browserName === "Edge" && browserVersion >= 100) ||
+    (browserName === "Microsoft Edge" && browserVersion >= 100) ||
     (browserName === "Firefox" && browserVersion >= 100) ||
     (browserName === "Safari" && browserVersion >= 14);
 
