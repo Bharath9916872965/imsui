@@ -3,6 +3,13 @@ import { useNavigate } from 'react-router-dom';
 import { jwtDecode } from 'jwt-decode';
 import { login } from 'services/auth.service';
 import AlertConfirmation from './AlertConfirmation.component';
+import config from 'environment/config'; 
+import axios from 'axios';
+
+const CLIENT_ID  = config.CLIENT_ID;
+const CLIENT_SECRET = config.CLIENT_SECRET;
+const TOKEN_URL = config.TOKEN_URL;
+const REFRESH_GRANT_TYPE = config.REFRESH_GRANT_TYPE;
 
 
 const UseIdleTimer = (open) => {
@@ -107,9 +114,28 @@ const UseIdleTimer = (open) => {
 
   const handleDialogConfirm = async () => {
     const user = JSON.parse(localStorage.getItem('user'));
-    await login(user.username,localStorage.getItem('password'));
+    await refreshAcessToken(user.username);
     setOpenConfirmationDialog(false);
     checkToken();
+  }
+
+  const refreshAcessToken = async (username) =>{
+    const params = new URLSearchParams();
+    params.append('grant_type', REFRESH_GRANT_TYPE);
+    params.append('client_id', CLIENT_ID);
+    params.append('client_secret', CLIENT_SECRET); 
+    params.append('refresh_token', localStorage.getItem('refreshToken'));
+  
+    const headers = {'Content-Type': 'application/x-www-form-urlencoded',};
+    const response = await axios.post(TOKEN_URL, params, { headers });
+  
+    if (response.data.access_token) {
+      localStorage.setItem('user', JSON.stringify({
+        token: response.data.access_token,
+        username: username,
+        refreshToken : response.data.refresh_token
+      }));
+    }
   }
 
 

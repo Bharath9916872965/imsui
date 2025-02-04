@@ -80,5 +80,12 @@
   width: 100%;
 }
 
+.edit-icon{
+  color: darkorange !important;
+  padding: 0px !important;
+  border: none !important;
+  background: transparent !important;
+}
+
 
 

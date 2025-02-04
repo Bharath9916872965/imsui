@@ -27,13 +27,14 @@ export const login = async (username, password) => {
         localStorage.setItem('user', JSON.stringify({
           token: response.data.access_token,
           username: username
-        }));
+      }));
+      console.log('response--------- ',response)
+        localStorage.setItem('refreshToken',response.data.refresh_token)
         const emp = await getEmpDetails(username);
         localStorage.setItem('roleId',emp.imsFormRoleId)
         localStorage.setItem('roleName',emp.roleName)
         localStorage.setItem('labCode',emp.labCode)
         localStorage.setItem('empId',emp.empId)
-        localStorage.setItem('password',password)
         localStorage.setItem('divId',emp.divisionId)
         localStorage.setItem('groupId',emp.groupId)
   

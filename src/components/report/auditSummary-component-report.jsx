@@ -55,7 +55,21 @@ const AuditSummaryReport = () => {
              setIqaId(iqa.iqaId)
              setIqaFromDate(dayjs(new Date(iqa.fromDate)))
              setIqaToDate(dayjs(new Date(iqa.toDate)))
-            const scList = scdList.filter(data => data.iqaId === iqa.iqaId)
+             const scList = scheduleList
+    .filter(data => data.iqaId === iqaId) // Filter by `iqaId`
+    .sort((a, b) => {
+      // Extract numeric part from teamCode using regex
+      const teamCodeNumberA = parseInt(a.teamCode.replace(/\D/g, ''));
+      const teamCodeNumberB = parseInt(b.teamCode.replace(/\D/g, ''));
+
+      // Compare the teamCodes numerically first
+      if (teamCodeNumberA !== teamCodeNumberB) {
+        return teamCodeNumberA - teamCodeNumberB;
+      }
+
+      // If teamCodes are the same, compare by scheduleDate
+      return new Date(a.scheduleDate) - new Date(b.scheduleDate);
+    });
             setDataTable(scList);
             const ncList = chListByObsIds.filter(data => data.iqaId === iqa.iqaId && data.auditObsId ===2)
             const obsList = chListByObsIds.filter(data => data.iqaId === iqa.iqaId && data.auditObsId ===3)
@@ -229,13 +243,21 @@ const AuditSummaryReport = () => {
     const scList = scheduleList
     .filter(data => data.iqaId === iqaId) // Filter by `iqaId`
     .sort((a, b) => {
-        const teamCodeComparison = a.teamCode.localeCompare(b.teamCode);
-        if (teamCodeComparison !== 0) {
-            return teamCodeComparison;
-        }
-        return new Date(a.scheduleDate) - new Date(b.scheduleDate);
+      // Extract numeric part from teamCode using regex
+      const teamCodeNumberA = parseInt(a.teamCode.replace(/\D/g, ''));
+      const teamCodeNumberB = parseInt(b.teamCode.replace(/\D/g, ''));
+
+      // Compare the teamCodes numerically first
+      if (teamCodeNumberA !== teamCodeNumberB) {
+        return teamCodeNumberA - teamCodeNumberB;
+      }
+
+      // If teamCodes are the same, compare by scheduleDate
+      return new Date(a.scheduleDate) - new Date(b.scheduleDate);
     });
 
+
+      console.log('scList12323',scList);
       setDataTable(scList)
      
       //for NC On change

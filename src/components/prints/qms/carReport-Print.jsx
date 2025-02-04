@@ -118,7 +118,7 @@ const filCarList = data ? data.filter(item => carId === item.correctiveActionId)
                   { },
               
               ],
-              [    { text: '7. Target date for completion of correction and corrective action', style: 'superheader' }, 
+              [    { text: '7. Target date for completion of correction and corrective action ', style: 'superheader' }, 
                      {text: filCarList[0]?.textcorrectiveActionTaken || '-', style: 'normal'},
               
               ],

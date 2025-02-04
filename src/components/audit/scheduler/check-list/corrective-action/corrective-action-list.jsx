@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getIqaAuditeelist,getCarList,getEmployee,insertCorrectiveAction } from "services/audit.service";
+import { getIqaAuditeelist,getCarList,getEmployee,insertCorrectiveAction,editCorrectiveAction,CarDto } from "services/audit.service";
 import { getIqaDtoList } from "services/audit.service";
 import { Box, TextField,Grid,Card,CardContent} from '@mui/material';
 import Navbar from "components/Navbar/Navbar";
@@ -16,7 +16,6 @@ import CarMasterPrint from "components/prints/qms/carmaster-list-print";
 
 const CorrectiveActionList = ({router}) => {
 
-  const {navigate,location} = router;
 
   const [isReady, setIsReady] = useState(false);
   const [isAddMode,setIsAddMode] = useState(true);
@@ -41,7 +40,7 @@ const CorrectiveActionList = ({router}) => {
   const [schToDate,setSchToDate] = useState(new Date());
   const [loginRoleName,setLoginRoleName] = useState('')
   const [loginEmpId,setLoginEmpId] = useState(0);
-  const [isAdmin,setIsAdmin] = useState(false)
+  const [isAdmin,setIsAdmin] = useState(false);
 
   useEffect(() => {
     fetchData();
@@ -220,8 +219,7 @@ const CorrectiveActionList = ({router}) => {
     setEmployees(prev => new Map(prev).set(caId,value));
   };
 
-  const handleConfirm = async () => {
-
+  const handleConfirm = async (id) => {
     const mergedMap = new Map();
     if(isAddMode){
       actionValue.forEach((value,key) => {
@@ -232,17 +230,17 @@ const CorrectiveActionList = ({router}) => {
         })
       });
     }else{
-      actionValue.forEach((value,key) => {
-        mergedMap.set(key,{
-          action     : value,
-          targetDate : dateValue.get(key).$d || '',
-          employee   : employees.get(key) || 0,
-        })
-      });
+      // actionValue.forEach((value,key) => {
+      //   mergedMap.set(key,{
+      //     action     : value,
+      //     targetDate : dateValue.get(key).$d || '',
+      //     employee   : employees.get(key) || 0,
+      //   })
+      // });
     }
 
     setIsValidationActive(true)
-    if(actionValueValidation.length !== 0){
+    if(isAddMode && actionValueValidation.length !== 0){
       Swal.fire({
         icon: "error",
         title: 'Please Add All CAR Actions',
@@ -256,23 +254,44 @@ const CorrectiveActionList = ({router}) => {
         }).then(async (result) => {
         if (result) {
           try {
-                const result = await insertCorrectiveAction(mergedMap);
-                if (result.status === 'S') {
-                  afterSubmit();
-                  Swal.fire({
-                    icon: "success",
-                    title: isAddMode?'Corrective Actions Added Successfully':'Corrective Actions Updated Successfully' ,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                } else {
-                  Swal.fire({
-                    icon: "error",
-                    title: isAddMode?'Corrective Actions Add Unsuccessful':'Corrective Actions Update Unsuccessful' ,
-                    showConfirmButton: false,
-                    timer: 1500
-                  });
-                }
+            if(isAddMode){
+              const result = await insertCorrectiveAction(mergedMap);
+              if (result.status === 'S') {
+                afterSubmit();
+                Swal.fire({
+                  icon: "success",
+                  title: 'Corrective Actions Added Successfully' ,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: 'Corrective Actions Add Unsuccessful' ,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            }else{
+              const result = await editCorrectiveAction(new CarDto(id,actionValue.get(id),employees.get(id) || 0,dateValue.get(id).$d || ''));
+              if (result.status === 'S') {
+                afterSubmit();
+                Swal.fire({
+                  icon: "success",
+                  title: 'Corrective Actions Updated Successfully' ,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: 'Corrective Actions Update Unsuccessful' ,
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+            }
+
     
           } catch (error) {
             Swal.fire('Error!', 'There was an issue adding the KPI.', 'error');
@@ -306,6 +325,7 @@ const CorrectiveActionList = ({router}) => {
             <Grid item xs={12} md={12}>
              <Card>
               <CardContent className="card-content mg-b-10 " >
+              {isAddMode ?               
                <table className="table table-responsive">
                 <thead className="table-light">
                   <tr>
@@ -347,15 +367,59 @@ const CorrectiveActionList = ({router}) => {
                     </tr>)
                  }):(<tr  className="table-active box-border"> <td colSpan={5}  className="text-center  box-border"><span className="fn-bold">There are no records to display</span></td></tr>)}
                 </tbody>
-               </table>
-               { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
-                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
-          <button className="btn btn-dark" onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)}>
-                PRINT
-              </button>
+               </table> :
+                      <table className="table table-responsive">
+                      <thead className="table-light">
+                        <tr>
+                          <th scope="col" className="text-center width13">CAR Ref No</th>
+                          <th scope="col" className="text-center width17">Description</th>
+                          <th scope="col" className="text-center width30">Action Plan</th>
+                          <th scope="col" className="text-center width20">Responsibility</th>
+                          <th scope="col" className="text-center width13">Target Date</th>
+                          <th scope="col" className="text-center width7">Action</th>
+                        </tr>
+                      </thead>
+                     <tbody >
+                      {filCarList && filCarList !=null && filCarList.length > 0? filCarList.map((obj, i) => {
+                        return(                 
+                          <tr  className="table-active box-border">
+                            <td  className="text-left  box-border"><span className="fn-bold">{obj.carRefNo}</span></td>
+                            <td  className="text-left  box-border"><span className="fn-bold">{obj.carDescription}</span></td>
+                            <td  className="text-center box-border">
+                             <TextField className="form-control w-100" label="Action Plan" variant="outlined" size="small" value={actionValue.get(obj.correctiveActionId) || ''}
+                               onChange={(e) => onActionValueChange(e.target.value, obj.correctiveActionId)} 
+                               InputLabelProps={{ style: {color: isValidationActive && actionValueValidation.includes(String(obj.correctiveActionId)) ? 'red' : 'inherit',},}} 
+                               sx={{
+                                   "& .MuiOutlinedInput-root": {
+                                   "&:hover .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && actionValueValidation.includes(String(obj.correctiveActionId)) ? 'red' : 'inherit',},
+                                   "&.Mui-focused .MuiOutlinedInput-notchedOutline": {borderColor: isValidationActive && actionValueValidation.includes(String(obj.correctiveActionId))? 'red' : 'inherit',},
+                                 },
+                                 "& .MuiOutlinedInput-notchedOutline": {border: isValidationActive && actionValueValidation.includes(String(obj.correctiveActionId)) ? '1px solid red' : '1px solid inherit' },
+                                 "& .MuiInputLabel-root.Mui-focused": {color: isValidationActive && actionValueValidation.includes(String(obj.correctiveActionId)) ? 'red' : 'inherit',}}}/>
+                            </td>
+                            <td className="text-center box-border">
+                              <SelectPicker options={employeeOptions} value={employeeOptions.find((option) => option.value === employees.get(obj.correctiveActionId)) || null}
+                               label="Responsibility" handleChange={(newValue) => {onEmployeeValueChange( newValue?.value,obj.correctiveActionId) }}/>
+                            </td>
+                            <td className="text-center box-border">
+                             <LocalizationProvider dateAdapter={AdapterDayjs}>
+                              <DatePicker format='DD-MM-YYYY' value={dateValue.get(obj.correctiveActionId) || dayjs(new Date())} label="Target Date" views={['year', 'month', 'day']}
+                              minDate={dayjs(new Date(schFromDate))} onChange={(newValue) => {onTargetDateValueChange(newValue, obj.correctiveActionId)}}slotProps={{ textField: { size: 'small' } }}/>
+                             </LocalizationProvider> 
+                            </td>
+                            <td className="text-center">
+                              {['','INI','CRH','CMR'].includes(obj.auditStatus) && <button className="edit-icon" onClick={() => handleConfirm(obj.correctiveActionId)} title="Edit"> <i className="material-icons" >edit_note</i></button>}
+                            </td>
+                          </tr>)
+                       }):(<tr  className="table-active box-border"> <td colSpan={6}  className="text-center  box-border"><span className="fn-bold">There are no records to display</span></td></tr>)}
+                      </tbody>
+                     </table>  }
+
+               { (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm(0)} className="btn btn-success bt-sty">Submit</button></div>:
+                 <div className="text-center">
+                 {/* <button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp; */}
+                 <button className="btn btn-dark" onClick={() => CarMasterPrint(filCarList,iqaNo,auditeeName,schFromDate,schToDate)}> PRINT </button>
                  </div>)}
-
-
               </CardContent>
              </Card>
             </Grid>
