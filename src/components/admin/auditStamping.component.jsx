@@ -158,7 +158,7 @@ const AuditStamping = () => {
     <LocalizationProvider dateAdapter={AdapterDayjs}>
        <div className="card">
         <Helmet>
-          <title>QMS - Audit Stamping List</title>
+          <title>IMS - Audit Stamping List</title>
         </Helmet>
 
         <Navbar />
