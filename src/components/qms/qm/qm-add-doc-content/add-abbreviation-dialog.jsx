@@ -34,7 +34,8 @@ const AbbreviationMaster = ({ router }) => {
 const getAbbreviationsList = async () => {
     try {
         let list = await getAbbreviationsByIdNotReq("0");
-        setAllAbbreviationList(list);
+        const sortedList = list.sort((a, b) =>  a.abbreviation.localeCompare(b.abbreviation));
+        setAllAbbreviationList(sortedList);
         let revistionRecord;
         if(docType === 'QM'){
           revistionRecord = await getQmRevistionRecordById(revisionData.revisionRecordId);
@@ -100,6 +101,7 @@ const handleDelete = async (abbreviationId) => {
         res = await updateQspNotReqAbbreviationIds(combinedData + '', revisionData.revisionRecordId + '');
       }
       if (res && res > 0) {
+          getAbbreviationsList();
           Swal.fire({
               icon: "success",
               title: "Deleted",
@@ -107,31 +109,6 @@ const handleDelete = async (abbreviationId) => {
               showConfirmButton: false,
               timer: 1500
           });
-          const updatedAbbreviationList = abbreviationList.filter(
-            (item) => item.abbreviationId !== abbreviationId
-          );
-          setAbbreviationList(updatedAbbreviationList);
-      
-          const deletedItem = abbreviationList.find(
-            (item) => item.abbreviationId === abbreviationId
-          );
-      
-          if (deletedItem) {
-            setDeletedItems((prev) => {
-              // Determine the next column with the least number of items
-              const nextColumnIndex =
-                prev[0].length <= prev[1].length && prev[0].length <= prev[2].length
-                  ? 0
-                  : prev[1].length <= prev[2].length
-                  ? 1
-                  : 2;
-              // Create a copy of the current deletedItems
-              const updated = [...prev];
-              // Add the deleted item to the appropriate column
-              updated[nextColumnIndex] = [...updated[nextColumnIndex], deletedItem];
-              return updated;
-            });
-          }
       } else {
           Swal.fire({
               icon: "error",
@@ -230,6 +207,7 @@ const handleDelete = async (abbreviationId) => {
       res = await updateQspNotReqAbbreviationIds(combinedIds + '', revisionData.revisionRecordId + '');
     }
     if (res && res > 0) {
+        getAbbreviationsList();
         Swal.fire({
             icon: "success",
             title: "Added",
@@ -237,19 +215,19 @@ const handleDelete = async (abbreviationId) => {
             showConfirmButton: false,
             timer: 1500
         });
-        const newList = [...abbreviationList];
-        const updatedDeletedItems = deletedItems.map((column, columnIndex) => {
-          const remainingItems = column.filter(
-            (item) => !selectedItems[columnIndex].includes(item)
-          );
-          selectedItems[columnIndex].forEach((item) => {
-            if (!newList.includes(item)) newList.push(item);
-          });
-          return remainingItems;
-        });
-        setAbbreviationList(newList.sort());
-        setDeletedItems(updatedDeletedItems);
-        setSelectedItems({ 0: [], 1: [], 2: [] });
+        // const newList = [...abbreviationList];
+        // const updatedDeletedItems = deletedItems.map((column, columnIndex) => {
+        //   const remainingItems = column.filter(
+        //     (item) => !selectedItems[columnIndex].includes(item)
+        //   );
+        //   selectedItems[columnIndex].forEach((item) => {
+        //     if (!newList.includes(item)) newList.push(item);
+        //   });
+        //   return remainingItems;
+        // });
+        // setAbbreviationList(newList.sort());
+        // setDeletedItems(updatedDeletedItems);
+        // setSelectedItems({ 0: [], 1: [], 2: [] });
     } else {
       Swal.fire({
           icon: "error",
@@ -283,35 +261,22 @@ const handleDelete = async (abbreviationId) => {
 
 
   const handleInputChange = (index, field, value) => {
-    // if (field === 'abbreviation' || field === 'meaning') {
-    //   Swal.fire("Warning", `Abbreviation or Description should not be blank!`, "warning");
-    //   setIsSubmit(false);
-    //   return;
-    // }
     const updatedRows = [...rows];
     updatedRows[index][field] = value;
     setRows(updatedRows);
   };
 
   const handleBlurValidation = (index, value) => {
-    // if (!value.trim()) {
-    //   setIsSubmit(false);
-    //   Swal.fire("Warning", `Abbreviation should not be blank!`, "warning");
-    //   return;
-    // }
-  
     if (allAbbreviationList?.length > 0) {
       const isDuplicate = allAbbreviationList.some(
         (data) => data.abbreviation?.toLowerCase() === value.trim().toLowerCase()
       );
-  
       if (isDuplicate) {
         Swal.fire("Warning", `${value} Abbreviation Already Exists!`, "warning");
         setIsSubmit(false);
         return;
       }
     }
-  
     const updatedRows = [...rows];
     setIsSubmit(true);
     setRows(updatedRows);
@@ -324,6 +289,15 @@ const handleDelete = async (abbreviationId) => {
       revisionRecordId: revisionData.revisionRecordId || null,
       docName:docType,
     };
+   
+    for (let i = 0; i < abbreData.abbreviationDetails.length; i++) {
+      const item = abbreData.abbreviationDetails[i];
+      if (item.abbreviation.trim() === '' || item.meaning.trim() === '') {
+        Swal.fire("Warning", "Abbreviation or Description should not be blank!", "warning");
+        setIsSubmit(false);
+        return;
+      }
+    }
     const isConfirmed = await AlertConfirmation({
       title: 'Are you sure to add ?',
       message: '',
@@ -536,6 +510,7 @@ const handleDelete = async (abbreviationId) => {
                                     placeholder="Description"
                                     value={row.meaning}
                                     onChange={(e) => handleInputChange(index, "meaning", e.target.value)}
+                                    onBlur={(e) => handleBlurValidation(index, e.target.value)}
                                   />
                                 </div>
                                 <div className="col-md-1">
