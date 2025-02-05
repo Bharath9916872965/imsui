@@ -186,13 +186,7 @@ const handleDelete = async (abbreviationId) => {
 
     const abbIdNotReq = revistionRecord.abbreviationIdNotReq ? revistionRecord.abbreviationIdNotReq.split(",").map(Number) : [0] ;
     const combinedIds = [...abbIdNotReq, ...arr];
-    combinedIds.sort((a, b) => a - b);
-    // const combinedIds = abbIdNotReq
-    //                     .filter((id) => !arr.includes(id))
-    //                     .sort((a, b) => a - b)
-    //                     .concat([0])
-    //                     .slice(0, Math.max(1, abbIdNotReq.filter((id) => !arr.includes(id)).length));
-                        
+    combinedIds.sort((a, b) => a - b); 
     const isConfirmed = await AlertConfirmation({
       title: 'Are you sure to add ?',
       message: '',
@@ -215,19 +209,6 @@ const handleDelete = async (abbreviationId) => {
             showConfirmButton: false,
             timer: 1500
         });
-        // const newList = [...abbreviationList];
-        // const updatedDeletedItems = deletedItems.map((column, columnIndex) => {
-        //   const remainingItems = column.filter(
-        //     (item) => !selectedItems[columnIndex].includes(item)
-        //   );
-        //   selectedItems[columnIndex].forEach((item) => {
-        //     if (!newList.includes(item)) newList.push(item);
-        //   });
-        //   return remainingItems;
-        // });
-        // setAbbreviationList(newList.sort());
-        // setDeletedItems(updatedDeletedItems);
-        // setSelectedItems({ 0: [], 1: [], 2: [] });
     } else {
       Swal.fire({
           icon: "error",
