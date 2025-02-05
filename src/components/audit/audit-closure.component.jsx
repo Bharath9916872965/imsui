@@ -13,6 +13,7 @@ import $ from 'jquery';
 import { LocalizationProvider, DatePicker } from '@mui/x-date-pickers';
 import { AdapterDayjs } from '@mui/x-date-pickers/AdapterDayjs';
 import AlertConfirmation from "common/AlertConfirmation.component";
+import  AuditClosurePrint from "components/prints/qms/auditClosure-print";
 
 
 
@@ -37,7 +38,7 @@ const AuditClosureComponent = ({router}) => {
   const [element,setElement] = useState('');
   const [selectedFile, setSelectedFile] = useState(undefined);
   const fileInputRef = useRef(null);
-
+console.log('auditClouserList',auditClouserList);
 
 
 
@@ -200,7 +201,7 @@ const AuditClosureComponent = ({router}) => {
   const closureAdd = async()=>{
 
     const content = $('#summernote').summernote('code');
-
+console.log('content',content);
     if(content.trim() === ''){
       Swal.fire({
         icon: "warning",
@@ -302,6 +303,7 @@ const AuditClosureComponent = ({router}) => {
 
       if(auditClouserList && auditClouserList.length > 0){
         const iqaAuditData = auditClouserList.find(data => data.iqaId === selectedIqa.iqaId);
+        console.log('iqaAuditData',iqaAuditData);
         if(iqaAuditData){
           setClosureDate(dayjs(new Date(iqaAuditData.closureDate)));
           setEditorContent(iqaAuditData.remarks)
@@ -364,6 +366,11 @@ const AuditClosureComponent = ({router}) => {
             <span className="text-heading">&nbsp;  Auditee Submit : </span><button className="button-count auditee-sub">{auditeeSubmitCount}</button>
             <span className="text-heading">&nbsp;  Auditor Submit : </span><button className="button-count total-auditee-count">{auditorSubmitCount}</button>
             <span className="text-heading">&nbsp;  Auditee Accept : </span><button className="button-count assigned-count">{auditeeAcceptCount}</button>
+            <div style={{ textAlign: "center" }}>
+            <button onClick={() =>  AuditClosurePrint(iqaNo,iqaFromDate,iqaToDate,closureDate,element) }title="Audit Closure" aria-label="Audit Closure"style={{ margin: "0 5px" }}>
+            <i className="material-icons">print</i> &nbsp; 
+          </button>
+          </div>
             </Box>
           <Box flex="10%">
             <SelectPicker options={iqaOptions} label="IQA No"
