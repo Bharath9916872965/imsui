@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from "react";
-import { getIqaDtoList,getScheduleApprovalList,approveSchedule,returnSchedule,auditorForward } from "../../../services/audit.service";
+import { getIqaDtoList,getScheduleApprovalList,approveSchedule,returnSchedule,auditorForward,getAuditTeamMemberList } from "../../../services/audit.service";
 import Datatable from "../../datatable/Datatable";
 import { Box,Tabs, Tab,Badge} from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
@@ -30,7 +30,9 @@ const ScheduleApprovalComponent = ({router}) => {
   const [isBoth,setIsBoth] = useState(false);
   const [selectedTab, setSelectedTab] = useState(0);
   const [roleId,setRoleId] = useState(0);
-  const [heading,setHeading] = useState('')
+  const [heading,setHeading] = useState('');
+  const [teamMembersList,setTeamMembersList] = useState([])
+  const [isReady,setIsReady] = useState(false)
 
 
   const columns = [
@@ -50,6 +52,9 @@ const ScheduleApprovalComponent = ({router}) => {
     try {
       const scdList        = await getScheduleApprovalList();
       const iqaList        = await getIqaDtoList();
+     const teamMembers     =  await getAuditTeamMemberList();
+     setTeamMembersList(teamMembers)
+
       const iqaNum = router.location.state?.iqaNo;
       const role = localStorage.getItem('roleId')
       setRoleId(role)
@@ -85,7 +90,7 @@ const ScheduleApprovalComponent = ({router}) => {
        }
       }
       setIqaOptions(iqaData)
-
+      setIsReady(true);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
@@ -93,11 +98,22 @@ const ScheduleApprovalComponent = ({router}) => {
 
   useEffect(() => {
     fetchData();
-  }, []);
+  }, [isReady]);
 
   const setDataTable = (list,flag,role)=>{
     const mappedData = list.map((item,index)=>{
       let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':['AES'].includes(item.scheduleStatus)?'aditee-sub-clr':['ARS'].includes(item.scheduleStatus)?'aditor-sub-clr':'acknowledge')}`; 
+      let isMember = false;
+      const team = teamMembersList.filter(data => data.teamId == item.teamId);
+      if(team && team.length > 0){
+        for (let i = 0; i < team.length; i++) {
+          if (item.loginEmpId === team[i].empId) {
+            isMember = true;
+            break;
+          }
+        }
+      }
+
       return{
         sn           : index+1,
         date         : format(new Date(item.scheduleDate),'dd-MM-yyyy HH:mm') || '-',
@@ -107,8 +123,8 @@ const ScheduleApprovalComponent = ({router}) => {
         team         : item.teamCode || '-',
         status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
-        action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId)) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
-                          {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && item.leadEmpId === item.loginEmpId))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
+        action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember))) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
+                          {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember)))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
                           {['AAA','AES','ARS','ABA','RBA'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
                           {item.fwdFlag === 1 && !['ARS','ABA'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7'].includes(String(role)) || flag === 'L')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
                           {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
