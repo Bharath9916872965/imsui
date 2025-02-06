@@ -33,6 +33,7 @@ const ScheduleApprovalComponent = ({router}) => {
   const [heading,setHeading] = useState('');
   const [teamMembersList,setTeamMembersList] = useState([])
   const [isReady,setIsReady] = useState(false)
+  const [isAdmin,setIsAdmin] = useState(false)
 
 
   const columns = [
@@ -60,6 +61,11 @@ const ScheduleApprovalComponent = ({router}) => {
       setRoleId(role)
       setIqaFullList(iqaList);
       setScheduleList(scdList)
+      if(['1','2','3','4'].includes(String(role))){
+        setIsAdmin(true)
+       }else{
+        setIsAdmin(false)
+       }
     
       const iqaData = iqaList.map(data => ({
                       value : data.iqaId,
@@ -102,7 +108,7 @@ const ScheduleApprovalComponent = ({router}) => {
 
   const setDataTable = (list,flag,role)=>{
     const mappedData = list.map((item,index)=>{
-      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':['AES'].includes(item.scheduleStatus)?'aditee-sub-clr':['ARS'].includes(item.scheduleStatus)?'aditor-sub-clr':'acknowledge')}`; 
+      let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA','RAR'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':['AES'].includes(item.scheduleStatus)?'aditee-sub-clr':['ARS'].includes(item.scheduleStatus)?'aditor-sub-clr':'acknowledge')}`; 
       let isMember = false;
       const team = teamMembersList.filter(data => data.teamId == item.teamId);
       if(team && team.length > 0){
@@ -123,13 +129,15 @@ const ScheduleApprovalComponent = ({router}) => {
         team         : item.teamCode || '-',
         status       : <Box  className={statusColor} onClick = {()=>openTran(item)}><Box class='status'>{item.statusName}<i class="material-icons float-right font-med">open_in_new</i></Box></Box>|| '-',
         revision     : 'R'+item.revision || '-',
-        action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember))) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
-                          {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && item.auditeeEmpId === item.loginEmpId)  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember)))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
-                          {['AAA','AES','ARS','ABA','RBA'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
-                          {item.fwdFlag === 1 && !['ARS','ABA'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7'].includes(String(role)) || flag === 'L')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+        action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && (item.auditeeEmpId === item.loginEmpId || isAdmin))  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember || isAdmin))) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
+                          {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && (item.auditeeEmpId === item.loginEmpId || isAdmin))  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember || isAdmin)))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
+                          {['AAA','AES','ARS','ABA','RBA','RAR'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
+                          {item.fwdFlag === 1 && !['ARS','ABA','RAR'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7','4'].includes(String(role)) || flag === 'L' || flag === 'F')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['AES'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return By Auditor"><i className="material-icons">assignment_return</i></button>}
                           {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
                           {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Auditee Reject"><i className="material-icons">assignment_return</i></button>}
-                          {['ARS','ABA','RBA'].includes(item.scheduleStatus) &&<button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
+                          {['ARS','ABA','RBA'].includes(item.scheduleStatus) && <button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
+                          {['RAR'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditee Forward"> <i className="material-icons"  >double_arrow</i></button>}
                           </>  
       }      
     });
@@ -337,7 +345,7 @@ const ScheduleApprovalComponent = ({router}) => {
           AuditorSubmit(element);
       }else{
         await AlertConfirmation({
-          title: element.scheduleStatus === 'ARS'?'Are you sure Reject CheckList ?.':'Are you sure Return Schedule ?',
+          title: element.scheduleStatus === 'AES'?'Are you sure Return Check List ?':element.scheduleStatus === 'ARS'?'Are you sure Reject CheckList ?.':'Are you sure Return Schedule ?',
           message: '',
           }).then(async (result) => {
           if (result) {

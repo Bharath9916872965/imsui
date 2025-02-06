@@ -258,12 +258,15 @@ const AuditCheckListComponent = ({router}) => {
           initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, chapter.attachmentName);
           //for only input tags
-          if(chapter.auditeeRemarks !== 'NA' || element.scheduleStatus !== 'AAA'){
+          if(chapter.auditeeRemarks === 'NA' || element.scheduleStatus !== 'AAA'){
             setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter.mocId])]);
           }
         }
       });
       setCheckListIds(inticheckListIds);
+      if(['RAR'].includes(element.scheduleStatus)){
+        setIsAddMode(false);
+      }
     }else{
       mainChapter.forEach((chapter) => {
         if(Number(chapter.clauseNo) === Number(secNo) || compareSec(chapter.clauseNo,secNo)){
@@ -271,7 +274,7 @@ const AuditCheckListComponent = ({router}) => {
           if(chapter.clauseNo !== '8.3.1'){
           initialObservations.set(chapter.mocId, 0);
           initialAuditorRemarks.set(chapter.mocId, 'NA');
-          initialAuditeeRemarks.set(chapter.mocId, 'NA');
+          initialAuditeeRemarks.set(chapter.mocId, 'NAA');
           initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, '');
           }
@@ -292,7 +295,7 @@ const AuditCheckListComponent = ({router}) => {
                 }else{
                   initialObservations.set(chapter1.mocId, 0);
                   initialAuditorRemarks.set(chapter1.mocId, 'NA');
-                  initialAuditeeRemarks.set(chapter1.mocId, 'NA');
+                  initialAuditeeRemarks.set(chapter1.mocId, 'NAA');
                   initialMocDescription.set(chapter1.mocId,chapter1.description);
                   initialAttachmentNames.set(chapter1.mocId, '');
 
