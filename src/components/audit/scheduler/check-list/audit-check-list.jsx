@@ -258,7 +258,7 @@ const AuditCheckListComponent = ({router}) => {
           initialMocDescription.set(chapter.mocId,chapter.description);
           initialAttachmentNames.set(chapter.mocId, chapter.attachmentName);
           //for only input tags
-          if(chapter.auditeeRemarks === 'NA' || element.scheduleStatus !== 'AAA'){
+          if(chapter.auditeeRemarks !== 'NAA' || element.scheduleStatus !== 'AAA'){
             setAuditeeRemarksValidation(prev => [...new Set([...prev,chapter.mocId])]);
           }
         }
