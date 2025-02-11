@@ -20,7 +20,6 @@ const auditObs =  obsList.map(item=>({
   auditObsId : item.auditObsId,
   label : item.observation
 }));
-
 const checkCont = (mocId, value) => {
   const row = filChapters.filter(data => data.mocParentId === mocId);
   if (row && row.length > 0) {
@@ -184,16 +183,21 @@ const tables = mainChapter.map((chapter) => {
         dontBreakRows: true,  // Prevent row from breaking across pages
       },
       {
-        columns: [
-          { text: observation !== 'NA' && observation.trim() ? ` ${observation}` : ' ', width: '33%' },
-          { text: lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim() ? `Auditor: ${lvl1.auditorRemarks}` : ' ', width: '33%' },
-          { text: lvl1.auditeeRemarks !== 'NA' && lvl1.auditeeRemarks.trim() ? `Auditee: ${lvl1.auditeeRemarks}` : ' ', width: '33%' }
-        ],
-        columnGap: 10,  // Adds spacing between columns
-        border,  // Apply border condition
-        dontBreakRows: true  // Prevent row from breaking across pages
-      }
-          
+        stack: [
+          observation !== 'NA' && observation.trim()
+            ? { text: ` ${observation}`, margin: [0, 0, 0, 5] }  // Adds bottom spacing
+            : null,
+          lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim()
+            ? { text: [{ text: 'Auditor Remarks: ', bold: true }, { text: lvl1.auditorRemarks }], margin: [0, 0, 0, 5] }
+            : null,
+          lvl1.auditeeRemarks !== 'NA' && lvl1.auditeeRemarks.trim()
+            ? { text: [{ text: 'Auditee Remarks: ', bold: true }, { text: lvl1.auditeeRemarks }], margin: [0, 0, 0, 5] }
+            : null,
+        ].filter(Boolean),  // Remove null values
+        border: border,  // Apply the same border condition
+        dontBreakRows: true,  // Prevent row from breaking across pages
+      },
+      
     ];
   });
 
@@ -439,12 +443,12 @@ const tables = mainChapter.map((chapter) => {
                   {
                     text: 'Name, Designation, Signature of Auditor',
                     style: 'superheader',
-                    margin: [0, 10, 0, 10], // Top and bottom margin
+                    margin: [0, 30, 0, 10], // Top and bottom margin
                     border: [false, false, false, true],
                   },
             {
                   stack: [
-                    { text: 'Name, Designation, Signature of Auditee:', style: 'superheader' ,  margin: [50, 5, 0, 5], },
+                    { text: 'Name, Designation, Signature of Auditee:', style: 'superheader' ,  margin: [50, 30, 0, 5], },
                     {text: `Page ${currentPage} of ${pageCount}`,margin: [200, 0, 0, 0], },
                    
                   ],border: [false, false, false, true],}
