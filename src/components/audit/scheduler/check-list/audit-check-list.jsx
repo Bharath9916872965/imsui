@@ -64,7 +64,7 @@ const AuditCheckListComponent = ({router}) => {
       setIsAuditor(false)
      }
 
-     if(['1','2','3','4'].includes(String(role))){
+     if(['1','2','3','4','5'].includes(String(role))){
       setIsAdmin(true)
      }else{
       setIsAdmin(false)
@@ -92,7 +92,7 @@ const AuditCheckListComponent = ({router}) => {
       }
        setimgView(imgSource);
        setCheckList(chList)
-       setButtoncolors(chList,Number(role) === 7,['1','2','3','4'].includes(String(role)))
+       setButtoncolors(chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)))
        let filChapters = [];
        
        if(chList.length === 0 || eleData.scheduleStatus !== 'ARS'){
@@ -126,7 +126,7 @@ const AuditCheckListComponent = ({router}) => {
       setMainClause(mainChapter);
       setFilMainClause(mainChapter.filter((item, index, self) => index === self.findIndex((el)=>el.sectionNo === item.sectionNo)))
       sectionOpenRef.current = mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo;
-      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4'].includes(String(role)),flag,eleData)
+      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)),flag,eleData)
       }
 
     } catch (error) {
