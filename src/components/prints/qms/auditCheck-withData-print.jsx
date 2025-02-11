@@ -20,6 +20,7 @@ const auditObs =  obsList.map(item=>({
   auditObsId : item.auditObsId,
   label : item.observation
 }));
+
 const checkCont = (mocId, value) => {
   const row = filChapters.filter(data => data.mocParentId === mocId);
   if (row && row.length > 0) {
@@ -183,13 +184,16 @@ const tables = mainChapter.map((chapter) => {
         dontBreakRows: true,  // Prevent row from breaking across pages
       },
       {
-        stack: [
-          observation !== 'NA' && observation.trim() ? { text: ` ${observation}` } : null,
-          lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim() ? { text: ` ${lvl1.auditorRemarks}` } : null,
-        ].filter(Boolean),  // Filter out null values
-        border: border,  // Apply the same border condition
-        dontBreakRows: true,  // Prevent row from breaking across pages
-      },
+        columns: [
+          { text: observation !== 'NA' && observation.trim() ? ` ${observation}` : ' ', width: '33%' },
+          { text: lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim() ? `Auditor: ${lvl1.auditorRemarks}` : ' ', width: '33%' },
+          { text: lvl1.auditeeRemarks !== 'NA' && lvl1.auditeeRemarks.trim() ? `Auditee: ${lvl1.auditeeRemarks}` : ' ', width: '33%' }
+        ],
+        columnGap: 10,  // Adds spacing between columns
+        border,  // Apply border condition
+        dontBreakRows: true  // Prevent row from breaking across pages
+      }
+          
     ];
   });
 
