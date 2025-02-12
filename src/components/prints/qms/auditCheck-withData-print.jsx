@@ -184,12 +184,20 @@ const tables = mainChapter.map((chapter) => {
       },
       {
         stack: [
-          observation !== 'NA' && observation.trim() ? { text: ` ${observation}` } : null,
-          lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim() ? { text: ` ${lvl1.auditorRemarks}` } : null,
-        ].filter(Boolean),  // Filter out null values
+          observation !== 'NA' && observation.trim()
+            ? { text: ` ${observation}`, margin: [0, 0, 0, 5] }  // Adds bottom spacing
+            : null,
+          lvl1.auditorRemarks !== 'NA' && lvl1.auditorRemarks.trim()
+            ? { text: [{ text: 'Auditor Remarks: ', bold: true }, { text: lvl1.auditorRemarks }], margin: [0, 0, 0, 5] }
+            : null,
+          lvl1.auditeeRemarks !== 'NA' && lvl1.auditeeRemarks.trim()
+            ? { text: [{ text: 'Auditee Remarks: ', bold: true }, { text: lvl1.auditeeRemarks }], margin: [0, 0, 0, 5] }
+            : null,
+        ].filter(Boolean),  // Remove null values
         border: border,  // Apply the same border condition
         dontBreakRows: true,  // Prevent row from breaking across pages
       },
+      
     ];
   });
 
@@ -435,12 +443,12 @@ const tables = mainChapter.map((chapter) => {
                   {
                     text: 'Name, Designation, Signature of Auditor',
                     style: 'superheader',
-                    margin: [0, 10, 0, 10], // Top and bottom margin
+                    margin: [0, 30, 0, 10], // Top and bottom margin
                     border: [false, false, false, true],
                   },
             {
                   stack: [
-                    { text: 'Name, Designation, Signature of Auditee:', style: 'superheader' ,  margin: [50, 5, 0, 5], },
+                    { text: 'Name, Designation, Signature of Auditee:', style: 'superheader' ,  margin: [50, 30, 0, 5], },
                     {text: `Page ${currentPage} of ${pageCount}`,margin: [200, 0, 0, 0], },
                    
                   ],border: [false, false, false, true],}
