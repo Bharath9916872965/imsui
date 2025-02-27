@@ -64,7 +64,7 @@ const AuditCheckListComponent = ({router}) => {
       setIsAuditor(false)
      }
 
-     if(['1','2','3','4'].includes(String(role))){
+     if(['1','2','3','4','5'].includes(String(role))){
       setIsAdmin(true)
      }else{
       setIsAdmin(false)
@@ -92,7 +92,7 @@ const AuditCheckListComponent = ({router}) => {
       }
        setimgView(imgSource);
        setCheckList(chList)
-       setButtoncolors(chList,Number(role) === 7,['1','2','3','4'].includes(String(role)))
+       setButtoncolors(chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)))
        let filChapters = [];
        
        if(chList.length === 0 || eleData.scheduleStatus !== 'ARS'){
@@ -126,7 +126,7 @@ const AuditCheckListComponent = ({router}) => {
       setMainClause(mainChapter);
       setFilMainClause(mainChapter.filter((item, index, self) => index === self.findIndex((el)=>el.sectionNo === item.sectionNo)))
       sectionOpenRef.current = mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo;
-      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4'].includes(String(role)),flag,eleData)
+      setInitialValues(mainChapter,mainChapter && mainChapter.length > 0 && mainChapter[0].sectionNo,filChapters,chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)),flag,eleData)
       }
 
     } catch (error) {
@@ -832,11 +832,11 @@ const AuditCheckListComponent = ({router}) => {
                                      </Box>
                                      </td>
                                      <td className="text-center width15 box-border">
-      {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions}  value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
-                                     readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}</td>  
+      {((['ARS','RBA','ABA','RAR'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions}  value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
+                                     readOnly = {['ARS','ABA','RAR'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}</td>  
                                      <td className="width20 box-border">
-      {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) &&<TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
-                                      inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
+      {((['ARS','RBA','ABA','RAR'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) &&<TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
+                                      inputProps={{readOnly : ['ARS','ABA','RAR'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                        InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}
                                       sx={{
                                         "& .MuiOutlinedInput-root": {
@@ -883,12 +883,12 @@ const AuditCheckListComponent = ({router}) => {
                                  </Box>
                                 </td>
                                 <td className="text-center width15 box-border">
-    {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions} value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
-                                 readOnly = {['ARS','ABA'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}
+    {((['ARS','RBA','ABA','RAR'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <SelectPicker options={selectOptions} value={selectOptions.find((option) => option.value === observations.get(chapter1.mocId)) || null}
+                                 readOnly = {['ARS','ABA','RAR'].includes(element.scheduleStatus) || (Number(roleId) === 6 && !flag === 'L')} label="Observation" handleChange={(newValue) => {onObsChange( newValue?.value,chapter1.mocId) }}/>}
                                 </td>
                                 <td className="width20 box-border">
-    {((['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
-                                   inputProps={{readOnly : ['ARS','ABA'].includes(element.scheduleStatus) || Number(roleId) === 6 && !flag === 'L'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
+    {((['ARS','RBA','ABA','RAR'].includes(element.scheduleStatus)) || (flag === 'L' && element.scheduleStatus === 'AES') || ((isAuditor || isAdmin) && isAuditeeAdd && element.scheduleStatus === 'AES')) && (new Date(schduleDate) <= new Date()) && <TextField className="form-control w-100" label="Auditor Remarks" variant="outlined" size="small" value={auditorRemarks.get(chapter1.mocId) || ''}
+                                   inputProps={{readOnly : ['ARS','ABA','RAR'].includes(element.scheduleStatus) || Number(roleId) === 6 && !flag === 'L'}} onChange={(e) => onAuditorRemarksChange(e.target.value, chapter1.mocId)}
                                     InputLabelProps={{ style: {color: auditorRemarksValidation.includes(chapter1.mocId) ? 'red' : 'inherit',},}}
                                     sx={{
                                       "& .MuiOutlinedInput-root": {
