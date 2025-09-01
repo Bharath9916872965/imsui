@@ -28,7 +28,6 @@ export const login = async (username, password) => {
           token: response.data.access_token,
           username: username
       }));
-      console.log('response--------- ',response)
         localStorage.setItem('refreshToken',response.data.refresh_token)
         const emp = await getEmpDetails(username);
         localStorage.setItem('roleId',emp.imsFormRoleId)
@@ -92,7 +91,13 @@ export const customAuditStampingLogin = async (username) => {
     }
   };
 
-
+  export const getLicense = async ()=>{
+    try {
+        return (await axios.get(`${API_URL}get-license`,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+    } catch (error) {
+        throw error;
+    }
+  }
 
 // Function for custom audit stamping logout
 export const customAuditStampingLogout = async (username, logoutType) => {

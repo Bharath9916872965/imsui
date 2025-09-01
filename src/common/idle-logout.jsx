@@ -102,10 +102,12 @@ const UseIdleTimer = (open) => {
   }
 
   const handleLogout = () => {
-    localStorage.removeItem('user');
-    localStorage.removeItem('roleId');
-    localStorage.removeItem('password');
-    navigate('/login');
+    if(localStorage.getItem('license-exp') === 'N'){
+        localStorage.removeItem('user');
+        localStorage.removeItem('roleId');
+        localStorage.removeItem('password');
+        navigate('/login');
+    }
   };
 
   const handleDialogClose = () => {

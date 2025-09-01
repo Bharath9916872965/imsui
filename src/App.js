@@ -49,6 +49,7 @@ import ProcurementListComponent from 'components/audit/scheduler/check-list/proc
 import TrendNCReport from 'components/report/trend-nc-report.component.jsx';
 import AuditClosureComponent from 'components/audit/audit-closure.component';
 import AuditPatchComponent from 'components/admin/auditpatch.component';
+import LicenseExpComponent from 'components/Login/licenseExp.component';
 
 function App() {
   return (
@@ -131,6 +132,7 @@ function App() {
          <Route path="/qsp-add-content" element={<QspAddDocContentComponent/>} />
 
          <Route path="/add-abbreviation" element={<AddAbbreviationDialog/>} />
+         <Route path='/license-exp' element={<LicenseExpComponent />} />
       </Routes>
 {/* <Login/> */}
     </div>

@@ -4,6 +4,7 @@ import { login } from "../../services/auth.service";
 import withRouter from "../../common/with-router";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from 'yup';
+import { getLicense } from "../../services/auth.service";
 
 
 const Login = (props) => {
@@ -31,6 +32,8 @@ const Login = (props) => {
         setLoading(true);
         const username = values.username;
         const password = values.password;
+        const licenseResponse = await getLicense();
+         if(licenseResponse == 1){
         await login(username, password).then(
             (response) => {
                 if (!response.access_token) {
@@ -58,6 +61,10 @@ const Login = (props) => {
                 setMessage(resMessage);
             }
         );
+         }else{
+            localStorage.setItem('license-exp','Y')
+            props.router.navigate('/license-exp')
+        }
     }
 
     return (
