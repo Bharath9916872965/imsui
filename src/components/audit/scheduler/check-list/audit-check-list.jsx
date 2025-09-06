@@ -80,7 +80,6 @@ const AuditCheckListComponent = ({router}) => {
 
       setSchduleDate(new Date(datePart));
       const flag = router.location.state?.flag;
-      console.log('flag------ ',flag)
       setFlag(flag)
       if(eleData){
         setElement(eleData)

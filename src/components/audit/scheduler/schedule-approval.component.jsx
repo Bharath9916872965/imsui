@@ -164,7 +164,6 @@ const ScheduleApprovalComponent = ({router}) => {
    }
 
    const addCheckList = (item,flag)=>{
-    console.log('flag-------',flag)
     if(item.auditeeEmpId === Number(localStorage.getItem('empId'))){
       navigate('/audit-check-list',{state:{element:item,flag : 'A'}})
     }else{
