@@ -15,7 +15,7 @@ import { Helmet } from "react-helmet";
 import { Formik, Form, Field } from "formik";
 import withRouter from "../../common/with-router";
 import Navbar from "components/Navbar/Navbar";
-import { getRolesList, submitUserManagerEdit, UserManagerDto, userManagerEditData, usernameDuplicateCheckInAdd } from "services/admin.serive";
+import { getRolesList, submitUserManagerEdit, UserManagerDto, userManagerEditData, usernameDuplicateCheckInAdd,submitUserManagerAdd } from "services/admin.serive";
 import { getEmployeesList } from "services/header.service";
 import { CustomMenuItem } from "services/auth.header";
 import Swal from "sweetalert2";
@@ -134,9 +134,11 @@ const validationSchema = Yup.object().shape({
     if (confirm) {
         try {
           let response;
-          if (mode === "edit") {
-          response = await submitUserManagerEdit(userManagerDto);
-          }
+            if (mode === "add") {
+              response = await submitUserManagerAdd(userManagerDto);
+            } else if (mode === "edit") {
+              response = await submitUserManagerEdit(userManagerDto);
+            }
           if(response > 0){
           setStatus('list'); 
           Swal.fire({

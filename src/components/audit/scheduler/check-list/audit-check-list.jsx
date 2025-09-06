@@ -46,6 +46,7 @@ const AuditCheckListComponent = ({router}) => {
   const [schduleDate,setSchduleDate] = useState(new Date())
   const [roleId,setRoleId] = useState(0);
   const [flag,setFlag] = useState('');
+  const [loginEmpId,setLoginEmpId] = useState(0)
   let attachMocId = 0;
   let attachMocDescription = '';
   let auditorRemarksValid = false
@@ -79,6 +80,7 @@ const AuditCheckListComponent = ({router}) => {
 
       setSchduleDate(new Date(datePart));
       const flag = router.location.state?.flag;
+      console.log('flag------ ',flag)
       setFlag(flag)
       if(eleData){
         setElement(eleData)
@@ -86,13 +88,15 @@ const AuditCheckListComponent = ({router}) => {
        const obsList   = await getObservation();
        const chList    = await getAuditCheckList(eleData.scheduleId);
        const imgSource = await getCheckListimg(eleData);
+       const empId = Number(localStorage.getItem('empId'))
+       setLoginEmpId(empId)
        
       if( ['AES','ARS'].includes(eleData.scheduleStatus)){
         setIsAuditeeAdd(true)
       }
        setimgView(imgSource);
        setCheckList(chList)
-       setButtoncolors(chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)))
+       setButtoncolors(chList,Number(role) === 7,['1','2','3','4','5'].includes(String(role)),flag)
        let filChapters = [];
        
        if(chList.length === 0 || eleData.scheduleStatus !== 'ARS'){
@@ -138,10 +142,10 @@ const AuditCheckListComponent = ({router}) => {
     fetchData();
   }, []);
 
-  const setButtoncolors = (list,isAuditor,isAdmin)=>{
+  const setButtoncolors = (list,isAuditor,isAdmin,flag)=>{
     let newSuccessBtns = [];
     let newUnsuccessBtns = [];
-    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && ((!isAuditor && !isAdmin) || data.auditorRemarks !== '')).map(item => item.sectionNo))];
+    const secs = [...new Set(list.filter(data => data.clauseNo !== '8.3.1' && ((!isAuditor && !isAdmin && flag !== 'L') || data.auditorRemarks !== '')).map(item => item.sectionNo))];
     secs.forEach(item =>{
       if(setColor(list,item)){
         newUnsuccessBtns.push(String(item))
@@ -170,7 +174,7 @@ const AuditCheckListComponent = ({router}) => {
 
   const afterSubmit = async ()=>{
     const chList   = await getAuditCheckList(element.scheduleId);
-    setButtoncolors(chList,isAuditor,isAdmin)
+    setButtoncolors(chList,isAuditor,isAdmin,flag)
     setCheckList(chList);
     if(isAddMode){
       const nextSection = getNextValue(sectionOpenRef.current);
@@ -212,7 +216,7 @@ const AuditCheckListComponent = ({router}) => {
     if(chList.some(data => Number(data.sectionNo) === Number(secNo) && (data.clauseNo !== '8.3.1'))){
       chList.forEach((chapter) => {
         if (Number(chapter.sectionNo) === Number(secNo)) {
-          if(chapter.auditorRemarks === '' && (isAuditor || isAdmin ) && element.scheduleStatus !== 'AAA' ){
+          if(chapter.auditorRemarks === '' && (isAuditor || isAdmin || flag === 'L' ) && element.scheduleStatus !== 'AAA' ){
             //setIsAuditor(true)
             //afterAuditeeSubmit
             mainChapter.forEach((chapter) => {
@@ -499,7 +503,7 @@ const AuditCheckListComponent = ({router}) => {
     auditorRemarksValid = false
     const mergedMap = new Map();
     //Auditor
-    if((isAuditor && flag !== 'A') || isAdmin || (flag === 'L' && element.scheduleStatus === 'AES' )){
+    if((isAuditor && flag !== 'A') || isAdmin || (flag === 'L' && ['AES','RBA'].includes(element.scheduleStatus))){
       observations.forEach((value,key)=>{
         if(value !== 0 && value !== 5 && value !== 1){
           if(auditorRemarks.get(key)?.trim() === 'NA' || auditorRemarks.get(key)?.trim() === ''){
@@ -607,7 +611,7 @@ const AuditCheckListComponent = ({router}) => {
           if (result) {
             try {
              let response = '';
-             if(((isAuditor && flag !== 'A') || ((['ARS','RBA','AES'].includes(element.scheduleStatus)) && isAdmin) || (element.scheduleStatus === 'AES' && flag === 'L')) && (new Date(schduleDate) <= new Date())){
+             if(((isAuditor && flag !== 'A') || ((['ARS','RBA','AES'].includes(element.scheduleStatus)) && isAdmin) || (['AES','RBA'].includes(element.scheduleStatus) && flag === 'L')) && (new Date(schduleDate) <= new Date())){
               response = await addAuditCheckList(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo));
              }else{
               response = await updateAuditeeRemarks(new AuditCheckList(mergedMap,element.scheduleId,element.iqaId,element.iqaNo),selectedFiles);
@@ -741,7 +745,7 @@ const AuditCheckListComponent = ({router}) => {
                   {filMainClause.length > 0 &&filMainClause.map(item =>{
                     const fx = 90/filMainClause.length -1;
                     return (<Box flex={fx+'%'}><Tooltip title={<span className="tooltip-title">{'Clause '+item.clauseNo+' : '+ (mocDescription.get(item.mocId) || item.description)}</span>} className="mg-down-10">
-                      <button className={((flag === 'L') || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) && (new Date(schduleDate) <= new Date()) ) ? (unSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-error-color':(auditorSuccessBtns.includes(item.sectionNo)?'btn btn-sm bt-success-color':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')):
+                      <button className={((flag === 'L' ) || (isAuditor && flag !== 'A') || (['ARS','RBA','ABA'].includes(element.scheduleStatus)) || (isAdmin && ['AES','ARS'].includes(element.scheduleStatus)) && (new Date(schduleDate) <= new Date()) ) ? (unSuccessBtns.includes(item.sectionNo)?('btn btn-sm bt-error-color'):(auditorSuccessBtns.includes(item.sectionNo)?('btn btn-sm bt-success-color'):(Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected'))):
                       (auditeeSuccessBtns.includes(item.sectionNo)?'btn btn-sm bg-auditee-success':Number(sectionOpenRef.current) === Number(item.sectionNo)?'btn btn-sm bt-color':'btn btn-sm bg-unselected')} 
                       onClick={()=>openTable(Number(item.sectionNo))}>{item.sectionNo}</button></Tooltip></Box>)
                   })}
@@ -909,15 +913,14 @@ const AuditCheckListComponent = ({router}) => {
                       )
                     }
                  })}
-                 {element && (!['ARS','ABA'].includes(element.scheduleStatus)) && (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-success bt-sty">Submit</button></div>:
-                 <div className="text-center"><button onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
+                 {element && (!['ARS','ABA'].includes(element.scheduleStatus)) && (isAddMode ?<div className="text-center"><button onClick={() => handleConfirm()} disabled={(flag === 'L' && (['AAA','RAR'].includes(element.scheduleStatus))) || (isAuditor && flag !== 'A' &&  (['AAA','RAR'].includes(element.scheduleStatus))) || (['AES','RBA'].includes(element.scheduleStatus) && flag === 'A')} className="btn btn-success bt-sty">Submit</button></div>:
+                 <div className="text-center"><button disabled={(flag === 'L' && (['AAA','RAR'].includes(element.scheduleStatus))) || (isAuditor && flag !== 'A' &&  (['AAA','RAR'].includes(element.scheduleStatus))) || (['AES','RBA'].includes(element.scheduleStatus) && element?.auditeeEmpId == loginEmpId) || (['AES','RBA'].includes(element.scheduleStatus) && flag === 'A') } onClick={() => handleConfirm()} className="btn btn-warning bt-sty update-bg">Update</button></div>)}
                  </CardContent>
                 </Card>
               </CardContent>
              </Card>
             </Grid>
            </Grid>
-
           </div>
         </div>
     </div>

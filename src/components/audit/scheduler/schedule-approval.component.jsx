@@ -1,5 +1,6 @@
 import React, { useEffect, useState } from "react";
-import { getIqaDtoList,getScheduleApprovalList,approveSchedule,returnSchedule,auditorForward,getAuditTeamMemberList } from "../../../services/audit.service";
+import { getIqaDtoList,getScheduleApprovalList,approveSchedule,returnSchedule,auditorForward,getAuditTeamMemberList,getCheckListAddCount,
+         auditeeSubmit } from "../../../services/audit.service";
 import Datatable from "../../datatable/Datatable";
 import { Box,Tabs, Tab,Badge} from '@mui/material';
 import Navbar from "../../Navbar/Navbar";
@@ -34,7 +35,7 @@ const ScheduleApprovalComponent = ({router}) => {
   const [teamMembersList,setTeamMembersList] = useState([])
   const [isReady,setIsReady] = useState(false)
   const [isAdmin,setIsAdmin] = useState(false)
-
+  const [loginEmpId,setLoginEmpId] = useState(0)
 
   const columns = [
     { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center', width: '3%'  },
@@ -81,11 +82,11 @@ const ScheduleApprovalComponent = ({router}) => {
           const auditee = scList.filter(data => data.auditeeFlag === 'A');
           const auditor = scList.filter(data => data.auditeeFlag === 'L');
           if(auditee.length >0 && auditor.length >0){
-            setDataTable(auditee,'A',role)
-            setDataTable(auditor,'L',role)
+            setDataTable(auditee,'A',role,teamMembers)
+            setDataTable(auditor,'L',role,teamMembers)
             setIsBoth(true)
           }else{
-            setDataTable(scList,'F',role)
+            setDataTable(scList,'F',role,teamMembers)
             setIsBoth(false)
           }
         }else{
@@ -106,8 +107,12 @@ const ScheduleApprovalComponent = ({router}) => {
     fetchData();
   }, [isReady]);
 
-  const setDataTable = (list,flag,role)=>{
+  const setDataTable = (list,flag,role,teamMembersList)=>{
+    let checkListFlag = 'A';
+    const empId = Number(localStorage.getItem('empId'))
+    setLoginEmpId(empId)
     const mappedData = list.map((item,index)=>{
+      let isAditor = 'N';
       let statusColor = `${item.scheduleStatus === 'INI'?'initiated' : (item.scheduleStatus === 'FWD' ? 'forwarde' : item.scheduleStatus === 'ARF'?'reschedule':['ASR','ARL','RBA','RAR'].includes(item.scheduleStatus)?'returned':['ASA','AAL'].includes(item.scheduleStatus)?'lead-auditee':['AES'].includes(item.scheduleStatus)?'aditee-sub-clr':['ARS'].includes(item.scheduleStatus)?'aditor-sub-clr':'acknowledge')}`; 
       let isMember = false;
       const team = teamMembersList.filter(data => data.teamId == item.teamId);
@@ -115,7 +120,10 @@ const ScheduleApprovalComponent = ({router}) => {
         for (let i = 0; i < team.length; i++) {
           if (item.loginEmpId === team[i].empId) {
             isMember = true;
-            break;
+          }
+          if(empId == team[i].empId){
+            isAditor = 'Y';
+            checkListFlag = 'L'
           }
         }
       }
@@ -131,13 +139,17 @@ const ScheduleApprovalComponent = ({router}) => {
         revision     : 'R'+item.revision || '-',
         action       : <>{((['FWD','AAL','ARF'].includes(item.scheduleStatus) && (item.auditeeEmpId === item.loginEmpId || isAdmin))  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember || isAdmin))) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => scheduleApprove(item)}  title="Acknowledge"> <i className="material-icons"  >task_alt</i></button>}
                           {((['FWD','AAL','ARF'].includes(item.scheduleStatus) && (item.auditeeEmpId === item.loginEmpId || isAdmin))  || (['FWD','ASA','ARF'].includes(item.scheduleStatus) && (item.leadEmpId === item.loginEmpId || isMember || isAdmin)))  && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return"><i className="material-icons">assignment_return</i></button>}
-                          {['AAA','AES','ARS','ABA','RBA','RAR'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,flag)}  ><i className="material-icons">playlist_add_check</i></button>}
-                          {item.fwdFlag === 1 && !['ARS','ABA','RAR'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7','4'].includes(String(role)) || flag === 'L' || flag === 'F')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
-                          {['AES'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return By Auditor"><i className="material-icons">assignment_return</i></button>}
-                          {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
-                          {['ARS'].includes(item.scheduleStatus) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Auditee Reject"><i className="material-icons">assignment_return</i></button>}
+                          {['AAA','AES','ARS','ABA','RBA','RAR'].includes(item.scheduleStatus) && <button title='Add CheckList' className={" btn btn-outline-primary btn-sm me-1"} onClick={() => addCheckList(item,checkListFlag)}  ><i className="material-icons">playlist_add_check</i></button>}
+
+                          {item.fwdFlag === 1 && !['ARS','ABA','RAR','AAA'].includes(item.scheduleStatus) && flag !== 'A' && (['1','2','3','7','4'].includes(String(role)) || flag === 'L' || flag === 'F')  && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditor Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['AES'].includes(item.scheduleStatus) && (( isAditor === 'Y') || isAdmin) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Return By Auditor"><i className="material-icons">assignment_return</i></button>}
+
+                          {['ARS'].includes(item.scheduleStatus) && (item.auditeeEmpId == empId || isAdmin) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => acceptByAuditee(item)}  title="Auditee Accept"> <i className="material-icons"  >task_alt</i></button>}
+                          {['ARS'].includes(item.scheduleStatus) && (item.auditeeEmpId == empId || isAdmin) && <button className=" btn btn-outline-danger btn-sm me-1" onClick={() => scheduleReturn(item)}  title="Auditee Reject"><i className="material-icons">assignment_return</i></button>}
+
                           {['ARS','ABA','RBA'].includes(item.scheduleStatus) && <button className=" btn-primary"  onClick={() =>auditCheckListWithDataPdf(item)} title="Print" aria-label="Print checklist" > <i className="material-icons">print</i> </button>}
-                          {['RAR'].includes(item.scheduleStatus) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditee Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['RAR'].includes(item.scheduleStatus) && (item.auditeeEmpId == empId || isAdmin) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditor(item)}  title="Auditee Forward"> <i className="material-icons"  >double_arrow</i></button>}
+                          {['AAA'].includes(item.scheduleStatus) && (item.auditeeEmpId == empId || isAdmin) && <button className=" btn btn-outline-success btn-sm me-1" onClick={() => forwardByAuditee(item)}  title="Auditee Submit"> <i className="material-icons"  >double_arrow</i></button>}
                           </>  
       }      
     });
@@ -152,6 +164,7 @@ const ScheduleApprovalComponent = ({router}) => {
    }
 
    const addCheckList = (item,flag)=>{
+    console.log('flag-------',flag)
     if(item.auditeeEmpId === Number(localStorage.getItem('empId'))){
       navigate('/audit-check-list',{state:{element:item,flag : 'A'}})
     }else{
@@ -202,6 +215,49 @@ const ScheduleApprovalComponent = ({router}) => {
     }else{
       AuditorSubmit(item)
     }
+   }
+
+   const forwardByAuditee = async (item)=>{
+      const response = await getCheckListAddCount(item.scheduleId);
+      if(response && response.length > 1){
+        const master = response[0].addCount
+        const checkList = response[1].addCount
+        if(master == (checkList+1) || (master == checkList)){
+        await AlertConfirmation({
+            title: 'Are you sure Submit CheckList ?' ,
+            message: '',
+        }).then(async (result) => {
+            if (result) {
+              try {
+              const response = await auditeeSubmit(item.scheduleId);
+              if(response.status === 'S'){
+                afterSubmit(item);
+                Swal.fire({
+                  icon: "success",
+                  title: 'CheckList Submitted Successfully',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              } else {
+                Swal.fire({
+                  icon: "error",
+                  title: 'CheckList Submitted Unsuccessful',
+                  showConfirmButton: false,
+                  timer: 1500
+                });
+              }
+              }catch (error) {
+                  Swal.fire('Error!', 'There was an issue auditeeForward.', 'error');
+                }
+            }
+          })
+        }else{
+           await AlertConfirmation({
+              title: `Master CheckList Count (${master}) does not match the Schedule CheckList Count (${checkList})` ,
+              message: '',
+           })
+        }
+      }
    }
 
    const AuditorSubmit = async (item)=>{
@@ -284,11 +340,11 @@ const ScheduleApprovalComponent = ({router}) => {
       const auditee = scList.filter(data => data.auditeeFlag === 'A');
       const auditor = scList.filter(data => data.auditeeFlag === 'L');
       if(auditee.length >0 && auditor.length >0){
-        setDataTable(auditee,'A',roleId)
-        setDataTable(auditor,'L',roleId)
+        setDataTable(auditee,'A',roleId,teamMembersList)
+        setDataTable(auditor,'L',roleId,teamMembersList)
         setIsBoth(true)
       }else{
-        setDataTable(scList,'F',roleId)
+        setDataTable(scList,'F',roleId,teamMembersList)
         setIsBoth(false)
       }
     }else{
@@ -310,11 +366,11 @@ const ScheduleApprovalComponent = ({router}) => {
       const auditee = scList.filter(data => data.auditeeFlag === 'A');
       const auditor = scList.filter(data => data.auditeeFlag === 'L');
       if(auditee.length >0 && auditor.length >0){
-        setDataTable(auditee,'A',roleId)
-        setDataTable(auditor,'L',roleId)
+        setDataTable(auditee,'A',roleId,teamMembersList)
+        setDataTable(auditor,'L',roleId,teamMembersList)
         setIsBoth(true)
       }else{
-        setDataTable(scList,'F',roleId)
+        setDataTable(scList,'F',roleId,teamMembersList)
         setIsBoth(false)
       }
     }else{

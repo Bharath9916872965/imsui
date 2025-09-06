@@ -93,7 +93,7 @@ export const customAuditStampingLogin = async (username) => {
 
   export const getLicense = async ()=>{
     try {
-        return (await axios.get(`${API_URL}get-license`,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
+        return (await axios.get(`${API_URL}get-license`,{headers : {'Content-Type': 'application/json'}})).data;
     } catch (error) {
         throw error;
     }
