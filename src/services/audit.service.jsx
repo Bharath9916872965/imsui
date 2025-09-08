@@ -1056,7 +1056,7 @@ export const getAssignedData = async (committeeType)=>{
             throw error;
         }
       }
-      export const getAttachPdfList = async (iqaId,iqaNo)=>{
+    export const getAttachPdfList = async (iqaId,iqaNo)=>{
       try {
            const data = new AuditClosuredto(iqaId,iqaNo);
             return (await axios.post(`${API_URL}get-attach-pdf-list`,data,{headers : {'Content-Type': 'application/json', ...authHeader()}})).data;
@@ -1065,3 +1065,19 @@ export const getAssignedData = async (committeeType)=>{
             throw error;
         }
     }
+
+    export const getCheckListAddCount = async (scheduleId) => {
+        try {
+            return (await axios.get(`${API_URL}get-checklist-add-count/${scheduleId}`, { headers: { 'Content-Type': 'application/json', ...authHeader() } })).data;
+        } catch (error) {
+            throw error;
+        }
+    }
+
+    export const auditeeSubmit = async (scheduleId)=>{
+    try {
+        return (await axios.post(`${API_URL}auditee-submit`,scheduleId,{headers : {'Content-Type': 'text/plain', ...authHeader()}})).data;
+    } catch (error) {
+        throw error;
+    }
+}

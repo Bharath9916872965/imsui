@@ -122,6 +122,20 @@ export const getRolesList = async () => {
       throw error;
     }
   };
+
+  export const submitUserManagerAdd = async (userManagerDto) => {
+  try {
+    const response = await axios.post(
+      `${API_URL}user-manager-add-submit`,
+      userManagerDto,
+      { headers: authHeader() }
+    );
+    return response.data;
+  } catch (error) {
+    console.error('Error occurred in submitUserManagerAdd:', error);
+    throw error;
+  }
+  };
   
   export const userManagerEditData = async (loginId) => {
     try {

@@ -65,7 +65,10 @@ const UserManager = (props) => {
       setFilteredUserManagerList(filteredList);
     };
   
-  
+    const handleUserManagerAdd = (e) => {
+      e.preventDefault();
+      setStatus('add');
+    };
   
     const columns = [
       { name: 'SN', selector: (row) => row.sn, sortable: true, grow: 1, align: 'text-center' },
@@ -108,6 +111,8 @@ const UserManager = (props) => {
     ];
   
   switch (status) {
+    case 'add':
+        return <UserManagerActionsComponent mode="add" />;
     case 'edit':
         return (
             <UserManagerActionsComponent
@@ -171,11 +176,11 @@ const UserManager = (props) => {
                 <Datatable columns={columns} data={mappedData} />
               )}
   
-             {/* <Box className="add-button-wrapper" align="center" >
+              <Box className="add-button-wrapper" align="center" >
                 <Button variant="contained" sx={{ marginLeft: '8px!important' }}  color="primary" onClick={handleUserManagerAdd}>
                   Add
                 </Button>
-              </Box>  */}
+              </Box>  
   
             </Box>
           </Box>
